@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Mail\VerifiedMail;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+
 // use Validator;
 
 
@@ -47,8 +50,11 @@ class AuthController extends Controller
         $user->phone = request()->phone;
         $user->type_user = 2;
         $user->email = request()->email;
+        $user->uniqd = uniqid();
         $user->password = bcrypt(request()->password);
         $user->save();
+
+        Mail::to(request()->email)->send(new VerifiedMail($user));
 
         return response()->json($user, 201);
     }
