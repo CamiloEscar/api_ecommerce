@@ -18,7 +18,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce']]);
     }
 
 
@@ -27,19 +27,25 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register() {
+    public function register()
+    {
         $validator = Validator::make(request()->all(), [
             'name' => 'required',
+            'surname' => 'required',
+            'phone' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:8',
+            'password' => 'required|min:8',
         ]);
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
 
         $user = new User;
         $user->name = request()->name;
+        $user->surname = request()->surname;
+        $user->phone = request()->phone;
+        $user->type_user = 2;
         $user->email = request()->email;
         $user->password = bcrypt(request()->password);
         $user->save();
@@ -57,7 +63,25 @@ class AuthController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth('api')->attempt($credentials)) {
+        if (! $token = auth('api')->attempt([
+            'email' => request()->email,
+            'password' => request()->password,
+            'type_user' => 1
+        ])) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+    public function login_ecommerce()
+    {
+        $credentials = request(['email', 'password']);
+
+        if (! $token = auth('api')->attempt([
+            'email' => request()->email,
+            'password' => request()->password,
+            'type_user' => 2
+        ])) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -111,7 +135,7 @@ class AuthController extends Controller
             'expires_in' => auth('api')->factory()->getTTL() * 60,
             "user" => [
                 "full_name" => auth('api')->user()->name . ' ' . auth('api')->user()->surname,
-                "email"=> auth('api')->user()->email,
+                "email" => auth('api')->user()->email,
             ]
         ]);
     }
