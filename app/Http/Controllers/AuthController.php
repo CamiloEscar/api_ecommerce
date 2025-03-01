@@ -61,6 +61,34 @@ class AuthController extends Controller
         return response()->json($user, 201);
     }
 
+    public function verified_email(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            $user->update(["code_verified" => uniqid()]);
+            Mail::to($request->email)->send(new VerifiedMail($user));
+            return response()->json($user, 200);
+        } else {
+            return response()->json(['message' => 403], 0);
+        }
+    }
+    public function verified_code(Request $request)
+    {
+        $user = User::where('code_verified', $request->code)->first();
+        if ($user) {
+            return response()->json(["message" => 200]);
+        } else {
+            return response()->json(['message' => 403], 403);
+        }
+    }
+    public function new_password(Request $request) {
+        $user = User::where('code_verified', $request->code)->first();
+        $user->update(['password'=> bcrypt($request->new_password), 'code_verified' => null]);
+        return response()->json(["message" => 200]);
+
+    }
+
 
     /**
      * Get a JWT via given credentials.
@@ -100,12 +128,13 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    public function verified_auth(Request $request) {
+    public function verified_auth(Request $request)
+    {
         $user = User::where('uniqd', $request->code_user)->first();
 
-        if($user){
-            $user->update(["email_verified_at"=> now()]);
-            return response()->json(["success"=> 200]);
+        if ($user) {
+            $user->update(["email_verified_at" => now()]);
+            return response()->json(["success" => 200]);
         }
         return response()->json(["mensaje" => 403]);
     }
