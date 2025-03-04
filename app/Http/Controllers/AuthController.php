@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Mail\ForgotPasswordMail;
 use App\Mail\VerifiedMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -23,7 +24,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password']]);
     }
 
 
@@ -67,12 +68,20 @@ class AuthController extends Controller
 
         if ($user) {
             $user->update(["code_verified" => uniqid()]);
-            Mail::to($request->email)->send(new VerifiedMail($user));
-            return response()->json($user, 200);
+            Mail::to($user->email)->send(new ForgotPasswordMail($user));
+
+            return response()->json([
+                "message" => "Código de verificación enviado correctamente.",
+                "status" => 200
+            ]);
         } else {
-            return response()->json(['message' => 403], 0);
+            return response()->json([
+                "message" => "El correo no está registrado.",
+                "status" => 403
+            ], 403);
         }
     }
+
     public function verified_code(Request $request)
     {
         $user = User::where('code_verified', $request->code)->first();
@@ -82,11 +91,11 @@ class AuthController extends Controller
             return response()->json(['message' => 403], 403);
         }
     }
-    public function new_password(Request $request) {
+    public function new_password(Request $request)
+    {
         $user = User::where('code_verified', $request->code)->first();
-        $user->update(['password'=> bcrypt($request->new_password), 'code_verified' => null]);
+        $user->update(['password' => bcrypt($request->new_password), 'code_verified' => null]);
         return response()->json(["message" => 200]);
-
     }
 
 

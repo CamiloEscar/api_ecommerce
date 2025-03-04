@@ -165,7 +165,7 @@
 																											<tr>
 																												<td class="title-22 a-center py-20 px-50 mpx-15" style="border-radius: 10px; border: 1px dashed #b4b4d4; font-size:22px; line-height:26px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; text-align:center; padding-top: 20px; padding-bottom: 20px; padding-left: 50px; padding-right: 50px;" bgcolor="#f4ecfa">
 																													<multiline>
-																														<strong>USE CODE : <span class="c-purple" style="color:#9128df;">{{$user->code_verified}}</span></strong>
+                                                                                                                    <strong>USE CODE : <span class="c-purple" style="color:#9128df;">{{$user->code_verified}}</span></strong>
 																													</multiline>
 																												</td>
 																											</tr>
@@ -177,7 +177,7 @@
 																										<!-- Button -->
 																										<table border="0" cellspacing="0" cellpadding="0" style="min-width: 200px;">
 																											<tr>
-																												<td class="btn-16 c-white l-white" bgcolor="#f3189e" style="font-size:16px; line-height:20px; mso-padding-alt:15px 35px; font-family:'PT Sans', Arial, sans-serif; text-align:center; font-weight:bold; text-transform:uppercase; border-radius:25px; min-width:auto !important; color:#ffffff;">
+																												<td class="btn-16 c-white l-white" bgcolor="#f3189e" style="font-size:16px; line-height:20px; font-family:'PT Sans', Arial, sans-serif; text-align:center; font-weight:bold; text-transform:uppercase; border-radius:25px; min-width:auto !important; color:#ffffff;">
 																													<multiline>
 																														<a href="#" target="_blank" class="link c-white" style="display: block; padding: 15px 35px; text-decoration:none; color:#ffffff;">
 																															<span class="link c-white" style="text-decoration:none; color:#ffffff;">ACTIVATE CODE</span>
@@ -289,3 +289,5 @@
 	</center>
 </body>
 </html>
+{"threads":[{"position":8242,"start":0,"end":8675,"connection":"open"},{"position":17350,"start":8676,"end":17350,"connection":"closed"}],"url":"https://att-c.udemycdn.com/2024-03-08_04-34-12-f0e763797cce0fec6ef45bbed3122718/original.html?response-content-disposition=attachment%3B+filename%3Demail-v05-campaig.html&Expires=1717719926&Signature=flL~sJK~sFP321xKlym4nKpmHjykigO27rlv35yR33HD6meLs4M2Bo81L~nHZ2y1MTafXAQPm2MHU3Jc2fXiTprhLMvSxJXBnh-mrwcOB~sPeKKwR0LvQgMtOyXOE1kCfvm0S1BGo7Dz22K8Gss2tT1H204kzi4qs8UiccIDGCmU3gSM9CP7ATcP~FwLQj2RoJWAktmzfa5Z7ncTkGF2RDV77gJeQ8jzyNEeWIcU9pR1MS3KyEl4-UNHUhjNtoNyRTQP0TdCuFqFs6bNWZgA8eJXGdwsbTd8TlpPzrpUctjzOlN7EHaPhiEnVjdelqU1qKo1yvopCZjWwwUFm5zGJw__&Key-Pair-Id=K3MG148K9RIRF4","method":"GET","port":443,"downloadSize":17350,"headers":{"content-type":"text/html","content-length":"17350","connection":"close","date":"Thu, 06 Jun 2024 19:57:06 GMT","x-amz-replication-status":"COMPLETED","last-modified":"Fri, 08 Mar 2024 04:34:13 GMT","etag":"\"9b0c57ad50d64b7fdd185703ef2faf25\"","x-amz-server-side-encryption":"AES256","x-amz-meta-qqfilename":"email-v05-campaig.html","x-amz-version-id":"piDGz57.vku6kweA9sn4i9CNTGz32Ksm","content-disposition":"attachment; filename=email-v05-campaig.html","accept-ranges":"bytes","server":"AmazonS3","x-cache":"Miss from cloudfront","via":"1.1 4d67223b5c8ce8c89803f739ce754b14.cloudfront.net (CloudFront)","x-amz-cf-pop":"SCL51-P4","x-amz-cf-id":"f3fWXd1epR3_v_YcsYnsFtGHlvqVPrjbOPfQV9XRytoAWYFp5ZGtHQ==","x-cdn":"cf-cloudfront","vary":"Origin"}}
+
