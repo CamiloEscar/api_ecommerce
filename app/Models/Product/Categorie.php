@@ -18,7 +18,8 @@ class Categorie extends Model
         "imagen",
         "categorie_second_id",
         "categorie_third_id",
-        "position"
+        "position",
+        "type_categorie"
     ];
 
     public function setCreatedAtAttribute($value)

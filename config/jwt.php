@@ -101,7 +101,8 @@ return [
     |
     */
 
-    'ttl' => env('JWT_TTL', 60),
+    //agregamos mas tiempo del token, 60 * 3
+    'ttl' => env('JWT_TTL', default: 60 * 60 * 3),
 
     /*
     |--------------------------------------------------------------------------
