@@ -14,6 +14,8 @@ class CategorieCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "data" => CategorieResource::collection($this->collection)
+        ];
     }
 }

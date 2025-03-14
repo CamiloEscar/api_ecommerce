@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Product\CategorieCollection;
 use App\Models\Product\Categorie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,18 @@ class CategorieController extends Controller
 
         return response()->json([
             "total" => $categories->total(),
-            "categories" => $categories
+            "categories" => CategorieCollection::make($categories)
+        ]);
+    }
+
+    public function config(){
+
+        $categories_first = Categorie::where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->get();
+        $categories_seconds = Categorie::where("categorie_second_id", "<>", NULL)->where("categorie_third_id", NULL)->get();
+
+        return response()->json([
+            "categorie_first" => $categories_first,
+            "categorie_seconds" => $categories_seconds
         ]);
     }
 
@@ -48,7 +60,7 @@ class CategorieController extends Controller
     {
         $categorie = Categorie::findOrFail($id);
 
-        return response()->json(["categorie" => $categorie]);
+        return response()->json(["categorie" => CategorieCollection::make($categorie)]);
     }
 
     /**
