@@ -18,7 +18,7 @@ class CategorieResource extends JsonResource
             "id" => $this->resource->id,
             "name" => $this->resource->name,
             "icon" => $this->resource->icon,
-            "imagenet" => $this->resource->imagen ? env("APP_URL") . "storage/" . $this->resource->imagen : NULL,
+            "imagen" => $this->resource->imagen ? env("APP_URL") . "storage/" . $this->resource->imagen : null,
             "categorie_second_id" => $this->resource->categorie_second_id,
             "categorie_second" => $this->resource->categorie_second ? [
                 "name" => $this->resource->categorie_second->name
@@ -29,6 +29,7 @@ class CategorieResource extends JsonResource
             ] : NULL,
             "position" => $this->resource->position,
             "type_categorie" => $this->resource->type_categorie,
+            "state" => $this->resource->state,
             "created_at" => $this->resource->created_at->format('Y-m-d h:i:s'),
         ];
     }

@@ -19,7 +19,8 @@ class Categorie extends Model
         "categorie_second_id",
         "categorie_third_id",
         "position",
-        "type_categorie"
+        "type_categorie",
+        "state"
     ];
 
     public function setCreatedAtAttribute($value)
@@ -41,6 +42,12 @@ class Categorie extends Model
     {
         return $this->belongsTo(Categorie::class, "categorie_third_id");
     }
+
+    // // Asegúrate de que no haya ningún accesor que esté alterando la ruta de la imagen
+    // public function getImagenAttribute($value)
+    // {
+    //     return $value ? asset('storage/categories/' . $value) : null;
+    // }
 }
 
 //Este código define un modelo de categoría de producto en Laravel que gestiona las relaciones jerárquicas entre categorías, establece fechas personalizadas con la zona horaria de Buenos Aires y utiliza eliminación suave.
