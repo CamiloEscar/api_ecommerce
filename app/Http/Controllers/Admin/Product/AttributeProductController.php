@@ -16,18 +16,18 @@ class AttributeProductController extends Controller
     {
         $search = $request->search;
 
-        $attributes = Attribute::where("name", "like", "%" . $search . "%")->orderBy("id", "desc")->paginate(25);
+        $attributes = Attribute::where("name","like","%".$search."%")->orderBy("id","desc")->paginate(25);
 
         return response()->json([
             "total" => $attributes->total(),
-            "attributes" => $attributes->map(function ($attribute) {
+            "attributes" => $attributes->map(function($attribute) {
                 return [
                     "id" => $attribute->id,
                     "name" => $attribute->name,
                     "type_attribute" => $attribute->type_attribute,
                     "state" => $attribute->state,
-                    "created_at" => $attribute->created_at->format("Y-m-d H:i:s"),
-                    "properties" => $attribute->properties->map(function ($propertie) {
+                    "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
+                    "properties" => $attribute->properties->map(function($propertie) {
                         return [
                             "id" => $propertie->id,
                             "name" => $propertie->name,
@@ -44,11 +44,10 @@ class AttributeProductController extends Controller
      */
     public function store(Request $request)
     {
-        $isValida = Attribute::where("name", $request->name)->first();
-        if (!$isValida) {
+        $isValida = Attribute::where("name",$request->name)->first();
+        if($isValida){
             return response()->json(["message" => 403]);
         }
-
         $attribute = Attribute::create($request->all());
 
         return response()->json([
@@ -58,61 +57,47 @@ class AttributeProductController extends Controller
                 "name" => $attribute->name,
                 "type_attribute" => $attribute->type_attribute,
                 "state" => $attribute->state,
-                "created_at" => $attribute->created_at->format("Y-m-d H:i:s"),
-                "properties" => $attribute->properties->map(function ($propertie) {
+                "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
+                "properties" => $attribute->properties->map(function($propertie) {
                     return [
                         "id" => $propertie->id,
                         "name" => $propertie->name,
                         "code" => $propertie->code,
                     ];
                 })
-            ]
+            ],
         ]);
     }
 
-    public function store_properties(Request $request)
-    {
-        $isValida = Propertie::where("name", $request->name)->first();
-        if (!$isValida) {
+    public function store_propertie(Request $request) {
+        $isValida = Propertie::where("name",$request->name)
+                            ->where("attribute_id",$request->attribute_id)
+                            ->first();
+        // lista de colores fuertes rojo amarillo verde
+
+        // lista de colores rojo marron anaranjado
+        if($isValida){
             return response()->json(["message" => 403]);
         }
-
         $propertie = Propertie::create($request->all());
 
         return response()->json([
             "message" => 200,
-            "attribute" => [
+            "propertie" => [
                 "id" => $propertie->id,
                 "name" => $propertie->name,
                 "code" => $propertie->code,
-                "created_at" => $propertie->created_at->format("Y-m-d H:i:s"),
-
-            ]
+                "created_at" => $propertie->created_at->format("Y-m-d h:i:s"),
+            ],
         ]);
     }
-    public function destroy_properties($id)
-    {
+
+    public function destroy_propertie($id) {
         $propertie = Propertie::findOrFail($id);
         $propertie->delete();
 
         return response()->json([
             "message" => 200,
-        ]);
-    }
-
-    public function update_properties($id, Request $request)
-    {
-
-        $propertie = Propertie::findOrFail($id);
-        $propertie->update($request->all());
-        return response()->json([
-            "message" => 200,
-            "attribute" => [
-                "id" => $propertie->id,
-                "name" => $propertie->name,
-                "code" => $propertie->code,
-                "created_at" => $propertie->created_at->format("Y-m-d H:i:s"),
-            ]
         ]);
     }
 
@@ -125,19 +110,16 @@ class AttributeProductController extends Controller
     }
 
     /**
-
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        $isValida = Attribute::where("id", "<>", $id)->where("name", $request->name)->first();
-        if (!$isValida) {
+        $isValida = Attribute::where("id","<>",$id)->where("name",$request->name)->first();
+        if($isValida){
             return response()->json(["message" => 403]);
         }
-
         $attribute = Attribute::findOrFail($id);
         $attribute->update($request->all());
-
         return response()->json([
             "message" => 200,
             "attribute" => [
@@ -145,8 +127,8 @@ class AttributeProductController extends Controller
                 "name" => $attribute->name,
                 "type_attribute" => $attribute->type_attribute,
                 "state" => $attribute->state,
-                "created_at" => $attribute->created_at->format("Y-m-d H:i:s"),
-                "properties" => $attribute->properties->map(function ($propertie) {
+                "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
+                "properties" => $attribute->properties->map(function($propertie) {
                     return [
                         "id" => $propertie->id,
                         "name" => $propertie->name,
@@ -163,8 +145,7 @@ class AttributeProductController extends Controller
     public function destroy(string $id)
     {
         $attribute = Attribute::findOrFail($id);
-        $attribute->delete(); //IMPORT: VALIDACION
-
+        $attribute->delete();//IMPORTANTE VALIDACION
         return response()->json([
             "message" => 200,
         ]);

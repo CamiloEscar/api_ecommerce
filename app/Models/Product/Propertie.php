@@ -13,9 +13,9 @@ class Propertie extends Model
     use SoftDeletes; //para que se eliminen visualmente
     //fillable es para setear que campos se podian cambiar
     protected $fillable = [
+        "attribute_id",
         "name",
-        "type_attribute",
-        "state"
+        "code"
     ];
 
     public function setCreatedAtAttribute($value)
