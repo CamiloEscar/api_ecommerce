@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Product;
 
+use App\Models\Product\Propertie;
 use Illuminate\Http\Request;
 use App\Models\Product\Attribute;
 use App\Http\Controllers\Controller;
@@ -19,7 +20,22 @@ class AttributeProductController extends Controller
 
         return response()->json([
             "total" => $attributes->total(),
-            "attributes" => $attributes,
+            "attributes" => $attributes->map(function ($attribute) {
+                return [
+                    "id" => $attribute->id,
+                    "name" => $attribute->name,
+                    "type_attribute" => $attribute->type_attribute,
+                    "state" => $attribute->state,
+                    "created_at" => $attribute->created_at->format("Y-m-d H:i:s"),
+                    "properties" => $attribute->properties->map(function ($propertie) {
+                        return [
+                            "id" => $propertie->id,
+                            "name" => $propertie->name,
+                            "code" => $propertie->code,
+                        ];
+                    })
+                ];
+            }),
         ]);
     }
 
@@ -37,7 +53,66 @@ class AttributeProductController extends Controller
 
         return response()->json([
             "message" => 200,
-            "attribute" => $attribute,
+            "attribute" => [
+                "id" => $attribute->id,
+                "name" => $attribute->name,
+                "type_attribute" => $attribute->type_attribute,
+                "state" => $attribute->state,
+                "created_at" => $attribute->created_at->format("Y-m-d H:i:s"),
+                "properties" => $attribute->properties->map(function ($propertie) {
+                    return [
+                        "id" => $propertie->id,
+                        "name" => $propertie->name,
+                        "code" => $propertie->code,
+                    ];
+                })
+            ]
+        ]);
+    }
+
+    public function store_properties(Request $request)
+    {
+        $isValida = Propertie::where("name", $request->name)->first();
+        if (!$isValida) {
+            return response()->json(["message" => 403]);
+        }
+
+        $propertie = Propertie::create($request->all());
+
+        return response()->json([
+            "message" => 200,
+            "attribute" => [
+                "id" => $propertie->id,
+                "name" => $propertie->name,
+                "code" => $propertie->code,
+                "created_at" => $propertie->created_at->format("Y-m-d H:i:s"),
+
+            ]
+        ]);
+    }
+    public function destroy_properties($id)
+    {
+        $propertie = Propertie::findOrFail($id);
+        $propertie->delete();
+
+        return response()->json([
+            "message" => 200,
+        ]);
+    }
+
+    public function update_properties($id, Request $request)
+    {
+
+        $propertie = Propertie::findOrFail($id);
+        $propertie->update($request->all());
+        return response()->json([
+            "message" => 200,
+            "attribute" => [
+                "id" => $propertie->id,
+                "name" => $propertie->name,
+                "code" => $propertie->code,
+                "created_at" => $propertie->created_at->format("Y-m-d H:i:s"),
+            ]
         ]);
     }
 
@@ -55,7 +130,7 @@ class AttributeProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $isValida = Attribute::where("id","<>",$id)->where("name", $request->name)->first();
+        $isValida = Attribute::where("id", "<>", $id)->where("name", $request->name)->first();
         if (!$isValida) {
             return response()->json(["message" => 403]);
         }
@@ -65,7 +140,20 @@ class AttributeProductController extends Controller
 
         return response()->json([
             "message" => 200,
-            "attribute" => $attribute,
+            "attribute" => [
+                "id" => $attribute->id,
+                "name" => $attribute->name,
+                "type_attribute" => $attribute->type_attribute,
+                "state" => $attribute->state,
+                "created_at" => $attribute->created_at->format("Y-m-d H:i:s"),
+                "properties" => $attribute->properties->map(function ($propertie) {
+                    return [
+                        "id" => $propertie->id,
+                        "name" => $propertie->name,
+                        "code" => $propertie->code,
+                    ];
+                })
+            ],
         ]);
     }
 

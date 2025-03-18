@@ -45,5 +45,9 @@ Route::group([
     Route::resource("categories", CategorieController::class);
     Route::post("categories/{id}", [CategorieController::class, "update"]);
 
+    Route::post("properties", [AttributeProductController::class, "store_properties"]);
+    Route::delete("properties/{id}", [AttributeProductController::class, "destroy_properties"]);
+    //url para editar las properties TODO: hacer
+    Route::put("properties/{id}", [AttributeProductController::class, "update_propertie"]);
     Route::resource("attributes", AttributeProductController::class);
 });
