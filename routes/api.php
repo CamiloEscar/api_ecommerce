@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\Product\CategorieController;
 use App\Http\Controllers\Admin\Product\AttributeProductController;
+use App\Http\Controllers\Admin\SliderController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -50,4 +52,9 @@ Route::group([
     Route::resource("attributes", AttributeProductController::class);
     // //url para editar las properties TODO: hacer
     // Route::put("properties/{id}", [AttributeProductController::class, "update_propertie"]);
+
+    Route::resource("sliders", SliderController::class);
+    Route::post("sliders/{id}", [SliderController::class, "update"]);
+
+
 });
