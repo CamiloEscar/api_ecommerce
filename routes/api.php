@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Product\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -57,4 +58,7 @@ Route::group([
     Route::post("sliders/{id}", [SliderController::class, "update"]);
 
 
+    Route::get("products/config", [ProductController::class, "config"]);
+    Route::resource("products", ProductController::class);
+    Route::post("products/{id}", [ProductController::class, "update"]);
 });
