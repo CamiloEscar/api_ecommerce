@@ -55,7 +55,7 @@ class Product extends Model
     }
     public function brand()
     {
-        return $this->belongsTo(Brand::class, "brand");
+        return $this->belongsTo(Brand::class, "brand_id");
     }
 
     public function images()
@@ -63,7 +63,7 @@ class Product extends Model
         return $this->hasMany(ProductImage::class, "product_id");
     }
 
-    public function scopeFilterAdvanceProduct($query, $search, $categorie_first_id, $categorie_second_id, $categorie_third_id)
+    public function scopeFilterAdvanceProduct($query, $search, $categorie_first_id, $categorie_second_id, $categorie_third_id, $brand_id)
     {
 
         if ($search) {
@@ -77,6 +77,9 @@ class Product extends Model
         }
         if ($categorie_third_id) {
             $query->where("categorie_id", $categorie_third_id);
+        }
+        if ($brand_id) {
+            $query->where("categorie_id", $brand_id);
         }
 
 

@@ -30,7 +30,7 @@ class ProductController extends Controller
             ->orderBy("id")->paginate(25);
 
         return response()->json([
-            "total" => $products->total,
+            "total" => $products->total(),
             "products" => ProductCollection::make($products)
         ]);
     }
@@ -120,7 +120,6 @@ class ProductController extends Controller
         return response()->json([
             "message" => 200,
             "Producto creado con éxito",
-            "product" => $product
         ]);
     }
 
