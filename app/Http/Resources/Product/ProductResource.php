@@ -21,11 +21,11 @@ class ProductResource extends JsonResource
             'sku' => $this->resource->sku,
             'price_ars' => $this->resource->price_ars,
             'price_usd' => $this->resource->price_usd,
-            'resumen' => env('APP_URL') . "storage/" . $this->resource->resumen,
+            'resumen' => $this->resource->resumen,
             'imagen' => $this->resource->imagen ? env('APP_URL') . "storage/" . $this->resource->imagen : null,
             'state' => $this->resource->state,
             'description' => $this->resource->description,
-            'tags' => $this->resource->tags,
+            'tags' => $this->resource->tags ? json_decode($this->resource->tags, true) : [],
             'brand_id' => $this->resource->brand_id,
 
             'brand' => $this->resource->brand ? [
