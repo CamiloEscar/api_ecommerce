@@ -26,12 +26,12 @@ class ProductController extends Controller
         $brand_id = $request->brand_id;
 
 
-        $products = Product::filterAdvanceProduct($search, $categorie_first_id, $categorie_second_id, $categorie_third_id)
+        $products = Product::filterAdvanceProduct($search, $categorie_first_id, $categorie_second_id, $categorie_third_id, $brand_id)
             ->orderBy("id")->paginate(25);
 
         return response()->json([
             "total" => $products->total,
-            "products" => $products
+            "products" => ProductCollection::make($products)
         ]);
     }
 
@@ -71,13 +71,11 @@ class ProductController extends Controller
 
 
         $request->request->add(["slug" => Str::slug($request->title)]);
-        $request->request->add(["tags" => $request->multiselect]);
+        $request->request->add(["tags" =>$request->multiselect]);
 
         $product = Product::create($request->all());
         return response()->json([
             "message" => 200,
-            "Producto creado con éxito",
-            "product" => ProductCollection::make($product)
         ]);
     }
 

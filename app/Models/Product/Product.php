@@ -16,7 +16,7 @@ class Product extends Model
         'title',
         'slug',
         'sku',
-        'price_pen',
+        'price_ars',
         'price_usd',
         'resumen',
         'imagen',
