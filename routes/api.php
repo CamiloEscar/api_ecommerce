@@ -61,6 +61,7 @@ Route::group([
     Route::get("products/config", [ProductController::class, "config"]);
     Route::post("products/imagens", [ProductController::class, "imagens"]);
     Route::delete("products/imagens/{id}", [ProductController::class, "delete_imagens"]);
+    Route::post("products/index", [ProductController::class, "index"]);
     Route::resource("products", ProductController::class);
     Route::post("products/{id}", [ProductController::class, "update"]);
 

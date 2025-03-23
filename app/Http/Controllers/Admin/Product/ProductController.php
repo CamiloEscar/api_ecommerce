@@ -155,6 +155,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
+        // TODO: no podemos eliminar un producto que ya tenga una venta
+
         return response()->json([
             "message" => 200,
             "Producto eliminado con éxito"

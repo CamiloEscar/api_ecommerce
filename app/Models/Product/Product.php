@@ -70,16 +70,16 @@ class Product extends Model
             $query->where("title", "like", "%" . $search . "%");
         }
         if ($categorie_first_id) {
-            $query->where("categorie_id", $categorie_first_id);
+            $query->where("categorie_first_id", $categorie_first_id);
         }
         if ($categorie_second_id) {
-            $query->where("categorie_id", $categorie_second_id);
+            $query->where("categorie_second_id", $categorie_second_id);
         }
         if ($categorie_third_id) {
-            $query->where("categorie_id", $categorie_third_id);
+            $query->where("categorie_third_id", $categorie_third_id);
         }
         if ($brand_id) {
-            $query->where("categorie_id", $brand_id);
+            $query->where("brand_id", $brand_id);
         }
 
 
