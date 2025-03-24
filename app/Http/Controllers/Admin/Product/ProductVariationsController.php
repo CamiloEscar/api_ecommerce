@@ -11,9 +11,35 @@ class ProductVariationsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $product_id = $request->product_id;
+
+        $variations = ProductVariation::where('product_id', $product_id)->orderBy("id", "desc")->get();
+        return response()->json([
+            "variations" => $variations->map(function ($variation) {
+                return [
+                    'product_id' => $variation->product_id,
+                    'attribute_id' => $variation->attribute_id,
+                    //relaciones
+                    "attribute" => $variation->attribute ? [
+                        "name" => $variation->attribute->name,
+                        "type_attribute" => $variation->attribute->type_attribute,
+                    ] : NULL,
+                    'propertie_id' => $variation->propertie_id,
+                    //relaciones
+                    "propertie" => $variation->propertie ? [
+                        "name" => $variation->propertie->name,
+                        "code" => $variation->propertie->code,
+                    ] : NULL,
+
+                    'value_add' => $variation->value_add,
+                    'add_price' => $variation->add_price,
+                    'stock' => $variation->stock,
+                ];
+            })
+
+        ]);
     }
 
     /**
@@ -41,7 +67,34 @@ class ProductVariationsController extends Controller
         }
 
         $product_variation = ProductVariation::create($request->all());
-        return response()->json($product_variation, 200);
+        return response()->json(
+            [
+                "message" => 200,
+                "variation" => [
+                    response(
+                        [
+                            'product_id' => $product_variation->product_id,
+                            'attribute_id' => $product_variation->attribute_id,
+                            //relaciones
+                            "attribute" => $product_variation->attribute ? [
+                                "name" => $product_variation->attribute->name,
+                                "type_attribute" => $product_variation->attribute->type_attribute,
+                            ] : NULL,
+                            'propertie_id' => $product_variation->propertie_id,
+                            //relaciones
+                            "propertie" => $product_variation->propertie ? [
+                                "name" => $product_variation->propertie->name,
+                                "code" => $product_variation->propertie->code,
+                            ] : NULL,
+
+                            'value_add' => $product_variation->value_add,
+                            'add_price' => $product_variation->add_price,
+                            'stock' => $product_variation->stock,
+                        ]
+                    )
+                ]
+            ]
+        );
     }
 
     /**
@@ -80,7 +133,34 @@ class ProductVariationsController extends Controller
 
         $product_variation = ProductVariation::findOrFail($id);
         $product_variation->update($request->all());
-        return response()->json($product_variation, 200);
+        return response()->json(
+            [
+                "message" => 200,
+                "variation" => [
+                    response(
+                        [
+                            'product_id' => $product_variation->product_id,
+                            'attribute_id' => $product_variation->attribute_id,
+                            //relaciones
+                            "attribute" => $product_variation->attribute ? [
+                                "name" => $product_variation->attribute->name,
+                                "type_attribute" => $product_variation->attribute->type_attribute,
+                            ] : NULL,
+                            'propertie_id' => $product_variation->propertie_id,
+                            //relaciones
+                            "propertie" => $product_variation->propertie ? [
+                                "name" => $product_variation->propertie->name,
+                                "code" => $product_variation->propertie->code,
+                            ] : NULL,
+
+                            'value_add' => $product_variation->value_add,
+                            'add_price' => $product_variation->add_price,
+                            'stock' => $product_variation->stock,
+                        ]
+                    )
+                ]
+            ]
+        );
     }
 
     /**
@@ -92,6 +172,5 @@ class ProductVariationsController extends Controller
         $product_variation->delete();
         //TODO: cololcar una validacion si el producto esta en carrito de compra o en el pedido
         return response()->json($product_variation, 200);
-
     }
 }
