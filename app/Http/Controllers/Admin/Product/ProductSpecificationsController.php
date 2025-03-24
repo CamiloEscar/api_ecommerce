@@ -17,7 +17,7 @@ class ProductSpecificationsController extends Controller
 
         $specifications = ProductSpecification::where('product_id', $product_id)->orderBy("id", "desc")->get();
         return response()->json([
-            "specifications$specifications" => $specifications->map(function ($specification) {
+            "$specifications" => $specifications->map(function ($specification) {
                 return [
                     'product_id' => $specification->product_id,
                     'attribute_id' => $specification->attribute_id,
@@ -61,14 +61,14 @@ class ProductSpecificationsController extends Controller
                 ->first();
         }
         if ($is_valid_specification) {
-            return response()->json(["message" => "Ya existe una variación con estas características"], 403);
+            return response()->json(["message" => "Ya existe una especificacion con estas características"], 403);
         }
 
         $product_specification = ProductSpecification::create($request->all());
         return response()->json(
             [
                 "message" => 200,
-                "variation" => [
+                "specification" => [
                     response(
                         [
                             'product_id' => $product_specification->product_id,
@@ -124,7 +124,7 @@ class ProductSpecificationsController extends Controller
                 ->first();
         }
         if ($is_valid_specification) {
-            return response()->json(["message" => "Ya existe una variación con estas características"], 403);
+            return response()->json(["message" => "Ya existe una especificacion con estas características"], 403);
         }
 
         $product_specification = ProductSpecification::findOrFail($id);
@@ -132,7 +132,7 @@ class ProductSpecificationsController extends Controller
         return response()->json(
             [
                 "message" => 200,
-                "variation" => [
+                "specification" => [
                     response(
                         [
                             'product_id' => $product_specification->product_id,
