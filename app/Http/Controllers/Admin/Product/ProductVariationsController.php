@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Product;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product\Attribute;
 use App\Models\Product\ProductVariation;
 use Illuminate\Http\Request;
 
@@ -39,6 +40,50 @@ class ProductVariationsController extends Controller
                 ];
             })
 
+        ]);
+    }
+
+    public function config()
+    {
+        $attributes_specifications = Attribute::where("state", 1)->orderBy("id", "desc")->get();
+
+        $attributes_variations = Attribute::where("state", 1)->whereIn("type_attribute", [1, 3])->orderBy("id", "desc")->get();
+
+        return response()->json([
+            "attributes_specifications" => $attributes_specifications->map(function ($specification) {
+                return [
+                    "id" => $specification->id,
+                    "name" => $specification->name,
+                    "type_attribute" => $specification->type_attribute,
+                    "state" => $specification->state,
+                    "created_at" => $specification->created_at->format("Y-m-d h:i:s"),
+                    "properties" => $specification->properties->map(function ($propertie) {
+                        return [
+                            "id" => $propertie->id,
+                            "name" => $propertie->name,
+                            "code" => $propertie->code,
+                        ];
+                    })
+
+                ];
+            }),
+            "attributes_variations" => $attributes_variations->map(function ($variation) {
+                return [
+                    "id" => $variation->id,
+                    "name" => $variation->name,
+                    "type_attribute" => $variation->type_attribute,
+                    "state" => $variation->state,
+                    "created_at" => $variation->created_at->format("Y-m-d h:i:s"),
+                    "properties" => $variation->properties->map(function ($propertie) {
+                        return [
+                            "id" => $propertie->id,
+                            "name" => $propertie->name,
+                            "code" => $propertie->code,
+                        ];
+                    })
+
+                ];
+            })
         ]);
     }
 
