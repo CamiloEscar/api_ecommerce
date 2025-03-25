@@ -16,6 +16,7 @@ class ProductSpecificationsController extends Controller
         $product_id = $request->product_id;
 
         $specifications = ProductSpecification::where('product_id', $product_id)->orderBy("id", "desc")->get();
+
         return response()->json([
             "$specifications" => $specifications->map(function ($specification) {
                 return [
