@@ -19,7 +19,7 @@ class ProductSpecificationsController extends Controller
 
         return response()->json([
             "$specifications" => $specifications->map(function ($specification) {
-                return [
+                return ['id' => $specification->id,
                     'product_id' => $specification->product_id,
                     'attribute_id' => $specification->attribute_id,
                     //relaciones
@@ -71,7 +71,7 @@ class ProductSpecificationsController extends Controller
                 "message" => 200,
                 "specification" => [
                     response(
-                        [
+                        ['id' => $product_specification->id,
                             'product_id' => $product_specification->product_id,
                             'attribute_id' => $product_specification->attribute_id,
                             //relaciones
@@ -135,7 +135,7 @@ class ProductSpecificationsController extends Controller
                 "message" => 200,
                 "specification" => [
                     response(
-                        [
+                        ['id' => $product_specification->id,
                             'product_id' => $product_specification->product_id,
                             'attribute_id' => $product_specification->attribute_id,
                             //relaciones
