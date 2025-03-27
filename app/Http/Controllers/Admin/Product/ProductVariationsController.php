@@ -20,6 +20,7 @@ class ProductVariationsController extends Controller
         return response()->json([
             "variations" => $variations->map(function ($variation) {
                 return [
+                    'id' => $variation->id,
                     'product_id' => $variation->product_id,
                     'attribute_id' => $variation->attribute_id,
                     //relaciones
@@ -93,11 +94,11 @@ class ProductVariationsController extends Controller
     public function store(Request $request)
     {
         $variations_exists = ProductVariation::where("product_id", $request->product_id)->count();
-        if($variations_exists > 0){
+        if ($variations_exists > 0) {
             $variations_attributes_exists = ProductVariation::where("product_id", $request->product_id)
-            ->where("attribute_id", $request->attribute_id)
-            ->count();
-            if($variations_attributes_exists == 0) {
+                ->where("attribute_id", $request->attribute_id)
+                ->count();
+            if ($variations_attributes_exists === 0) {
                 return response()->json(["message" => 403, "message_text" => "No se puede agregar un atributo diferente del que ya hay en la lista"]);
             }
         }
@@ -127,6 +128,7 @@ class ProductVariationsController extends Controller
                 "variation" => [
                     response(
                         [
+                            'id' => $product_variation->id,
                             'product_id' => $product_variation->product_id,
                             'attribute_id' => $product_variation->attribute_id,
                             //relaciones
@@ -164,6 +166,16 @@ class ProductVariationsController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $variations_exists = ProductVariation::where("product_id", $request->product_id)->count();
+        if ($variations_exists > 0) {
+            $variations_attributes_exists = ProductVariation::where("product_id", $request->product_id)
+                ->where("attribute_id", $request->attribute_id)
+                ->count();
+            if ($variations_attributes_exists === 0) {
+                return response()->json(["message" => 403, "message_text" => "No se puede agregar un atributo diferente del que ya hay en la lista"]);
+            }
+        }
+
         $is_valid_variation = null;
         if ($request->propertie_id) {
             $is_valid_variation = ProductVariation::where("product_id", $request->product_id)
@@ -193,6 +205,7 @@ class ProductVariationsController extends Controller
                 "variation" => [
                     response(
                         [
+                            'id' => $product_variation->id,
                             'product_id' => $product_variation->product_id,
                             'attribute_id' => $product_variation->attribute_id,
                             //relaciones
