@@ -92,6 +92,15 @@ class ProductVariationsController extends Controller
      */
     public function store(Request $request)
     {
+        $variations_exists = ProductVariation::where("product_id", $request->product_id)->count();
+        if($variations_exists > 0){
+            $variations_attributes_exists = ProductVariation::where("product_id", $request->product_id)
+            ->where("attribute_id", $request->attribute_id)
+            ->count();
+            if($variations_attributes_exists == 0) {
+                return response()->json(["message" => 403, "message_text" => "No se puede agregar un atributo diferente del que ya hay en la lista"]);
+            }
+        }
         $is_valid_variation = null;
         if ($request->propertie_id) {
             $is_valid_variation = ProductVariation::where("product_id", $request->product_id)
