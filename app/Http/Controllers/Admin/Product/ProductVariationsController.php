@@ -108,7 +108,7 @@ class ProductVariationsController extends Controller
                 ->first();
         }
         if ($is_valid_variation) {
-            return response()->json(["message" => 403, "message_text" => "Ya existe una variación con estas características"], 403);
+            return response()->json(["message" => 403, "message_text" => "Ya existe una variación con estas características"]);
         }
 
         $product_variation = ProductVariation::create($request->all());
