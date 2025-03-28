@@ -180,6 +180,22 @@ class ProductVariationsAnidadoController extends Controller
             return response()->json(["message" => "Ya existe una variación con estas características"], 403);
         }
 
+        // Limite de stock
+        $product_var = ProductVariation::find($product_variation_id);
+        $TOTAL_STOCK_VARIATION_CENTRAL =  $product_var ? $product_var->stock : 0;
+
+        $SUM_TOTAL_STOCK_ANIDADOS = ProductVariation::where("product_id", $request->product_id)
+                                                ->where("id", "<>", $id)
+                                                ->where("product_variation_id", $request->product_variation_id)
+                                                ->sum("stock");
+
+        $SUM_TOTAL_STOCK_ANIDADOS += $request->stock;
+
+        if($SUM_TOTAL_STOCK_ANIDADOS > $TOTAL_STOCK_VARIATION_CENTRAL) {
+            return response()->json(["message" => 403, "message_text" => "No puede agregar más stock que la disponible en la variación central"]);
+        }
+
+
         $product_variation = ProductVariation::findOrFail($id);
         $product_variation->update($request->all());
         return response()->json(
