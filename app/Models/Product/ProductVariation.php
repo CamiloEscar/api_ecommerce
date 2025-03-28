@@ -18,6 +18,7 @@ class ProductVariation extends Model
         'value_add',
         'add_price',
         'stock',
+        'product_variation_id',
     ];
 
     public function setCreatedAtAttribute($value)
@@ -43,5 +44,13 @@ class ProductVariation extends Model
     public function propertie_id()
     {
         return $this->belongsTo(Propertie::class, "product_id");
+    }
+    public function variation_father()
+    {
+        return $this->belongsTo(ProductVariation::class, "product_variation_id");
+    }
+    public function variation_children()
+    {
+        return $this->hasMany(ProductVariation::class, "product_variation_id");
     }
 }
