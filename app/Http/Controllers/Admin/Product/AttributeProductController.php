@@ -16,18 +16,18 @@ class AttributeProductController extends Controller
     {
         $search = $request->search;
 
-        $attributes = Attribute::where("name","like","%".$search."%")->orderBy("id","desc")->paginate(25);
+        $attributes = Attribute::where("name", "like", "%" . $search . "%")->orderBy("id", "desc")->paginate(25);
 
         return response()->json([
             "total" => $attributes->total(),
-            "attributes" => $attributes->map(function($attribute) {
+            "attributes" => $attributes->map(function ($attribute) {
                 return [
                     "id" => $attribute->id,
                     "name" => $attribute->name,
                     "type_attribute" => $attribute->type_attribute,
                     "state" => $attribute->state,
                     "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
-                    "properties" => $attribute->properties->map(function($propertie) {
+                    "properties" => $attribute->properties->map(function ($propertie) {
                         return [
                             "id" => $propertie->id,
                             "name" => $propertie->name,
@@ -44,8 +44,8 @@ class AttributeProductController extends Controller
      */
     public function store(Request $request)
     {
-        $isValida = Attribute::where("name",$request->name)->first();
-        if($isValida){
+        $isValida = Attribute::where("name", $request->name)->first();
+        if ($isValida) {
             return response()->json(["message" => 403]);
         }
         $attribute = Attribute::create($request->all());
@@ -58,7 +58,7 @@ class AttributeProductController extends Controller
                 "type_attribute" => $attribute->type_attribute,
                 "state" => $attribute->state,
                 "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
-                "properties" => $attribute->properties->map(function($propertie) {
+                "properties" => $attribute->properties->map(function ($propertie) {
                     return [
                         "id" => $propertie->id,
                         "name" => $propertie->name,
@@ -69,14 +69,15 @@ class AttributeProductController extends Controller
         ]);
     }
 
-    public function store_propertie(Request $request) {
-        $isValida = Propertie::where("name",$request->name)
-                            ->where("attribute_id",$request->attribute_id)
-                            ->first();
+    public function store_propertie(Request $request)
+    {
+        $isValida = Propertie::where("name", $request->name)
+            ->where("attribute_id", $request->attribute_id)
+            ->first();
         // lista de colores fuertes rojo amarillo verde
 
         // lista de colores rojo marron anaranjado
-        if($isValida){
+        if ($isValida) {
             return response()->json(["message" => 403]);
         }
         $propertie = Propertie::create($request->all());
@@ -92,14 +93,6 @@ class AttributeProductController extends Controller
         ]);
     }
 
-    public function destroy_propertie($id) {
-        $propertie = Propertie::findOrFail($id);
-        $propertie->delete();
-
-        return response()->json([
-            "message" => 200,
-        ]);
-    }
 
     /**
      * Display the specified resource.
@@ -114,8 +107,8 @@ class AttributeProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $isValida = Attribute::where("id","<>",$id)->where("name",$request->name)->first();
-        if($isValida){
+        $isValida = Attribute::where("id", "<>", $id)->where("name", $request->name)->first();
+        if ($isValida) {
             return response()->json(["message" => 403]);
         }
         $attribute = Attribute::findOrFail($id);
@@ -128,7 +121,7 @@ class AttributeProductController extends Controller
                 "type_attribute" => $attribute->type_attribute,
                 "state" => $attribute->state,
                 "created_at" => $attribute->created_at->format("Y-m-d h:i:s"),
-                "properties" => $attribute->properties->map(function($propertie) {
+                "properties" => $attribute->properties->map(function ($propertie) {
                     return [
                         "id" => $propertie->id,
                         "name" => $propertie->name,
@@ -145,7 +138,23 @@ class AttributeProductController extends Controller
     public function destroy(string $id)
     {
         $attribute = Attribute::findOrFail($id);
-        $attribute->delete();//IMPORTANTE VALIDACION
+        if ($attribute->specifications->count() > 0 || $attribute->variations->count() > 0) {
+            return response()->json(["message" => 403, "message_text" => "No se puede eliminar el atributo porque está en uso en productos"]);
+        }
+        $attribute->delete(); //IMPORTANTE VALIDACION
+        return response()->json([
+            "message" => 200,
+        ]);
+    }
+
+
+    public function destroy_propertie($id)
+    {
+        $propertie = Propertie::findOrFail($id);
+        $propertie->delete();
+        if ($propertie->specifications->count() > 0 || $propertie->variations->count() > 0) {
+            return response()->json(["message" => 403, "message_text" => "No se puede eliminar la propiedad porque está en uso en productos"]);
+        }
         return response()->json([
             "message" => 200,
         ]);

@@ -89,6 +89,11 @@ class BrandController extends Controller
     public function destroy(string $id)
     {
         $brand = Brand::findOrFail($id);
+        if($brand->products->count() > 0)
+        {
+            return response()->json(["message" => 403, "message_text" => "No se puede eliminar la marca, existen productos asociados"]);  // Esto es para evitar que se pueda eliminar una marca que tiene productos asociados. Si se desea eliminar, se debería deshabilitar los productos asociados antes de eliminar la marca.  // Esta validación se puede adaptar según sea necesario en su proyecto.  // Este ejemplo simplemente responde con un mensaje de error.  // En un caso real, se podría retornar un error personalizado y detallado.  // Este código no se ejecuta en este entorno, pero se puede verificar en su proyecto.  // Este código se debe usar como referencia y adaptarlo según sea necesario.  // IMPORTANTE: Este código no se ejecuta en
+        }
+
         $brand->delete(); //IMPORTANTE VALIDACION
         return response()->json([
             "message" => 200,

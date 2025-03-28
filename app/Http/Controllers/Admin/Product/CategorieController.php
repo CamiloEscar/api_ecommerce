@@ -76,46 +76,46 @@ class CategorieController extends Controller
     {
         $categorie = Categorie::findOrFail($id);
 
-    return response()->json(["categorie" => $categorie]);
+        return response()->json(["categorie" => $categorie]);
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-{
-    $is_exists = Categorie::where("id", "<>", $id)->where("name", $request->name)->first();
-    if ($is_exists) {
-        return response()->json(["message" => "La categoría ya existe"], 403);
-    }
-
-    $categorie = Categorie::findOrFail($id);
-    $data = $request->except('imagen');
-
-    if ($request->hasFile("imagen")) {
-        $file = $request->file("imagen");
-
-        // Validar que el archivo no tenga extensión .tmp
-        if ($file->getClientOriginalExtension() === 'tmp') {
-            return response()->json(["message" => "No se permiten archivos temporales"], 403);
+    {
+        $is_exists = Categorie::where("id", "<>", $id)->where("name", $request->name)->first();
+        if ($is_exists) {
+            return response()->json(["message" => "La categoría ya existe"], 403);
         }
 
-        // Eliminar la imagen anterior del disco 'public'
-        if ($categorie->imagen) {
-            Storage::disk("public")->delete($categorie->imagen);
+        $categorie = Categorie::findOrFail($id);
+        $data = $request->except('imagen');
+
+        if ($request->hasFile("imagen")) {
+            $file = $request->file("imagen");
+
+            // Validar que el archivo no tenga extensión .tmp
+            if ($file->getClientOriginalExtension() === 'tmp') {
+                return response()->json(["message" => "No se permiten archivos temporales"], 403);
+            }
+
+            // Eliminar la imagen anterior del disco 'public'
+            if ($categorie->imagen) {
+                Storage::disk("public")->delete($categorie->imagen);
+            }
+
+            // Guardar la imagen en el disco 'public' bajo la carpeta 'categories'
+            $fileName = $file->hashName();
+            $path = $file->storeAs("categories", $fileName, "public");
+
+            // Guardar como 'categories/nombrearchivo' en la base de datos
+            $data['imagen'] = "categories/" . $fileName;
         }
 
-        // Guardar la imagen en el disco 'public' bajo la carpeta 'categories'
-        $fileName = $file->hashName();
-        $path = $file->storeAs("categories", $fileName, "public");
-
-        // Guardar como 'categories/nombrearchivo' en la base de datos
-        $data['imagen'] = "categories/" . $fileName;
+        $categorie->update($data);
+        return response()->json(["message" => "Categoría actualizada con éxito"], 200);
     }
-
-    $categorie->update($data);
-    return response()->json(["message" => "Categoría actualizada con éxito"], 200);
-}
 
 
 
@@ -125,8 +125,15 @@ class CategorieController extends Controller
     public function destroy(string $id)
     {
         $categorie = Categorie::findOrFail($id);
-        $categorie->delete();
+
         //validar que la categoria no este en ningun producto
+        if ($categorie->product_categorie_firsts()->count() > 0 ||
+         $categorie->product_categorie_seconds()->count() > 0 ||
+         $categorie->product_categorie_thirds()->count() > 0) {
+            return response()->json(["message" => 403, "message_text" => "No se puede eliminar la categoría porque está en uso en productos"]);
+        };
+
+        $categorie->delete();
 
         return response()->json(["message" => 200]);
     }

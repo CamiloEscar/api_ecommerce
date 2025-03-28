@@ -28,4 +28,11 @@ class Propertie extends Model
         date_default_timezone_set("America/Argentina/Buenos_Aires");
         $this->attributes["updated_at"] = Carbon::now();
     }
+
+    public function specifications(){
+        return $this->hasMany(ProductSpecification::class);
+    }
+    public function variations(){
+        return $this->hasMany(ProductVariation::class);
+    }
 }

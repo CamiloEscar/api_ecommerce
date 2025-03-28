@@ -42,6 +42,18 @@ class Categorie extends Model
     {
         return $this->belongsTo(Categorie::class, "categorie_third_id");
     }
+    public function product_categorie_firsts()
+    {
+        return $this->hasMany(Product::class, "categorie_first_id");
+    }
+    public function product_categorie_seconds()
+    {
+        return $this->hasMany(Product::class, "categorie_second_id");
+    }
+    public function product_categorie_thirds()
+    {
+        return $this->hasMany(Product::class, "categorie_third_id");
+    }
 
     // // Asegúrate de que no haya ningún accesor que esté alterando la ruta de la imagen
     // public function getImagenAttribute($value)
