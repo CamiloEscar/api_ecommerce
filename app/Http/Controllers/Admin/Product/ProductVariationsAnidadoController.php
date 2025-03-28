@@ -55,13 +55,13 @@ class ProductVariationsAnidadoController extends Controller
     {
         $product_variation_id = $request->product_variation_id;
         $variations_exists = ProductVariation::where("product_id", $request->product_id)
-                                    ->where('product_variation_id', $product_variation_id)
-                                    ->count();
+            ->where('product_variation_id', $product_variation_id)
+            ->count();
         if ($variations_exists > 0) {
             $variations_attributes_exists = ProductVariation::where("product_id", $request->product_id)
-                                                ->where("attribute_id", $request->attribute_id)
-                                                ->where('product_variation_id', $product_variation_id)
-                                                ->count();
+                ->where("attribute_id", $request->attribute_id)
+                ->where('product_variation_id', $product_variation_id)
+                ->count();
             if ($variations_attributes_exists === 0) {
                 return response()->json(["message" => 403, "message_text" => "No se puede agregar un atributo diferente del que ya hay en la lista"]);
             }
@@ -84,6 +84,19 @@ class ProductVariationsAnidadoController extends Controller
         }
         if ($is_valid_variation) {
             return response()->json(["message" => 403, "message_text" => "Ya existe una variación con estas características"]);
+        }
+
+        $product_var = ProductVariation::find($product_variation_id);
+        $TOTAL_STOCK_VARIATION_CENTRAL =  $product_var ? $product_var->stock : 0;
+
+        $SUM_TOTAL_STOCK_ANIDADOS = ProductVariation::where("product_id", $request->product_id)
+                                                ->where("product_variation_id", $request->product_variation_id)
+                                                ->sum("stock");
+
+        $SUM_TOTAL_STOCK_ANIDADOS += $request->stock;
+
+        if($SUM_TOTAL_STOCK_ANIDADOS > $TOTAL_STOCK_VARIATION_CENTRAL) {
+            return response()->json(["message" => 403, "message_text" => "No puede agregar más stock que la disponible en la variación central"]);
         }
 
         $product_variation = ProductVariation::create($request->all());
@@ -135,8 +148,8 @@ class ProductVariationsAnidadoController extends Controller
     {
         $product_variation_id = $request->product_variation_id;
         $variations_exists = ProductVariation::where("product_id", $request->product_id)
-        ->where('product_variation_id', $product_variation_id)
-        ->count();
+            ->where('product_variation_id', $product_variation_id)
+            ->count();
         if ($variations_exists > 0) {
             $variations_attributes_exists = ProductVariation::where("product_id", $request->product_id)
                 ->where("attribute_id", $request->attribute_id)
