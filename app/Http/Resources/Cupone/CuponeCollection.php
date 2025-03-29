@@ -14,6 +14,8 @@ class CuponeCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "data" => CuponeResource::collection($this->collection)
+        ];
     }
 }

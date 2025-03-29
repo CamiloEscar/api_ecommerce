@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Cupone\CuponeController;
 use App\Http\Controllers\Admin\Product\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -76,5 +77,5 @@ Route::group([
     Route::resource("anidado_variations", ProductVariationsAnidadoController::class);
 
     Route::resource("specifications", ProductSpecificationsController::class);
-
+    Route::resource("cupones", CuponeController::class);
 });

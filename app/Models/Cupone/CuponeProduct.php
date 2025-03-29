@@ -2,6 +2,7 @@
 
 namespace App\Models\Cupone;
 
+use App\Models\Product\Product;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,5 +26,9 @@ class CuponeProduct extends Model
     {
         date_default_timezone_set("America/Argentina/Buenos_Aires");
         $this->attributes["updated_at"] = Carbon::now();
+    }
+
+    public function product(){
+        return $this->belongsTo(Product::class);
     }
 }

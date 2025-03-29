@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin\Cupone;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Cupone\CuponeCollection;
+use App\Http\Resources\Cupone\CuponeResource;
 use App\Models\Cupone\Cupone;
 use App\Models\Cupone\CuponeBrand;
 use App\Models\Cupone\CuponeCategorie;
@@ -20,7 +22,7 @@ class CuponeController extends Controller
 
         return response()->json([
             "total" => $cupones->total(),
-            "cupones" => $cupones,
+            "cupones" => CuponeCollection::make($cupones),  //pasamos la colecion, ya que pasamos la lista de registro
         ]);
     }
 
@@ -64,7 +66,8 @@ class CuponeController extends Controller
         }
 
         return response()->json([
-            "message" => 200, "message_text" => "Cupón creado correctamente"
+            "message" => 200,
+            "message_text" => "Cupón creado correctamente"
         ]);
     }
 
@@ -76,7 +79,7 @@ class CuponeController extends Controller
         $CUPONE = Cupone::findOrFail($id);
 
         return response()->json([
-            "cupone" => $CUPONE,
+            "cupone" => CuponeResource::make($CUPONE)
         ]);
     }
 
@@ -89,7 +92,7 @@ class CuponeController extends Controller
         //categorie_selected
         //brand_selected
 
-        $IS_EXIST = Cupone::where('code', $request->code)->where("id","<>", $id)->first(); //first para que se muestre al menos una coincidencia
+        $IS_EXIST = Cupone::where('code', $request->code)->where("id", "<>", $id)->first(); //first para que se muestre al menos una coincidencia
 
         if ($IS_EXIST) {
             return response()->json([
@@ -131,7 +134,8 @@ class CuponeController extends Controller
         }
 
         return response()->json([
-            "message" => 200, "message_text" => "Cupón creado correctamente"
+            "message" => 200,
+            "message_text" => "Cupón creado correctamente"
         ]);
     }
 
@@ -145,7 +149,8 @@ class CuponeController extends Controller
 
         //TODO: cuando hay una compra relacionada con el cupon ya no se puede eliminar
         return response()->json([
-            "message" => 200, "message_text" => "Cupón eliminado correctamente"
+            "message" => 200,
+            "message_text" => "Cupón eliminado correctamente"
         ]);
     }
 }
