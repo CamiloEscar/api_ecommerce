@@ -93,13 +93,13 @@ class CuponeController extends Controller
         foreach ($request->categorie_selected as $key => $categorie_selec) {
             CuponeCategorie::create([
                 "cupone_id" => $CUPONE->id,
-                "product_id" => $categorie_selec["id"],
+                "categorie_id" => $categorie_selec["id"],
             ]);
         }
         foreach ($request->brand_selected as $key => $brand_selec) {
             CuponeBrand::create([
                 "cupone_id" => $CUPONE->id,
-                "product_id" => $brand_selec["id"],
+                "brand_id" => $brand_selec["id"],
             ]);
         }
 
