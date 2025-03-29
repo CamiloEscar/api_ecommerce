@@ -9,6 +9,9 @@ use App\Models\Cupone\Cupone;
 use App\Models\Cupone\CuponeBrand;
 use App\Models\Cupone\CuponeCategorie;
 use App\Models\Cupone\CuponeProduct;
+use App\Models\Product\Brand;
+use App\Models\Product\Categorie;
+use App\Models\Product\Product;
 use Illuminate\Http\Request;
 
 class CuponeController extends Controller
@@ -23,6 +26,41 @@ class CuponeController extends Controller
         return response()->json([
             "total" => $cupones->total(),
             "cupones" => CuponeCollection::make($cupones),  //pasamos la colecion, ya que pasamos la lista de registro
+        ]);
+    }
+
+    public function config()
+    { //extraemos los datos que necesitamos para el seleccionable de la lista de registros de cupones
+        $products = Product::where("state", 2)->orderBy("id", "desc")->get();
+
+        $categories = Categorie::where("state", 1)->where("categorie_second_id", NULL)
+            ->where("categorie_third_id", NULL)
+            ->orderBy("id", "desc")
+            ->get();
+
+        $brands = Brand::where("state", 1)->orderBy("id", "desc")->get();
+
+        return response()->json([
+            "products" => $products->map(function ($product) {
+                return [
+                    "id" => $product->id,
+                    "title" => $product->title,
+                    "imagen" => env("APP_URL") . "storage/" . $product->imagen
+                ];
+            }),
+            "categories" => $categories->map(function ($categorie) {
+                return [
+                    "id" => $categorie->id,
+                    "name" => $categorie->name,
+                    "imagen" => env("APP_URL") . "storage/" . $categorie->imagen
+                ];
+            }),
+            "brands" => $brands->map(function ($brand) {
+                return [
+                    "id" => $brand->id,
+                    "name" => $brand->name,
+                ];
+            }),
         ]);
     }
 
