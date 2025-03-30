@@ -14,6 +14,8 @@ class DiscountCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'data' => DiscountResource::collection($this->collection),
+        ];
     }
 }
