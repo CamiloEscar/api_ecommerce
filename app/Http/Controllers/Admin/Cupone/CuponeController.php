@@ -129,8 +129,7 @@ class CuponeController extends Controller
         //product_selected va a contener los productos seleccionados para el cupon, se envia desde el frontend
         //categorie_selected
         //brand_selected
-
-        $IS_EXIST = Cupone::where('code', $request->code)->where("id", "<>", $id)->first(); //first para que se muestre al menos una coincidencia
+        $IS_EXIST = Cupone::where('code', $request->code)->where("id", "<>", $id)->first();
 
         if ($IS_EXIST) {
             return response()->json([
@@ -142,15 +141,10 @@ class CuponeController extends Controller
         $CUPONE = Cupone::findOrFail($id);
         $CUPONE->update($request->all());
 
-        foreach ($CUPONE->categories() as $key => $categorie) {
-            $categorie->delete();
-        }
-        foreach ($CUPONE->products() as $key => $product) {
-            $product->delete();
-        }
-        foreach ($CUPONE->brands() as $key => $brand) {
-            $brand->delete();
-        }
+        // Delete existing relationships using the correct approach
+        CuponeCategorie::where('cupone_id', $id)->delete();
+        CuponeProduct::where('cupone_id', $id)->delete();
+        CuponeBrand::where('cupone_id', $id)->delete();
 
         foreach ($request->product_selected as $key => $product_selec) {
             CuponeProduct::create([
@@ -158,22 +152,24 @@ class CuponeController extends Controller
                 "product_id" => $product_selec["id"],
             ]);
         }
+
         foreach ($request->categorie_selected as $key => $categorie_selec) {
             CuponeCategorie::create([
                 "cupone_id" => $CUPONE->id,
-                "product_id" => $categorie_selec["id"],
+                "categorie_id" => $categorie_selec["id"],
             ]);
         }
+
         foreach ($request->brand_selected as $key => $brand_selec) {
             CuponeBrand::create([
                 "cupone_id" => $CUPONE->id,
-                "product_id" => $brand_selec["id"],
+                "brand_id" => $brand_selec["id"],
             ]);
         }
 
         return response()->json([
             "message" => 200,
-            "message_text" => "Cupón creado correctamente"
+            "message_text" => "Cupón actualizado correctamente" // Changed from "creado" to "actualizado"
         ]);
     }
 

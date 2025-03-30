@@ -24,28 +24,27 @@ class CuponeResource extends JsonResource
             'type_cupone' => $this->resource->type_cupone,
             'state' => $this->resource->state,
             'created_at' => $this->resource->created_at->format('Y-m-d H:i A'), //6 AM 6 PM
-            'updated_at' => $this->resource->updated_at,
-            'product' => $this->resource->products->map(function ($product_aux) {
+            'products' => $this->resource->products->map(function ($product_aux) {
                 return [
-                    'id' => $product_aux->id,
+                    'id' => $product_aux->product->id,
                     'title' => $product_aux->product->title,
                     'imagen' => env("APP_URL") . "storage/" . $product_aux->product->imagen,
-                    'product_id' => $product_aux->product_id
+                    'id_aux' => $product_aux->id,
                 ];
             }),
-            'categorie' => $this->resource->categories->map(function ($categorie_aux) {
+            'categories' => $this->resource->categories->map(function ($categorie_aux) {
                 return [
-                    'id' => $categorie_aux->id,
+                    'id' => $categorie_aux->categorie->id,
                     'name' => $categorie_aux->categorie->name,
                     'imagen' => env("APP_URL") . "storage/" . $categorie_aux->categorie->imagen,
-                    'categorie_id' => $categorie_aux->categorie_id
+                    'id_aux' => $categorie_aux->id
                 ];
             }),
-            'brand' => $this->resource->brands->map(function ($brand_aux) {
+            'brands' => $this->resource->brands->map(function ($brand_aux) {
                 return [
-                    'id' => $brand_aux->id,
+                    'id' => $brand_aux->brand->id,
                     'name' => $brand_aux->brand->name,
-                    'brand_id' => $brand_aux->brand_id
+                    'id_aux' => $brand_aux->id
                 ];
             }),
 
