@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Cupone\CuponeController;
+use App\Http\Controllers\Admin\Discount\DiscountController;
 use App\Http\Controllers\Admin\Product\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -81,4 +82,6 @@ Route::group([
     Route::get("cupones/config", [CuponeController::class, "config"]);
 
     Route::resource("cupones", CuponeController::class);
+
+    Route::resource("discounts", DiscountController::class);
 });
