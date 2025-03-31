@@ -20,6 +20,9 @@ class Slider extends Model
         "link",
         "color",
         "state",
+        "type_slider",
+        "price_original",
+        "price_campaing"
     ];
 
     public function setCreatedAtAttribute($value)
