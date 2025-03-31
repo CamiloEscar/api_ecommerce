@@ -290,6 +290,7 @@ class DiscountController extends Controller
     public function destroy(string $id)
     {
         $discount = Discount::findOrFail($id);
+        $discount->delete();
 
         //TODO: SI YA PERTENCE A UNA VENTE NO DEBE ELIMINARSE
         return response()->json([
