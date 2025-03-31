@@ -45,6 +45,7 @@ class CuponeController extends Controller
                 return [
                     "id" => $product->id,
                     "title" => $product->title,
+                    "slug" => $product->slug,
                     "imagen" => env("APP_URL") . "storage/" . $product->imagen
                 ];
             }),
