@@ -15,7 +15,13 @@ class HomeController extends Controller
     {
         $sliders_principal = Slider::where("state", 1)->where("type_slider", 1)->orderBy("id", "desc")->get();
 
-        $categories_randoms = Categorie::where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->orderBy("id", "desc")->get();
+        // ->orderBy("id", "desc")
+        $categories_randoms = Categorie::withCount(["product_categorie_firsts"])
+        ->where("categorie_second_id", NULL)
+        ->where("categorie_third_id", NULL)
+        ->inRandomOrder()
+        ->limit(5)
+        ->get();
 
         return response()->json([
             "sliders_principal" => $sliders_principal->map(function ($slider) {
@@ -37,7 +43,8 @@ class HomeController extends Controller
                 return [
                     "id" => $categorie->id,
                     "name" => $categorie->name,
-                    "imagen" => env("APP_URL") . "storage/" . $categorie->imagen,
+                    "products_count" => $categorie->product_categorie_firsts_count,
+                    "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : NULL,
                 ];
             })
         ]);
