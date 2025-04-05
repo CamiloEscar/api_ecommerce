@@ -2,6 +2,7 @@
 
 namespace App\Models\Product;
 
+use App\Models\Discount\DiscountCategorie;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +59,11 @@ class Categorie extends Model
     public function product_categorie_thirds()
     {
         return $this->hasMany(Product::class, "categorie_third_id");
+    }
+
+    public function discount_categories()
+    {
+        return $this->hasMany(DiscountCategorie::class, "categorie_id");
     }
 
     // // Asegúrate de que no haya ningún accesor que esté alterando la ruta de la imagen
