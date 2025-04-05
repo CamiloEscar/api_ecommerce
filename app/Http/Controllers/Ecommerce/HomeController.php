@@ -39,6 +39,14 @@ class HomeController extends Controller
 
         $products_carousel = Product::where("state", 2)->whereIn("categorie_first_id", $categories_randoms->pluck("id"))->inRandomOrder()->get();
 
+        $sliders_productos = Slider::where("state", 1)->where("type_slider", 3)->orderBy("id", "asc")->get();
+
+        $products_last_discounts = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+
+        $products_last_featured = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+
+        $products_last_selling = Product::where("state", 2)->inRandomOrder()->limit(3)->get();
+
         return response()->json([
             "sliders_principal" => $sliders_principal->map(function ($slider) {
                 return [
@@ -84,6 +92,24 @@ class HomeController extends Controller
             }),
             "products_comics" => ProductEcommerceCollection::make($products_comics),
             "products_carousel" => ProductEcommerceCollection::make($products_carousel),
+            "sliders_productos" => $sliders_productos->map(function ($slider) {
+                return [
+                    "id" => $slider->id,
+                    "title" => $slider->title,
+                    "subtitle" => $slider->subtitle,
+                    "label" => $slider->label,
+                    "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
+                    "link" => $slider->link,
+                    "color" => $slider->color,
+                    "state" => $slider->state,
+                    "type_slider" => $slider->type_slider,
+                    "price_original" => $slider->price_original,
+                    "price_campaing" => $slider->price_campaing
+                ];
+            }),
+            "products_last_discounts" => ProductEcommerceCollection::make($products_last_discounts),
+            "products_last_featured" => ProductEcommerceCollection::make($products_last_featured),
+            "products_last_selling" => ProductEcommerceCollection::make($products_last_selling),
         ]);
     }
 
