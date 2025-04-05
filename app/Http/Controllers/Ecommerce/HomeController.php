@@ -33,6 +33,9 @@ class HomeController extends Controller
 
         $products_trending_top_sellers = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
 
+        $sliders_secundario = Slider::where("state", 1)->where("type_slider", 2)->orderBy("id", "asc")->get();
+
+
         return response()->json([
             "sliders_principal" => $sliders_principal->map(function ($slider) {
                 return [
@@ -49,6 +52,7 @@ class HomeController extends Controller
                     "price_campaing" => $slider->price_campaing
                 ];
             }),
+
             "categories_randoms" => $categories_randoms->map(function ($categorie) {
                 return [
                     "id" => $categorie->id,
@@ -60,6 +64,21 @@ class HomeController extends Controller
             "products_trending_new" => ProductEcommerceCollection::make($products_trending_new),
             "products_trending_featured" => ProductEcommerceCollection::make($products_trending_featured),
             "products_trending_top_sellers" => ProductEcommerceCollection::make($products_trending_top_sellers),
+            "sliders_secundario" => $sliders_secundario->map(function ($slider) {
+                return [
+                    "id" => $slider->id,
+                    "title" => $slider->title,
+                    "subtitle" => $slider->subtitle,
+                    "label" => $slider->label,
+                    "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
+                    "link" => $slider->link,
+                    "color" => $slider->color,
+                    "state" => $slider->state,
+                    "type_slider" => $slider->type_slider,
+                    "price_original" => $slider->price_original,
+                    "price_campaing" => $slider->price_campaing
+                ];
+            }),
         ]);
     }
 
