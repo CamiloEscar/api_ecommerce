@@ -93,4 +93,5 @@ Route::group([
     "prefix" => "ecommerce"
 ], function ($router) {
     Route::get("home",  [HomeController::class, "home"]);
+    Route::get("menus",  [HomeController::class, "menus"]);
 });

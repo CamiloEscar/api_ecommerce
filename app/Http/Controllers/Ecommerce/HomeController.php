@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Ecommerce\Product\ProductEcommerceCollection;
 use App\Models\Product\Categorie;
+use App\Models\Product\Product;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 
@@ -23,10 +25,13 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
 
-        $categories_menus = Categorie::where("categorie_second_id", NULL)
-            ->where("categorie_third_id", NULL)
-            ->orderBy("position", "desc")
-            ->get();
+
+
+        $products_trending_new = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
+
+        $products_trending_featured = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
+
+        $products_trending_top_sellers = Product::where("state", 2)->inRandomOrder()->limit(8)->get();
 
         return response()->json([
             "sliders_principal" => $sliders_principal->map(function ($slider) {
@@ -52,6 +57,18 @@ class HomeController extends Controller
                     "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : NULL,
                 ];
             }),
+            "products_trending_new" => ProductEcommerceCollection::make($products_trending_new),
+            "products_trending_featured" => ProductEcommerceCollection::make($products_trending_featured),
+            "products_trending_top_sellers" => ProductEcommerceCollection::make($products_trending_top_sellers),
+        ]);
+    }
+
+    public function menus(Request $request) {
+        $categories_menus = Categorie::where("categorie_second_id", NULL)
+        ->where("categorie_third_id", NULL)
+        ->orderBy("position", "desc")
+        ->get();
+        return response()->json([
             "categories_menus" => $categories_menus->map(function ($departament) {
                 return [
                     "id" => $departament->id,
@@ -74,5 +91,6 @@ class HomeController extends Controller
                 ];
             }),
         ]);
+
     }
 }
