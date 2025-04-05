@@ -26,7 +26,7 @@ class ProductEcommerceResource extends JsonResource
 
         $discount_categorie = $this->resource->discount_categorie;
         if($discount_categorie){
-            $discount_collection->push($discount_collection);
+            $discount_collection->push($discount_categorie);
         };
 
         $discount_brand = $this->resource->discount_brand;
