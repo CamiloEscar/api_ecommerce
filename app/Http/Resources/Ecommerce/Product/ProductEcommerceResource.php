@@ -35,7 +35,7 @@ class ProductEcommerceResource extends JsonResource
         };
 
         if($discount_collection->count() > 0){
-            $discount_g = $discount_collection->sortByDesc("discount")[0];
+            $discount_g = $discount_collection->sortByDesc("discount")->values()->all()[0];
         }
 
         return [
@@ -80,7 +80,6 @@ class ProductEcommerceResource extends JsonResource
 
                 ];
             }),
-            "discount_collection" => $discount_collection,
             "discount_g" => $discount_g,
         ];
     }
