@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Ecommerce\Product;
 
+use App\Models\Product\ProductVariation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -37,6 +38,71 @@ class ProductEcommerceResource extends JsonResource
         if ($discount_collection->count() > 0) {
             $discount_g = $discount_collection->sortByDesc("discount")->values()->all()[0];
         }
+
+        $variation_collect = collect([]);
+        foreach ($this->resource->variations->groupBy("attribute_id") as $key => $variation_t) {
+            $variation_collect->push([
+                "attribute_id" => $variation_t[0]->attribute_id,
+                "attribute" => $variation_t[0]->attribute ? [
+                    "name" => $variation_t[0]->attribute->name,
+                    "type_attribute" => $variation_t[0]->attribute->type_attribute,
+                ] : NULL,
+                "variations" => $variation_t->map(function ($variation) {
+                    return [
+                        'id' => $variation->id,
+                        'product_id' => $variation->product_id,
+                        'attribute_id' => $variation->attribute_id,
+                        //relaciones
+                        "attribute" => $variation->attribute ? [
+                            "name" => $variation->attribute->name,
+                            "type_attribute" => $variation->attribute->type_attribute,
+                        ] : NULL,
+                        'propertie_id' => $variation->propertie_id,
+                        //relaciones
+                        "propertie" => $variation->propertie ? [
+                            "name" => $variation->propertie->name,
+                            "code" => $variation->propertie->code,
+                        ] : NULL,
+
+                        'value_add' => $variation->value_add,
+                        'add_price' => $variation->add_price,
+                        'stock' => $variation->stock,
+                        "subvariation" => $variation->variation_children->count() > 0 ? [
+                            "attribute_id" => $variation->variation_children->first()->attribute_id,
+                            "attribute" => $variation->variation_children->first()->attribute ? [
+                                "name" => $variation->variation_children->first()->attribute->name,
+                                "type_attribute" => $variation->variation_children->first()->attribute->type_attribute,
+                            ] : NULL,
+                        ] : NULL,
+
+                        "subvariations" => $variation->variation_children->map(function ($subvarion) {
+                            return [
+                                'id' => $subvarion->id,
+                                'product_id' => $subvarion->product_id,
+                                'attribute_id' => $subvarion->attribute_id,
+                                //relaciones
+                                "attribute" => $subvarion->attribute ? [
+                                    "name" => $subvarion->attribute->name,
+                                    "type_attribute" => $subvarion->attribute->type_attribute,
+                                ] : NULL,
+                                'propertie_id' => $subvarion->propertie_id,
+                                //relaciones
+                                "propertie" => $subvarion->propertie ? [
+                                    "name" => $subvarion->propertie->name,
+                                    "code" => $subvarion->propertie->code,
+                                ] : NULL,
+
+                                'value_add' => $subvarion->value_add,
+                                'add_price' => $subvarion->add_price,
+                                'stock' => $subvarion->stock,
+                            ];
+                        })
+                    ];
+                })
+            ]);
+        }
+
+        // dd($variation_collect);
 
         return [
             "id" => $this->resource->id,
@@ -81,50 +147,56 @@ class ProductEcommerceResource extends JsonResource
                 ];
             }),
             "discount_g" => $discount_g,
-            "variations" => $this->resource->variations->map(function ($variation) {
-                return [
-                    'id' => $variation->id,
-                    'product_id' => $variation->product_id,
-                    'attribute_id' => $variation->attribute_id,
-                    //relaciones
-                    "attribute" => $variation->attribute ? [
-                        "name" => $variation->attribute->name,
-                        "type_attribute" => $variation->attribute->type_attribute,
-                    ] : NULL,
-                    'propertie_id' => $variation->propertie_id,
-                    //relaciones
-                    "propertie" => $variation->propertie ? [
-                        "name" => $variation->propertie->name,
-                        "code" => $variation->propertie->code,
-                    ] : NULL,
+            "variations" => $variation_collect,
 
-                    'value_add' => $variation->value_add,
-                    'add_price' => $variation->add_price,
-                    'stock' => $variation->stock,
-                    "variations" => $variation->variation_children->map(function ($subvariation) {
-                        return [
-                            'id' => $subvariation->id,
-                            'product_id' => $subvariation->product_id,
-                            'attribute_id' => $subvariation->attribute_id,
-                            //relaciones
-                            "attribute" => $subvariation->attribute ? [
-                                "name" => $subvariation->attribute->name,
-                                "type_attribute" => $subvariation->attribute->type_attribute,
-                            ] : NULL,
-                            'propertie_id' => $subvariation->propertie_id,
-                            //relaciones
-                            "propertie" => $subvariation->propertie ? [
-                                "name" => $subvariation->propertie->name,
-                                "code" => $subvariation->propertie->code,
-                            ] : NULL,
-
-                            'value_add' => $subvariation->value_add,
-                            'add_price' => $subvariation->add_price,
-                            'stock' => $subvariation->stock,
-                        ];
-                    })
-                ];
-            })
         ];
     }
 }
+
+
+
+
+// $this->resource->variations->map(function ($variation) {
+        // return [
+        //     'id' => $variation->id,
+        //     'product_id' => $variation->product_id,
+        //     'attribute_id' => $variation->attribute_id,
+        //     //relaciones
+        //     "attribute" => $variation->attribute ? [
+        //         "name" => $variation->attribute->name,
+        //         "type_attribute" => $variation->attribute->type_attribute,
+        //     ] : NULL,
+        //     'propertie_id' => $variation->propertie_id,
+        //     //relaciones
+        //     "propertie" => $variation->propertie ? [
+        //         "name" => $variation->propertie->name,
+        //         "code" => $variation->propertie->code,
+        //     ] : NULL,
+
+        //     'value_add' => $variation->value_add,
+        //     'add_price' => $variation->add_price,
+        //     'stock' => $variation->stock,
+        //     "variations" => $variation->variation_children->map(function ($subvariation) {
+        //         return [
+        //             'id' => $subvariation->id,
+        //             'product_id' => $subvariation->product_id,
+        //             'attribute_id' => $subvariation->attribute_id,
+        //             //relaciones
+        //             "attribute" => $subvariation->attribute ? [
+        //                 "name" => $subvariation->attribute->name,
+        //                 "type_attribute" => $subvariation->attribute->type_attribute,
+        //             ] : NULL,
+        //             'propertie_id' => $subvariation->propertie_id,
+        //             //relaciones
+        //             "propertie" => $subvariation->propertie ? [
+        //                 "name" => $subvariation->propertie->name,
+        //                 "code" => $subvariation->propertie->code,
+        //             ] : NULL,
+
+        //             'value_add' => $subvariation->value_add,
+        //             'add_price' => $subvariation->add_price,
+        //             'stock' => $subvariation->stock,
+        //         ];
+        //     })
+        // ];
+        // });
