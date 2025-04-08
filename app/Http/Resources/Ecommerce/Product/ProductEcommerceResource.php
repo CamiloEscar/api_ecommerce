@@ -154,6 +154,26 @@ class ProductEcommerceResource extends JsonResource
             }),
             "discount_g" => $discount_g,
             "variations" => $variation_collect,
+            "specifications" => $this->resource->specifications->map(function ($specification) {
+                return [
+                    'id' => $specification->id,
+                    'product_id' => $specification->product_id,
+                    'attribute_id' => $specification->attribute_id,
+                    //relaciones
+                    "attribute" => $specification->attribute ? [
+                        "name" => $specification->attribute->name,
+                        "type_attribute" => $specification->attribute->type_attribute,
+                    ] : NULL,
+                    'propertie_id' => $specification->propertie_id,
+                    //relaciones
+                    "propertie" => $specification->propertie ? [
+                        "name" => $specification->propertie->name,
+                        "code" => $specification->propertie->code,
+                    ] : NULL,
+
+                    'value_add' => $specification->value_add,
+                ];
+            })
 
         ];
     }
@@ -164,24 +184,24 @@ class ProductEcommerceResource extends JsonResource
 
 // $this->resource->variations->map(function ($variation) {
         // return [
-        //     'id' => $variation->id,
-        //     'product_id' => $variation->product_id,
-        //     'attribute_id' => $variation->attribute_id,
-        //     //relaciones
-        //     "attribute" => $variation->attribute ? [
-        //         "name" => $variation->attribute->name,
-        //         "type_attribute" => $variation->attribute->type_attribute,
-        //     ] : NULL,
-        //     'propertie_id' => $variation->propertie_id,
-        //     //relaciones
-        //     "propertie" => $variation->propertie ? [
-        //         "name" => $variation->propertie->name,
-        //         "code" => $variation->propertie->code,
-        //     ] : NULL,
+            // 'id' => $variation->id,
+            // 'product_id' => $variation->product_id,
+            // 'attribute_id' => $variation->attribute_id,
+            // //relaciones
+            // "attribute" => $variation->attribute ? [
+            //     "name" => $variation->attribute->name,
+            //     "type_attribute" => $variation->attribute->type_attribute,
+            // ] : NULL,
+            // 'propertie_id' => $variation->propertie_id,
+            // //relaciones
+            // "propertie" => $variation->propertie ? [
+            //     "name" => $variation->propertie->name,
+            //     "code" => $variation->propertie->code,
+            // ] : NULL,
 
-        //     'value_add' => $variation->value_add,
-        //     'add_price' => $variation->add_price,
-        //     'stock' => $variation->stock,
+            // 'value_add' => $variation->value_add,
+            // 'add_price' => $variation->add_price,
+            // 'stock' => $variation->stock,
         //     "variations" => $variation->variation_children->map(function ($subvariation) {
         //         return [
         //             'id' => $subvariation->id,

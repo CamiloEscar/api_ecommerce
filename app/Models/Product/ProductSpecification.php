@@ -36,10 +36,10 @@ class ProductSpecification extends Model
     }
     public function attribute()
     {
-        return $this->belongsTo(Attribute::class, "product_id");
+        return $this->belongsTo(Attribute::class, "attribute_id");
     }
-    public function propertie_id()
+    public function propertie()
     {
-        return $this->belongsTo(Propertie::class, "product_id");
+        return $this->belongsTo(Propertie::class, "propertie_id");
     }
 }

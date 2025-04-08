@@ -70,6 +70,10 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariation::class, "product_id")->where("product_variation_id", null);
     }
+    public function specifications()
+    {
+        return $this->hasMany(ProductSpecification::class, "product_id");
+    }
     //obtenemos un valor con un mutator
     public function getDiscountCategorieAttribute()
     {
