@@ -104,6 +104,11 @@ class ProductEcommerceResource extends JsonResource
 
         // dd($variation_collect);
 
+        $tags_parse = [];
+        foreach (($this->resource->tags ? json_decode($this->resource->tags, true) : []) as $key => $tag) {
+            array_push($tags_parse, $tag["item_text"]);
+        }
+
         return [
             "id" => $this->resource->id,
             'title' => $this->resource->title,
@@ -116,6 +121,7 @@ class ProductEcommerceResource extends JsonResource
             'state' => $this->resource->state,
             'description' => $this->resource->description,
             'tags' => $this->resource->tags ? json_decode($this->resource->tags, true) : [],
+            'tags_parse' => $tags_parse,
             'brand_id' => $this->resource->brand_id,
 
             'brand' => $this->resource->brand ? [
