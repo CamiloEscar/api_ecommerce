@@ -94,4 +94,5 @@ Route::group([
 ], function ($router) {
     Route::get("home",  [HomeController::class, "home"]);
     Route::get("menus",  [HomeController::class, "menus"]);
+    Route::get("producto/{slug}",  [HomeController::class, "show_product"]);
 });

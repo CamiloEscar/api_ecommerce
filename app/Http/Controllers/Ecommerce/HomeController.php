@@ -178,4 +178,20 @@ class HomeController extends Controller
         ]);
 
     }
+
+    public function show_product(Request $request, $slug){
+        $product = Product::where("slug",$slug)->where("state",2)->first();
+
+        if(!$product){
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El producto no existe"
+            ]);
+        }
+
+        return response()->json([
+            "message" => 200,
+            "product" => ProductEcommerceResource::make($product)
+        ]);
+    }
 }
