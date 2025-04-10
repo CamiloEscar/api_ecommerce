@@ -81,7 +81,7 @@ class CartController extends Controller
             }
         }
 
-        $request->request->add(["user_id", $user->id]);
+        $request->request->add(["user_id" => $user->id]);
         $cart = Cart::create($request->all());
 
         return response()->json([
