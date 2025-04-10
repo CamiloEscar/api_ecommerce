@@ -14,6 +14,9 @@ class CartEcommerceCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            //asignamos toda la lista que se le asigna al collection
+            "data" => CartEcommerceResource::collection($this->collection)
+        ];
     }
 }
