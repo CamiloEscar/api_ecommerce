@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
 use App\Http\Controllers\Admin\Product\ProductVariationsAnidadoController;
 use App\Http\Controllers\Admin\Product\ProductVariationsController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Ecommerce\CartController;
 use App\Http\Controllers\Ecommerce\HomeController;
 
 /*
@@ -95,4 +96,11 @@ Route::group([
     Route::get("home",  [HomeController::class, "home"]);
     Route::get("menus",  [HomeController::class, "menus"]);
     Route::get("producto/{slug}",  [HomeController::class, "show_product"]);
+
+    //middleware que va a obligar a que se use el carrito de compra si estas autentificado
+    Route::group([
+        "middleware" => 'auth:api'
+    ], function($router){
+        Route::resource('carts', CartController::class);
+    });
 });
