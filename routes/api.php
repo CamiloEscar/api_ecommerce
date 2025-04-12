@@ -101,6 +101,7 @@ Route::group([
     Route::group([
         "middleware" => 'auth:api'
     ], function($router){
+        Route::delete('carts/delete_all', [CartController::class, "delete_all"]);
         Route::resource('carts', CartController::class);
     });
 });

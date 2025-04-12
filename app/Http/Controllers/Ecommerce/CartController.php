@@ -159,6 +159,16 @@ class CartController extends Controller
         ]);
     }
 
+    public function delete_all(){
+        $user = auth("api")->user();
+        $carts = Cart::where("user_id", $user->id)->get();
+        foreach ($carts as $key => $cart) {
+            $cart->delete();
+        }
+        return response()->json([
+            "message" => 200,
+        ]);
+    }
     /**
      * Remove the specified resource from storage.
      */
