@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Ecommerce;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Cart\CartEcommerceCollection;
 use App\Http\Resources\Ecommerce\Cart\CartEcommerceResource;
+use App\Models\Cupone\Cupone;
 use App\Models\Product\Product;
 use App\Models\Product\ProductVariation;
 use App\Models\Sale\Cart;
@@ -87,6 +88,29 @@ class CartController extends Controller
         return response()->json([
             "cart" => CartEcommerceResource::make($cart)
         ]);
+    }
+
+    public function apply_cupon(Request $request){
+        $cupon = Cupone::where("code", $request->code_cupon)->where("state", 1)->first();
+
+        if(!$cupon){
+            return response()->json(["message" => 403, "message_text" => "El cupon ingresado no existe o ya caduco"]);
+        }
+
+        $user = auth('api')->user();
+        $carts = Cart::where("user_id", $user->id)->get();
+
+        foreach ($carts as $key => $cart) {
+            if($cupon->type_cupone == 1){  //1 es a nivel de producto
+
+            };
+            if($cupon->type_cupone == 2){  //1 es a nivel de categoria
+
+            };
+            if($cupon->type_cupone == 3){  //1 es a nivel de marca
+
+            };
+        }
     }
 
     /**

@@ -102,6 +102,7 @@ Route::group([
         "middleware" => 'auth:api'
     ], function($router){
         Route::delete('carts/delete_all', [CartController::class, "delete_all"]);
+        Route::post('carts/apply_cupon', [CartController::class, "apply_cupon"]);
         Route::resource('carts', CartController::class);
     });
 });
