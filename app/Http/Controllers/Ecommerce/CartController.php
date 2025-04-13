@@ -102,15 +102,101 @@ class CartController extends Controller
 
         foreach ($carts as $key => $cart) {
             if($cupon->type_cupone == 1){  //1 es a nivel de producto
+                $is_exists_product_cupon = false;       //existe?
+                foreach ($cupon->products as $cupon_product) { //products es una relacion al modelo auxiliar
+                    if($cupon_product->product_id == $cart->product_id){
+                        $is_exists_product_cupon = true;
+                        break;
+                    };
+                }
+                if($is_exists_product_cupon){
+                    $subtotal = 0;
+                    if($cupon->type_discount == 1){ //porcentaje
+                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount*0.01);
+                    };
+                    if($cupon->type_discount == 2){ //monto fijo
+                        $subtotal = $cart->price_unit - $cupon->discount;
+                    };
+
+                    // if(!$cart->code_discount){  //si ya tiene codigo de descuento hecho no hace falta
+                        $cart->update([
+                            "type_discount" => $cupon->type_discount,
+                            "discount" => $cupon->discount,
+                            "code_cupon" => $cupon->code,
+                            "subtotal" => $subtotal,
+                            "total" => $subtotal*$cart->quantity,
+                            "type_campaing" => NULL,
+                            "code_discount" => NULL,
+                        ]);
+                    // };
+                }
 
             };
             if($cupon->type_cupone == 2){  //1 es a nivel de categoria
+                $is_exists_categorie_cupon = false;       //existe?
+                foreach ($cupon->categories as $cupon_product) { //products es una relacion al modelo auxiliar
+                    if($cupon_product->categorie_id == $cart->product->categorie_first_id){
+                        $is_exists_categorie_cupon = true;
+                        break;
+                    };
+                }
+                if($is_exists_categorie_cupon){
+                    $subtotal = 0;
+                    if($cupon->type_discount == 1){ //porcentaje
+                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount*0.01);
+                    };
+                    if($cupon->type_discount == 2){ //monto fijo
+                        $subtotal = $cart->price_unit - $cupon->discount;
+                    };
 
+                    // if(!$cart->code_discount){  //si ya tiene codigo de descuento hecho no hace falta
+                        $cart->update([
+                            "type_discount" => $cupon->type_discount,
+                            "discount" => $cupon->discount,
+                            "code_cupon" => $cupon->code,
+                            "subtotal" => $subtotal,
+                            "total" => $subtotal*$cart->quantity,
+                            "type_campaing" => NULL,
+                            "code_discount" => NULL,
+                        ]);
+                    // };
+                }
             };
             if($cupon->type_cupone == 3){  //1 es a nivel de marca
+                $is_exists_brand_cupon = false;       //existe?
+                foreach ($cupon->brands as $cupon_product) { //products es una relacion al modelo auxiliar
+                    if($cupon_product->brand_id == $cart->product->brand_id){
+                        $is_exists_brand_cupon = true;
+                        break;
+                    };
+                }
+                if($is_exists_brand_cupon){
+                    $subtotal = 0;
+                    if($cupon->type_discount == 1){ //porcentaje
+                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount*0.01);
+                    };
+                    if($cupon->type_discount == 2){ //monto fijo
+                        $subtotal = $cart->price_unit - $cupon->discount;
+                    };
 
+                    // if(!$cart->code_discount){  //si ya tiene codigo de descuento hecho no hace falta
+                        $cart->update([
+                            "type_discount" => $cupon->type_discount,
+                            "discount" => $cupon->discount,
+                            "code_cupon" => $cupon->code,
+                            "subtotal" => $subtotal,
+                            "total" => $subtotal*$cart->quantity,
+                            "type_campaing" => NULL,
+                            "code_discount" => NULL,
+                        ]);
+                    // };
+                }
             };
         }
+
+        return response()->json([
+            "message" => 200,
+        ]);
     }
 
     /**
