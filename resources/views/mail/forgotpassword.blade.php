@@ -122,13 +122,13 @@
 															<tr>
 																<td style="border-radius: 10px 10px 0 0;" bgcolor="#ffffff">
 																	<!-- Logo -->
-																	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+																	<!-- <table width="100%" border="0" cellspacing="0" cellpadding="0">
 																		<tr>
 																			<td class="img-center p-30 px-15" style="font-size:0pt; line-height:0pt; text-align:center; padding: 30px; padding-left: 15px; padding-right: 15px;">
 																				<a href="https://laravest.com/" target="_blank"><img src="https://laravest.com/assets_lab/images/Logo-2.webp" style="background: black;border-radius: 5px;" width="112" height="43" editable="true" border="0" alt="" /></a>
 																			</td>
 																		</tr>
-																	</table>
+																	</table> -->
 																	<!-- Logo -->
 
 																	<!-- Main -->
@@ -148,15 +148,14 @@
 																								<tr>
 																									<td class="title-36 a-center pb-15" style="font-size:36px; line-height:40px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; text-align:center; padding-bottom: 15px;">
 																										<multiline>
-																											<strong>Activate with Code</strong>
+																											<strong>Activa tu cuenta con este codigo</strong>
 																										</multiline>
 																									</td>
 																								</tr>
 																								<tr>
 																									<td class="text-16 lh-26 a-center pb-25" style="font-size:16px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; text-align:center; padding-bottom: 25px;">
 																										<multiline>
-																											Click on the button below to activate code, this is your requested account key code to log in with your email address (name@mail.com)
-																										</multiline>
+                                                                                                        Haz clic en el botón de abajo para activar el código. Este es el código de clave de cuenta que solicitaste para iniciar sesión con tu dirección de correo electrónico (nombre@mail.com).																										</multiline>
 																									</td>
 																								</tr>
 																								<tr>
@@ -180,7 +179,7 @@
 																												<td class="btn-16 c-white l-white" bgcolor="#f3189e" style="font-size:16px; line-height:20px; font-family:'PT Sans', Arial, sans-serif; text-align:center; font-weight:bold; text-transform:uppercase; border-radius:25px; min-width:auto !important; color:#ffffff;">
 																													<multiline>
 																														<a href="#" target="_blank" class="link c-white" style="display: block; padding: 15px 35px; text-decoration:none; color:#ffffff;">
-																															<span class="link c-white" style="text-decoration:none; color:#ffffff;">ACTIVATE CODE</span>
+																															<span class="link c-white" style="text-decoration:none; color:#ffffff;">ACTIVAR</span>
 																														</a>
 																													</multiline>
 																												</td>
@@ -289,5 +288,3 @@
 	</center>
 </body>
 </html>
-{"threads":[{"position":8242,"start":0,"end":8675,"connection":"open"},{"position":17350,"start":8676,"end":17350,"connection":"closed"}],"url":"https://att-c.udemycdn.com/2024-03-08_04-34-12-f0e763797cce0fec6ef45bbed3122718/original.html?response-content-disposition=attachment%3B+filename%3Demail-v05-campaig.html&Expires=1717719926&Signature=flL~sJK~sFP321xKlym4nKpmHjykigO27rlv35yR33HD6meLs4M2Bo81L~nHZ2y1MTafXAQPm2MHU3Jc2fXiTprhLMvSxJXBnh-mrwcOB~sPeKKwR0LvQgMtOyXOE1kCfvm0S1BGo7Dz22K8Gss2tT1H204kzi4qs8UiccIDGCmU3gSM9CP7ATcP~FwLQj2RoJWAktmzfa5Z7ncTkGF2RDV77gJeQ8jzyNEeWIcU9pR1MS3KyEl4-UNHUhjNtoNyRTQP0TdCuFqFs6bNWZgA8eJXGdwsbTd8TlpPzrpUctjzOlN7EHaPhiEnVjdelqU1qKo1yvopCZjWwwUFm5zGJw__&Key-Pair-Id=K3MG148K9RIRF4","method":"GET","port":443,"downloadSize":17350,"headers":{"content-type":"text/html","content-length":"17350","connection":"close","date":"Thu, 06 Jun 2024 19:57:06 GMT","x-amz-replication-status":"COMPLETED","last-modified":"Fri, 08 Mar 2024 04:34:13 GMT","etag":"\"9b0c57ad50d64b7fdd185703ef2faf25\"","x-amz-server-side-encryption":"AES256","x-amz-meta-qqfilename":"email-v05-campaig.html","x-amz-version-id":"piDGz57.vku6kweA9sn4i9CNTGz32Ksm","content-disposition":"attachment; filename=email-v05-campaig.html","accept-ranges":"bytes","server":"AmazonS3","x-cache":"Miss from cloudfront","via":"1.1 4d67223b5c8ce8c89803f739ce754b14.cloudfront.net (CloudFront)","x-amz-cf-pop":"SCL51-P4","x-amz-cf-id":"f3fWXd1epR3_v_YcsYnsFtGHlvqVPrjbOPfQV9XRytoAWYFp5ZGtHQ==","x-cdn":"cf-cloudfront","vary":"Origin"}}
-

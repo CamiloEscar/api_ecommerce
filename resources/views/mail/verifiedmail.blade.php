@@ -122,13 +122,13 @@
 															<tr>
 																<td style="border-radius: 10px 10px 0 0;" bgcolor="#ffffff">
 																	<!-- Logo -->
-																	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+																	<!-- <table width="100%" border="0" cellspacing="0" cellpadding="0">
 																		<tr>
 																			<td class="img-center p-30 px-15" style="font-size:0pt; line-height:0pt; text-align:center; padding: 30px; padding-left: 15px; padding-right: 15px;">
 																				<a href="https://laravest.com/" target="_blank"><img src="https://laravest.com/assets_lab/images/Logo-2.webp" style="background: black;border-radius: 5px;" width="112" height="43" editable="true" border="0" alt="" /></a>
 																			</td>
 																		</tr>
-																	</table>
+																	</table> -->
 																	<!-- Logo -->
 
 																	<!-- Main -->
@@ -148,7 +148,7 @@
 																								<tr>
 																									<td class="title-36 a-center pb-15" style="font-size:36px; line-height:40px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; text-align:center; padding-bottom: 15px;">
 																										<multiline>
-																											<strong>Verify Your Email Account</strong>
+																											<strong>Verificacion de tu cuenta de email</strong>
 																										</multiline>
 																									</td>
 																								</tr>
@@ -226,7 +226,7 @@
 																<tr>
 																	<td class="text-14 lh-24 a-center c-white l-white pb-20" style="font-size:14px; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 24px; text-align:center; color:#ffffff; padding-bottom: 20px;">
 																		<multiline>
-																			Address name St. 12, City Name, State, Country Name
+                                                                        Nombre de la dirección: calle, Nombre de la Ciudad, Estado, Nombre del País.
 																			<br />
 																			<a cm_dontconvertlink href="tel:+17384796719" target="_blank" class="link c-white" style="text-decoration:none; color:#ffffff;"><span class="link c-white" style="text-decoration:none; color:#ffffff;">(738) 479-6719</span></a> - <a cm_dontconvertlink href="tel:+13697181973" target="_blank" class="link c-white" style="text-decoration:none; color:#ffffff;"><span class="link c-white" style="text-decoration:none; color:#ffffff;">(369) 718-1973</span></a>
 																			<br />

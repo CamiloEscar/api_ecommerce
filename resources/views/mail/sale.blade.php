@@ -253,7 +253,7 @@
 																<td style="border-radius: 10px 10px 0 0;"
 																	bgcolor="#ffffff">
 																	<!-- Logo -->
-																	<table width="100%" border="0" cellspacing="0"
+																	<!-- <table width="100%" border="0" cellspacing="0"
 																		cellpadding="0">
 																		<tr>
 																			<td class="img-center p-30 px-15"
@@ -266,7 +266,7 @@
 																						alt="" /></a>
 																			</td>
 																		</tr>
-																	</table>
+																	</table> -->
 																	<!-- Logo -->
 
 																	<!-- Main -->
@@ -308,17 +308,14 @@
 																									<td class="text-16 lh-26 a-center pb-25"
 																										style="font-size:16px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; text-align:center; padding-bottom: 25px;">
 																										<multiline>
-																											Great news,
-																											{{$user->name.' '.$user->surname}}! Your
-																											order&rsquo;s
-																											on the truck
-																											and heading
-																											your way.
-																											Just click
-																											the button
-																											below to
-																											track its
-																											progress.
+                                                                                                        ¡Grandes noticias,
+																											{{$user->name.' '.$user->surname}}! Tu
+																											pedido&rsquo;s
+																											ya está en el camión
+																											y en camino hacia ti.
+                                                                                                            Solo haz clic en el botón
+                                                                                                            de abajo para
+                                                                                                            seguir su progreso.
 																										</multiline>
 																									</td>
 																								</tr>
@@ -422,8 +419,8 @@
 																															<td class="title-20 pb-10"
 																																style="font-size:20px; line-height:24px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; padding-bottom: 10px;">
 																																<multiline>
-																																	<strong>Delivery
-																																		date</strong>
+																																	<strong>Fecha de
+																																		envio</strong>
 																																</multiline>
 																															</td>
 																														</tr>
@@ -455,8 +452,8 @@
 																															<td class="title-20 pb-10"
 																																style="font-size:20px; line-height:24px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; padding-bottom: 10px;">
 																																<multiline>
-																																	<strong>Shipping
-																																		details</strong>
+																																	<strong>Detalles de
+																																		envio</strong>
 																																</multiline>
 																															</td>
 																														</tr>
@@ -507,8 +504,8 @@
 																									<td class="title-28 a-center pb-35"
 																										style="font-size:28px; line-height:32px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; text-align:center; padding-bottom: 35px;">
 																										<multiline>
-																											<strong>Order
-																												details</strong>
+																											<strong>Detalles de
+																												orden</strong>
 																										</multiline>
 																									</td>
 																								</tr>
@@ -634,8 +631,8 @@
 																															<td class="title-20 pb-10"
 																																style="font-size:20px; line-height:24px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; padding-bottom: 10px;">
 																																<multiline>
-																																	<strong>Payment
-																																		method</strong>
+																																	<strong>Metodos de
+																																		pago</strong>
 																																</multiline>
 																															</td>
 																														</tr>
@@ -694,7 +691,7 @@
 																																		<td class="title-20 lh-30 a-right mt-left"
 																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 30px; text-align:right;">
 																																			<multiline>
-																																				<strong>Shipping:</strong>
+																																				<strong>Envio:</strong>
 																																			</multiline>
 																																		</td>
 																																		<td class="img mw-15"
@@ -711,7 +708,7 @@
 																																		<td class="title-20 lh-30 a-right mt-left"
 																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 30px; text-align:right;">
 																																			<multiline>
-																																				<strong>Tax:</strong>
+																																				<strong>Impuestos:</strong>
 																																			</multiline>
 																																		</td>
 																																		<td class="img mw-15"

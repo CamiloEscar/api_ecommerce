@@ -36,7 +36,7 @@ class CartEcommerceResource extends JsonResource
             "code_cupon" => $this->resource->code_cupon,
             "code_discount" => $this->resource->code_discount,
             "product_variation_id" => $this->resource->product_variation_id,
-            "product_variation" => $this->resource->product_variation_id ? [
+            "product_variation" => $this->resource->product_variation ? [
                 'id' => $this->resource->product_variation->id,
                 'attribute_id' => $this->resource->product_variation->attribute_id,
                 "attribute" => $this->resource->product_variation->attribute ? [

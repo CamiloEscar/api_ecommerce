@@ -253,7 +253,7 @@
 																<td style="border-radius: 10px 10px 0 0;"
 																	bgcolor="#ffffff">
 																	<!-- Logo -->
-																	<table width="100%" border="0" cellspacing="0"
+																	<!-- <table width="100%" border="0" cellspacing="0"
 																		cellpadding="0">
 																		<tr>
 																			<td class="img-center p-30 px-15"
@@ -266,7 +266,7 @@
 																						alt="" /></a>
 																			</td>
 																		</tr>
-																	</table>
+																	</table> -->
 																	<!-- Logo -->
 
 																	<!-- Main -->
@@ -430,9 +430,9 @@
 																															<td class="text-16"
 																																style="font-size:16px; line-height:20px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important;">
 																																<multiline>
-																																	04/22
+																																	<!-- 04/22
 																																	–
-																																	04/25/18
+																																	04/25/18 -->
 																																</multiline>
 																															</td>
 																														</tr>
