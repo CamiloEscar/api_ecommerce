@@ -35,6 +35,7 @@ class SaleController extends Controller
             $new_detail = $cart->toArray();
             $new_detail["sale_id"] = $sale->id;
             SaleDetail::create($new_detail);
+            //TODO: la eliminacion del carrito de compra
         }
 
         $sale_addres = $request->sale_address;

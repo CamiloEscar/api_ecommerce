@@ -14,13 +14,14 @@ class Sale extends Model
 
     protected $fillable = [
         "user_id",
-        "method_payments",
+        "method_payment",
         "currency_total",
         "currency_payment",
         "discount",
         "subtotal",
         "total",
         "price_dolar",
+        "description",
         "n_transaccion"
     ];
     public function setCreatedAtAttribute($value)
