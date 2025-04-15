@@ -26,6 +26,7 @@ class UserAdressController extends Controller
      */
     public function store(Request $request)
     {
+        $request->request->add(["user_id" => auth('api')->user()->id]);
         $addres = UserAddres::create($request->all());
 
         return response()->json([
