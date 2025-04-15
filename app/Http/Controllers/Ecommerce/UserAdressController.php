@@ -13,7 +13,8 @@ class UserAdressController extends Controller
      */
     public function index()
     {
-        $address = UserAddres::orderBy("id", "desc")->get();
+        $user = auth('api')->user();
+        $address = UserAddres::where("user_id", $user->id)->orderBy("id", "desc")->get();
 
         return response()->json([
             "address" => $address,
