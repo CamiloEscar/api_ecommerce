@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\Product\ProductVariationsController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Ecommerce\CartController;
 use App\Http\Controllers\Ecommerce\HomeController;
+use App\Http\Controllers\Ecommerce\SaleController;
 use App\Http\Controllers\Ecommerce\UserAdressController;
 
 /*
@@ -108,5 +109,7 @@ Route::group([
 
 
         Route::resource('user_address', UserAdressController::class);
+
+        Route::post('checkout', [SaleController::class, "store"]);
     });
 });

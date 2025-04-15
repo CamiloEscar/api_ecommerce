@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
+use App\Models\Sale\Cart;
+use App\Models\Sale\Sale;
+use App\Models\Sale\SaleAddres;
+use App\Models\Sale\SaleDetail;
 use Illuminate\Http\Request;
 
 class SaleController extends Controller
@@ -20,7 +24,27 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->request->add(["user_id" => auth("api")->user()->id]);
+        $sale = Sale::create($request->all());
+
+        $carts = Cart::where("user_id", auth("api")->user()->id)->get();
+
+        foreach ($carts as $key => $cart) {
+
+            $new_detail = [];
+            $new_detail = $cart->toArray();
+            $new_detail["sale_id"] = $sale->id;
+            SaleDetail::create($new_detail);
+        }
+
+        $sale_addres = $request->sale_address;
+        $sale_addres["sale_id"] = $sale->id;
+        $sale_address = SaleAddres::create($sale_addres);
+
+        //el correo que le debe llegar al cliente con la compra realizada
+        return response()->json([
+            "message" => 200
+        ]);
     }
 
     /**
