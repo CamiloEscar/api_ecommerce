@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Ecommerce;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Sale\SaleResource;
 use App\Mail\SaleMail;
+use App\Models\Product\Product;
+use App\Models\Product\ProductVariation;
 use App\Models\Sale\Cart;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleAddres;
@@ -34,11 +36,35 @@ class SaleController extends Controller
 
         foreach ($carts as $key => $cart) {
 
+            $nCart = $cart;
             $new_detail = [];
-            $new_detail = $cart->toArray();
+            $new_detail = $nCart->toArray();
             $new_detail["sale_id"] = $sale->id;
             SaleDetail::create($new_detail);
+
+            //descuento del stock del producto
+            if($cart->product_variation_id){
+                $variation = ProductVariation::find($cart->product_variation_id);
+                if($variation->variation_father){
+                    $variation->variation_father->update([
+                        "stock" => $variation->variation_father->stock - $cart->quantity
+                    ]);
+                    $variation->update([
+                        "stock" => $variation->stock - $cart->quantity
+                    ]);
+                } else{
+                    $variation->update([
+                        "stock" => $variation->stock - $cart->quantity
+                    ]);
+                }
+            } else {
+                $product = Product::find($cart->product_id);
+                $product->update([
+                    "stock" => $product->stock - $cart->quantity
+                ]);
+            }
             //TODO: la eliminacion del carrito de compra
+            $cart->delete();
         }
 
         $sale_addres = $request->sale_address;
@@ -52,6 +78,37 @@ class SaleController extends Controller
             "message" => 200
         ]);
     }
+
+
+    //TODO: COLOCAR ESTO CUANDO HAGA LA INTEGRACION CON MERCADO PAGO
+    //public function checkout_mercadopago
+
+    // $nCart = $cart;
+
+
+    //descuento del stock del producto
+    // if($cart->product_variation_id){
+    //     $variation = ProductVariation::find($cart->product_variation_id);
+    //     if($variation->variation_father){
+    //         $variation->variation_father->update([
+    //             "stock" => $variation->variation_father->stock - $cart->quantity
+    //         ]);
+    //         $variation->update([
+    //             "stock" => $variation->stock - $cart->quantity
+    //         ]);
+    //     } else{
+    //         $variation->update([
+    //             "stock" => $variation->stock - $cart->quantity
+    //         ]);
+    //     }
+    // } else {
+    //     $product = Product::find($cart->product_id);
+    //     $product->update([
+    //         "stock" => $product->stock - $cart->quantity
+    //     ]);
+    // }
+    // //TODO: la eliminacion del carrito de compra
+    // $cart->delete();
 
     /**
      * Display the specified resource.

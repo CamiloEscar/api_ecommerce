@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
 use App\Http\Controllers\Admin\Product\ProductVariationsAnidadoController;
 use App\Http\Controllers\Admin\Product\ProductVariationsController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\DolarController;
 use App\Http\Controllers\Ecommerce\CartController;
 use App\Http\Controllers\Ecommerce\HomeController;
 use App\Http\Controllers\Ecommerce\SaleController;
@@ -112,5 +113,9 @@ Route::group([
 
         Route::get('sale/{id}', [SaleController::class, "show"]);
         Route::post('checkout', [SaleController::class, "store"]);
+
+
     });
+    //api dolar
+    Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
 });
