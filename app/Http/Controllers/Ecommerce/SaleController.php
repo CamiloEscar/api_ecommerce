@@ -89,20 +89,28 @@ class SaleController extends Controller
         $client = new PreferenceClient();
         $client->auto_return = "approved";
 
-        $carts = Cart::where("user_id", auth('api')->user()->id)->get();
+        // $carts = Cart::where("user_id", auth('api')->user()->id)->get();
         $array_carts = [];
 
-        foreach ($carts as $key => $cart) {
-            array_push($array_carts, [
-                "title" => $cart->product->title,
-                "quantity" => $cart->quantity,
-                "currency_id" => $cart->currency,
-                "unit_price" => $cart->total,
-            ]);
-        }
+        // foreach ($carts as $key => $cart) {
+        //     array_push($array_carts, [
+        //         "title" => $cart->product->title,
+        //         "quantity" => $cart->quantity,
+        //         "currency_id" => $cart->currency,
+        //         "unit_price" => $cart->total,
+        //     ]);
+        // }
 
         $datos = array(
-        "items"=> $array_carts,
+        // "items"=> $array_carts,
+        "items"=> [
+            [
+                "title" => "NAME PRODUCT",
+                "quantity" => 1,
+                "currency_id" => 'ARS',
+                'unit_price' => $request->get("price_unit"),
+            ]
+        ],
         "back_urls" =>array(
             "success" => env("URL_TIENDA")."mercado-pago-success",
             "failure" => env("URL_TIENDA")."mercado-pago-failure",
