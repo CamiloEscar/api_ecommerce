@@ -111,6 +111,7 @@ Route::group([
 
         Route::resource('user_address', UserAdressController::class);
 
+        Route::get('mercadopago', [SaleController::class, "mercadopago"]);
         Route::get('sale/{id}', [SaleController::class, "show"]);
         Route::post('checkout', [SaleController::class, "store"]);
 
