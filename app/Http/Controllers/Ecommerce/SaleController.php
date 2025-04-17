@@ -108,7 +108,7 @@ class SaleController extends Controller
                 "title" => "NAME PRODUCT",
                 "quantity" => 1,
                 "currency_id" => 'ARS',
-                'unit_price' => 100,
+                'unit_price' => intval($request->get("price_unit")),
             ]
         ],
         "back_urls" =>array(
