@@ -111,15 +111,16 @@ Route::group([
 
         Route::resource('user_address', UserAdressController::class);
 
-        // Route::get('mercadopago', [SaleController::class, "mercadopago"]);
+        Route::get('mercadopago', [SaleController::class, "mercadopago"]);
         Route::get('sale/{id}', [SaleController::class, "show"]);
         Route::post('checkout', [SaleController::class, "store"]);
         Route::post('checkout-temp', [SaleController::class, "checkout_temp"]);
+        Route::post('checkout-mercadopago', [SaleController::class, "checkout_mercadopago"]);
 
+        Route::get("profile_client/me", [AuthController::class, "me"]);
 
     });
-    Route::post('checkout-mercadopago', [SaleController::class, "checkout_mercadopago"]);
     //api dolar
-    Route::get('mercadopago', [SaleController::class, "mercadopago"]);
-    Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
+    // Route::get('mercadopago', [SaleController::class, "mercadopago"]);
+    // Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
 });

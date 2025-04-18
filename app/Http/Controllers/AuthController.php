@@ -155,7 +155,18 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth('api')->user());
+        $user = User::find(auth('api')->user()->id);
+        return response()->json([
+            'name' => $user->name,
+            'surname' => $user->surname,
+            'phone' => $user->phone,
+            'email' => $user->email,
+            'bio' => $user->bio,
+            'fb' => $user->fb,
+            'ig' => $user->ig,
+            'sexo' => $user->sexo,
+            'address_city' => $user->address_city,
+        ]);
     }
 
     /**
