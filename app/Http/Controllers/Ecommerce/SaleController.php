@@ -11,6 +11,7 @@ use App\Models\Sale\Cart;
 use App\Models\Sale\Sale;
 use App\Models\Sale\SaleAddres;
 use App\Models\Sale\SaleDetail;
+use App\Models\Sale\SaleTemp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\Client\Preference\PreferenceClient;
@@ -129,6 +130,27 @@ class SaleController extends Controller
             "preference" => $preference,
         ]);
 
+    }
+
+    //funcion para guardar la informacion del checkout de mercado pago, ya que se pierde la informacion cuando se hace una compra por mp
+    public function checkout_temp(Request $request) {
+
+        $sale_temp = SaleTemp::where("user_id",auth('api')->user()->id)->first();
+        if($sale_temp){
+            $sale_temp->update([
+                "description" => $request->description,
+                "sale_address" => json_encode($request->sale_address),
+            ]);
+        } else {
+            SaleTemp::create([
+                "user_id" => auth('api')->user()->id,
+                "description" => $request->description,
+                "sale_address" => json_encode($request->sale_address),
+            ]);
+        }
+
+
+        return response()->json(true);
     }
     //public function checkout_mercadopago
 
