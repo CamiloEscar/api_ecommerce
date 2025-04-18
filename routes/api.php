@@ -118,6 +118,7 @@ Route::group([
 
 
     });
+    Route::post('checkout-mercadopago', [SaleController::class, "checkout_mercadopago"]);
     //api dolar
     Route::get('mercadopago', [SaleController::class, "mercadopago"]);
     Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
