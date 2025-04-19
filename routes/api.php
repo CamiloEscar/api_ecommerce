@@ -118,6 +118,7 @@ Route::group([
         Route::post('checkout-mercadopago', [SaleController::class, "checkout_mercadopago"]);
 
         Route::get("profile_client/me", [AuthController::class, "me"]);
+        Route::put("profile_client", [AuthController::class, "update"]);
 
     });
     //api dolar
