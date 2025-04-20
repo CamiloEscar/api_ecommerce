@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\DolarController;
 use App\Http\Controllers\Ecommerce\CartController;
 use App\Http\Controllers\Ecommerce\HomeController;
+use App\Http\Controllers\Ecommerce\ReviewController;
 use App\Http\Controllers\Ecommerce\SaleController;
 use App\Http\Controllers\Ecommerce\UserAdressController;
 
@@ -118,6 +119,10 @@ Route::group([
         Route::post('checkout-mercadopago', [SaleController::class, "checkout_mercadopago"]);
 
         Route::get("profile_client/me", [AuthController::class, "me"]);
+        Route::get('profile_client/orders', [SaleController::class, "orders"]);
+        Route::put("profile_client", [AuthController::class, "update"]);
+
+        Route::resource('reviews', ReviewController::class);
 
     });
     //api dolar

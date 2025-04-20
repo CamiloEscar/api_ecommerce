@@ -14,6 +14,8 @@ class SaleCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "data" => SaleResource::collection($this->collection)
+        ];
     }
 }
