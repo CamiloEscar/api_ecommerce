@@ -122,7 +122,7 @@ Route::group([
         Route::get('profile_client/orders', [SaleController::class, "orders"]);
         Route::put("profile_client", [AuthController::class, "update"]);
 
-        Route::resource('revews', ReviewController::class);
+        Route::resource('reviews', ReviewController::class);
 
     });
     //api dolar
