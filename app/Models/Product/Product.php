@@ -3,6 +3,7 @@
 namespace App\Models\Product;
 
 use App\Models\Discount\DiscountProduct;
+use App\Models\Sale\Review;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -74,7 +75,18 @@ class Product extends Model
     {
         return $this->hasMany(ProductSpecification::class, "product_id");
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, "product_id");
+    }
     //obtenemos un valor con un mutator
+
+    public function getReviewsCountAttribute() {
+        return $this->reviews->count();
+    }
+    public function getReviewsAvgAttribute() {
+        return $this->reviews->avg("rating");
+    }
     public function getDiscountCategorieAttribute()
     {
         date_default_timezone_set("America/Argentina/Buenos_Aires");
