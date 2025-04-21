@@ -62,6 +62,34 @@ class AuthController extends Controller
         return response()->json($user, 201);
     }
 
+    public function update(Request $request){
+
+        if($request->password){
+            $user = User::find(auth('api')->user()->id);
+            $user->update([
+                "password" => bcrypt($request->password)
+            ]);
+            return response()->json([
+            "message" => 200
+        ]);
+        }
+
+        $is_exists_email = User::where('id',"<>", auth('api')->user()->id)
+                                ->where('email', $request->email)->first();
+        if($is_exists_email) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El usuario ya esta registrado"
+            ]);
+        }
+
+        $user = User::find(auth('api')->user()->id);
+        $user->update($request->all());
+        return response()->json([
+            "message" => 200
+        ]);
+    }
+
     public function verified_email(Request $request)
     {
         $user = User::where('email', $request->email)->first();
