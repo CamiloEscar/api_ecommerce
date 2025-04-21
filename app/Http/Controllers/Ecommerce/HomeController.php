@@ -211,7 +211,8 @@ class HomeController extends Controller
                     "id" => $review->id,
                     "user" => [
                         "full_name" => $review->user->name . " " . $review->user->surname,
-                        "avatar" => 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png'
+                        'avatar' => $review->user->avatar ? env("APP_URL") . "storage/" . $review->user->avatar : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
+
                     ],
                     "message" => $review->message,
                     "rating" => $review->rating,

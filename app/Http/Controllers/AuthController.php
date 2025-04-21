@@ -8,8 +8,11 @@ use App\Http\Controllers\Controller;
 use App\Mail\ForgotPasswordMail;
 use App\Mail\VerifiedMail;
 use App\Models\User;
+// use Illuminate\Container\Attributes\Storage;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+
 
 
 // use Validator;
@@ -84,6 +87,13 @@ class AuthController extends Controller
         }
 
         $user = User::find(auth('api')->user()->id);
+        if($request->hasFile('file_imagen')){
+            if ($user->avatar) {
+                Storage::delete($user->avatar);
+            }
+            $path = Storage::putFile("users", $request->file("file_imagen"));
+            $request->request->add(["avatar" => $path]);
+        }
         $user->update($request->all());
         return response()->json([
             "message" => 200
@@ -194,6 +204,7 @@ class AuthController extends Controller
             'ig' => $user->ig,
             'sexo' => $user->sexo,
             'address_city' => $user->address_city,
+            'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
         ]);
     }
 
