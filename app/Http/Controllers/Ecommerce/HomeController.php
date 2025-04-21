@@ -8,6 +8,7 @@ use App\Http\Resources\Ecommerce\Product\ProductEcommerceResource;
 use App\Models\Discount\Discount;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
+use App\Models\Sale\Review;
 use App\Models\Slider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -198,11 +199,25 @@ class HomeController extends Controller
 
         $product_relateds = Product::where("categorie_first_id", $product->categorie_first_id)->where("state",2)->get();
 
+        $reviews = Review::where("product_id", $product->id)->get();
+
         return response()->json([
             "message" => 200,
             "product" => ProductEcommerceResource::make($product),
             "product_relateds" => ProductEcommerceCollection::make($product_relateds),
             "discount_campaing" => $discount,
+            "reviews" => $reviews->map(function ($review){
+                return [
+                    "id" => $review->id,
+                    "user" => [
+                        "full_name" => $review->user->name . " " . $review->user->surname,
+                        "avatar" => 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png'
+                    ],
+                    "message" => $review->message,
+                    "rating" => $review->rating,
+                    "created_at" => $review->created_at->format("Y-m-d H:i A")
+                ];
+            }),
         ]);
     }
 }
