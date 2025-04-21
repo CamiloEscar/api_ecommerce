@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceCollection;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceResource;
 use App\Models\Discount\Discount;
+use App\Models\Product\Brand;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
+use App\Models\Product\Propertie;
 use App\Models\Sale\Review;
 use App\Models\Slider;
 use Carbon\Carbon;
@@ -223,7 +225,52 @@ class HomeController extends Controller
     }
 
     public function config_filter_advance(){
-        
+        $categories = Categorie::withCount(["product_categorie_firsts"])
+                                ->where("categorie_second_id", NULL)
+                                ->where("categorie_third_id", NULL)
+                                ->get();
+
+        $brands = Brand::withCount(["products"])->where("state", 1)->get();
+
+        $colors = Propertie::where("code", "<>", NULL)->get();
+
+        $product_relateds = Product::where("state", 2)->inRandomOrder()->limit(4)->get();
+
+        return response()->json([
+            "categories" => $categories->map(function ($categorie) {
+                return [
+                    "id" => $categorie->id,
+                    "name" => $categorie->name,
+                    "products_count" => $categorie->product_categorie_firsts_count,
+                    "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : NULL,
+                ];
+            }),
+            "brands" => $brands->map(function ($brand) {
+                return [
+                    "id" => $brand->id,
+                    "name" => $brand->name,
+                    "products_count" => $brand->products_count,
+                ];
+            }),
+            "colors" => $colors->map(function ($color) {
+                $color->products_count = $color->attribute->variations->unique("product_id")->count();
+
+                return $color;
+            }),
+            "product_relateds" => ProductEcommerceCollection::make($product_relateds),
+
+        ]);
+
+
     }
-    public function filter_advance_product(Request $request){}
+
+    //usamos request ya que debe enviar y traer parametros
+    public function filter_advance_product(Request $request){
+
+        $products = Product::orderBy("id", "desc")->get();
+
+        return response()->json([
+            "products" => ProductEcommerceCollection::make($products),
+        ]);
+    }
 }

@@ -35,4 +35,9 @@ class Propertie extends Model
     public function variations(){
         return $this->hasMany(ProductVariation::class);
     }
+
+    //relacion entre propiedades y atributos
+    public function attribute(){
+        return $this->belongsTo(Attribute::class);
+    }
 }
