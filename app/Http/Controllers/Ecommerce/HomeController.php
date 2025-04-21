@@ -221,4 +221,9 @@ class HomeController extends Controller
             }),
         ]);
     }
+
+    public function config_filter_advance(){
+        
+    }
+    public function filter_advance_product(Request $request){}
 }
