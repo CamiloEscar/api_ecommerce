@@ -253,7 +253,7 @@ class HomeController extends Controller
                 ];
             }),
             "colors" => $colors->map(function ($color) {
-                $color->products_count = $color->attribute->variations->unique("product_id")->count();
+                $color->products_count = $color->variations->unique("product_id")->count();
 
                 return $color;
             }),
@@ -268,8 +268,19 @@ class HomeController extends Controller
     public function filter_advance_product(Request $request){
 
         $categories_selected = $request->categories_selected;
+        $colors_selected = $request->colors_selected;
+        $colors_product_selected = [];
 
-        $products = Product::filterAdvanceEcommerce($categories_selected)->orderBy("id", "desc")->get();
+        if($colors_selected && sizeof($colors_selected) > 0){
+            $properties = Propertie::whereIn("id", $colors_selected)->get();
+            foreach ($properties as $propertie) {
+                foreach ($propertie->variations as $variations) {
+                    array_push($colors_product_selected, $variations->product_id);
+                }
+            }
+        }
+
+        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected)->orderBy("id", "desc")->get();
 
         return response()->json([
             "products" => ProductEcommerceCollection::make($products),

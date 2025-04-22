@@ -165,10 +165,25 @@ class Product extends Model
         return $query;
     }
 
-    public function scopefilterAdvanceEcommerce($query, $categories_selected){
+    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected){
 
         if($categories_selected && sizeof($categories_selected) > 0){
             $query->whereIn("categorie_first_id", $categories_selected);
+        }
+        if($colors_product_selected && sizeof($colors_product_selected) > 0){
+            // $query->whereHas("variations", function($q) use ($colors_selected) {
+            //     $q->whereHas("propertie", function($subq) use ($colors_selected){
+            //         $subq->whereIn("code", $colors_selected);
+            //     });
+            // });
+            $query->whereIn("id", $colors_product_selected);
+            // $query->whereHas("variations", function($q) use ($colors_selected) {
+            //     $q->whereHas("variation_children", function($sub) use ($colors_selected){
+            //         $sub->whereHas("propertie", function($subq) use ($colors_selected){
+            //             $subq->whereIn("code", $colors_selected);
+            //         });
+            //     });
+            // });
         }
 
         return $query;
