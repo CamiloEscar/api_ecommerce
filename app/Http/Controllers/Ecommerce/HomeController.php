@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceCollection;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceResource;
 use App\Models\Discount\Discount;
+use App\Models\Product\Brand;
 use App\Models\Product\Categorie;
 use App\Models\Product\Product;
+use App\Models\Product\Propertie;
 use App\Models\Sale\Review;
 use App\Models\Slider;
 use Carbon\Carbon;
@@ -219,6 +221,104 @@ class HomeController extends Controller
                     "created_at" => $review->created_at->format("Y-m-d H:i A")
                 ];
             }),
+        ]);
+    }
+
+    public function config_filter_advance(){
+        $categories = Categorie::withCount(["product_categorie_firsts"])
+                                ->where("categorie_second_id", NULL)
+                                ->where("categorie_third_id", NULL)
+                                ->get();
+
+        $brands = Brand::withCount(["products"])->where("state", 1)->get();
+
+        $colors = Propertie::where("code", "<>", NULL)->get();
+
+        $product_relateds = Product::where("state", 2)->inRandomOrder()->limit(4)->get();
+
+        return response()->json([
+            "categories" => $categories->map(function ($categorie) {
+                return [
+                    "id" => $categorie->id,
+                    "name" => $categorie->name,
+                    "products_count" => $categorie->product_categorie_firsts_count,
+                    "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : NULL,
+                ];
+            }),
+            "brands" => $brands->map(function ($brand) {
+                return [
+                    "id" => $brand->id,
+                    "name" => $brand->name,
+                    "products_count" => $brand->products_count,
+                ];
+            }),
+            "colors" => $colors->map(function ($color) {
+                $color->products_count = $color->variations->unique("product_id")->count();
+
+                return $color;
+            }),
+            "product_relateds" => ProductEcommerceCollection::make($product_relateds),
+
+        ]);
+
+
+    }
+
+    //usamos request ya que debe enviar y traer parametros
+    public function filter_advance_product(Request $request){
+
+        $categories_selected = $request->categories_selected;
+        $colors_selected = $request->colors_selected;
+        $brands_selected = $request->brands_selected;
+
+        $min_price = $request->min_price;
+        $max_price = $request->max_price;
+
+        $currency = $request->currency;
+
+        $options_aditional = $request->options_aditional;
+
+        $search = $request->search;
+
+        $colors_product_selected = [];
+        if($colors_selected && sizeof($colors_selected) > 0){
+            $properties = Propertie::whereIn("id", $colors_selected)->get();
+            foreach ($properties as $propertie) {
+                foreach ($propertie->variations as $variations) {
+                    array_push($colors_product_selected, $variations->product_id);
+                }
+            }
+        }
+
+        $product_general_ids_array = [];
+        if($options_aditional && sizeof($options_aditional) > 0 && in_array("campaing", $options_aditional)) {
+
+            date_default_timezone_set("America/Argentina/Buenos_Aires");
+            $discount = Discount::where("type_campaing", 1)->where("state", 1)
+                                ->where("start_date", "<=", today())
+                                ->where("end_date", ">=", today())
+                                ->first();
+            if($discount){
+                foreach ($discount->products as $product_aux) {
+                    //accedemos a la relacion discount_product para asi poder acceder al producto
+                    array_push($product_general_ids_array, $product_aux->product_id);
+                }
+                foreach ($discount->categories as $categorie_aux) {
+                    //accedemos a la relacion discount_product para asi poder acceder al producto
+                    array_push($categories_selected, $categorie_aux->categorie_id);
+                }
+                foreach ($discount->brands as $brand_aux) {
+                    array_push($brands_selected, $brand_aux->brand_id);
+                }
+            }
+        };
+
+        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected,
+                                                    $min_price, $max_price, $currency, $product_general_ids_array, $options_aditional, $search )
+                                                    ->orderBy("id", "desc")->get();
+
+        return response()->json([
+            "products" => ProductEcommerceCollection::make($products),
         ]);
     }
 }

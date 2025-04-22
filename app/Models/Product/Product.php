@@ -164,4 +164,56 @@ class Product extends Model
 
         return $query;
     }
+
+    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected,
+                                                $min_price, $max_price, $currency, $product_general_ids_array,
+                                                $options_aditional, $search){
+
+        if($categories_selected && sizeof($categories_selected) > 0){
+            $query->whereIn("categorie_first_id", $categories_selected);
+        }
+
+        if($brands_selected && sizeof($brands_selected) > 0){
+            $query->whereIn("brand_id", $brands_selected);
+        }
+
+        if($colors_product_selected && sizeof($colors_product_selected) > 0){
+            // $query->whereHas("variations", function($q) use ($colors_selected) {
+            //     $q->whereHas("propertie", function($subq) use ($colors_selected){
+            //         $subq->whereIn("code", $colors_selected);
+            //     });
+            // });
+            $query->whereIn("id", $colors_product_selected);
+            // $query->whereHas("variations", function($q) use ($colors_selected) {
+            //     $q->whereHas("variation_children", function($sub) use ($colors_selected){
+            //         $sub->whereHas("propertie", function($subq) use ($colors_selected){
+            //             $subq->whereIn("code", $colors_selected);
+            //         });
+            //     });
+            // });
+        }
+
+        if($min_price > 0 && $max_price > 0) {
+            if($currency == 'ARS'){
+                $query->whereBetween("price_ars", [$min_price, $max_price]);
+            }
+            if($currency == 'USD'){
+                $query->whereBetween("price_usd", [$min_price, $max_price]);
+            }
+        }
+
+        if($product_general_ids_array && sizeof($product_general_ids_array) > 0){
+            $query->whereIn("id", $product_general_ids_array);
+        }
+
+        if($options_aditional && sizeof($options_aditional) > 0 && in_array("review", $options_aditional)){
+            $query->has("reviews");
+        }
+
+        if ($search) {
+            $query->where("title", "like", "%" . $search . "%");
+        }
+
+        return $query;
+    }
 }

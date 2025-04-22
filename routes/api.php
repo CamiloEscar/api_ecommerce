@@ -125,6 +125,10 @@ Route::group([
         Route::resource('reviews', ReviewController::class);
 
     });
+
+    Route::get("config-filter-advance",  [HomeController::class, "config_filter_advance"]);
+    Route::post("filter-advance-product",  [HomeController::class, "filter_advance_product"]);
+
     //api dolar
     // Route::get('mercadopago', [SaleController::class, "mercadopago"]);
     // Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
