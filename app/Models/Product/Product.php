@@ -166,7 +166,7 @@ class Product extends Model
     }
 
     public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected,
-                                                $min_price, $max_price, $currency){
+                                                $min_price, $max_price, $currency, $product_general_ids_array){
 
         if($categories_selected && sizeof($categories_selected) > 0){
             $query->whereIn("categorie_first_id", $categories_selected);
@@ -199,6 +199,10 @@ class Product extends Model
             if($currency == 'USD'){
                 $query->whereBetween("price_usd", [$min_price, $max_price]);
             }
+        }
+
+        if($product_general_ids_array && sizeof($product_general_ids_array) > 0){
+            $query->whereIn("id", $product_general_ids_array);
         }
 
         return $query;
