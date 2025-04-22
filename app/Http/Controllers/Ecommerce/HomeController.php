@@ -270,6 +270,7 @@ class HomeController extends Controller
         $categories_selected = $request->categories_selected;
         $colors_selected = $request->colors_selected;
         $colors_product_selected = [];
+        $brands_selected = $request->brands_selected;
 
         if($colors_selected && sizeof($colors_selected) > 0){
             $properties = Propertie::whereIn("id", $colors_selected)->get();
@@ -280,7 +281,7 @@ class HomeController extends Controller
             }
         }
 
-        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected)->orderBy("id", "desc")->get();
+        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected)->orderBy("id", "desc")->get();
 
         return response()->json([
             "products" => ProductEcommerceCollection::make($products),

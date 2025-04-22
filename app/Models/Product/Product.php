@@ -165,11 +165,16 @@ class Product extends Model
         return $query;
     }
 
-    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected){
+    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected){
 
         if($categories_selected && sizeof($categories_selected) > 0){
             $query->whereIn("categorie_first_id", $categories_selected);
         }
+
+        if($brands_selected && sizeof($brands_selected) > 0){
+            $query->whereIn("brand_id", $brands_selected);
+        }
+
         if($colors_product_selected && sizeof($colors_product_selected) > 0){
             // $query->whereHas("variations", function($q) use ($colors_selected) {
             //     $q->whereHas("propertie", function($subq) use ($colors_selected){
