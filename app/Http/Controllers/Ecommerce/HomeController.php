@@ -312,7 +312,7 @@ class HomeController extends Controller
         };
 
         $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected,
-                                                    $min_price, $max_price, $currency, $product_general_ids_array )
+                                                    $min_price, $max_price, $currency, $product_general_ids_array, $options_aditional )
                                                     ->orderBy("id", "desc")->get();
 
         return response()->json([
