@@ -167,7 +167,7 @@ class Product extends Model
 
     public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected,
                                                 $min_price, $max_price, $currency, $product_general_ids_array,
-                                                $options_aditional){
+                                                $options_aditional, $search){
 
         if($categories_selected && sizeof($categories_selected) > 0){
             $query->whereIn("categorie_first_id", $categories_selected);
@@ -208,6 +208,10 @@ class Product extends Model
 
         if($options_aditional && sizeof($options_aditional) > 0 && in_array("review", $options_aditional)){
             $query->has("reviews");
+        }
+
+        if ($search) {
+            $query->where("title", "like", "%" . $search . "%");
         }
 
         return $query;
