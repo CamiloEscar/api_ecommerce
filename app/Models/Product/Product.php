@@ -164,4 +164,13 @@ class Product extends Model
 
         return $query;
     }
+
+    public function scopefilterAdvanceEcommerce($query, $categories_selected){
+
+        if($categories_selected && sizeof($categories_selected) > 0){
+            $query->whereIn("categorie_first_id", $categories_selected);
+        }
+
+        return $query;
+    }
 }
