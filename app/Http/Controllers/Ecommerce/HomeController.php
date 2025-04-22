@@ -272,6 +272,11 @@ class HomeController extends Controller
         $colors_product_selected = [];
         $brands_selected = $request->brands_selected;
 
+        $min_price = $request->min_price;
+        $max_price = $request->max_price;
+
+        $currency = $request->currency;
+
         if($colors_selected && sizeof($colors_selected) > 0){
             $properties = Propertie::whereIn("id", $colors_selected)->get();
             foreach ($properties as $propertie) {
@@ -281,7 +286,9 @@ class HomeController extends Controller
             }
         }
 
-        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected)->orderBy("id", "desc")->get();
+        $products = Product::filterAdvanceEcommerce($categories_selected, $colors_product_selected, $brands_selected,
+                                                    $min_price, $max_price, $currency )
+                                                    ->orderBy("id", "desc")->get();
 
         return response()->json([
             "products" => ProductEcommerceCollection::make($products),

@@ -165,7 +165,8 @@ class Product extends Model
         return $query;
     }
 
-    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected){
+    public function scopefilterAdvanceEcommerce($query, $categories_selected, $colors_product_selected, $brands_selected,
+                                                $min_price, $max_price, $currency){
 
         if($categories_selected && sizeof($categories_selected) > 0){
             $query->whereIn("categorie_first_id", $categories_selected);
@@ -189,6 +190,15 @@ class Product extends Model
             //         });
             //     });
             // });
+        }
+
+        if($min_price > 0 && $max_price > 0) {
+            if($currency == 'ARS'){
+                $query->whereBetween("price_ars", [$min_price, $max_price]);
+            }
+            if($currency == 'USD'){
+                $query->whereBetween("price_usd", [$min_price, $max_price]);
+            }
         }
 
         return $query;
