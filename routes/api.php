@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
 use App\Http\Controllers\Admin\Product\ProductVariationsAnidadoController;
 use App\Http\Controllers\Admin\Product\ProductVariationsController;
+use App\Http\Controllers\Admin\Sale\SalesController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\DolarController;
 use App\Http\Controllers\Ecommerce\CartController;
@@ -90,6 +91,8 @@ Route::group([
     Route::resource("cupones", CuponeController::class);
 
     Route::resource("discounts", DiscountController::class);
+
+    Route::post("sales/list", [SalesController::class, "list"]);
 });
 
 
@@ -123,6 +126,7 @@ Route::group([
         Route::post("profile_client", [AuthController::class, "update"]);
 
         Route::resource('reviews', ReviewController::class);
+
 
     });
 
