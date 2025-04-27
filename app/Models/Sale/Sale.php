@@ -24,6 +24,9 @@ class Sale extends Model
         "description",
         "n_transaccion",
         "preference_id",
+        //
+        "created_at",
+        "updated_at",
     ];
     public function setCreatedAtAttribute($value)
     {
