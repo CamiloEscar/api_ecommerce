@@ -229,4 +229,39 @@ class KpiSaleReportController extends Controller
             "sales_for_month_year" => $query,
         ]);
     }
+
+    public function report_discount_cupone_year(Request $request) {
+
+        $year = $request->year;
+        $dolar = 1200;
+
+        $query_cupon = DB::table("sales")->where("sales.deleted_at", NULL)
+                                            ->join("sale_details", "sale_details.sale_id", "=", "sales.id")
+                                            ->where("sale_details.deleted_at", NULL)
+                                            ->whereYear("sales.created_at", $year)
+                                            ->where("sale_details.code_cupon", "<>", NULL)
+                                            ->select(
+                                                DB::raw("sale_details.code_cupon as cupone"),
+                                                DB::raw("COUNT(*) as count_total"),
+                                        )
+                                        ->groupBy("cupone")
+                                        ->get();
+
+        $query_discount = DB::table("sales")->where("sales.deleted_at", NULL)
+                                            ->join("sale_details", "sale_details.sale_id", "=", "sales.id")
+                                            ->where("sale_details.deleted_at", NULL)
+                                            ->whereYear("sales.created_at", $year)
+                                            ->where("sale_details.code_discount", "<>", NULL)
+                                            ->select(
+                                                DB::raw("sale_details.code_discount as code_discount"),
+                                                DB::raw("COUNT(*) as count_total"),
+                                        )
+                                        ->groupBy("code_discount")
+                                        ->get();
+
+        return response()->json([
+            "uso_discount_year" => $query_discount,
+            "canje_cupone_year" => $query_cupon
+        ]);
+    }
 }
