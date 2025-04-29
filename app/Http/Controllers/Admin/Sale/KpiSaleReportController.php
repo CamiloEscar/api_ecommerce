@@ -179,4 +179,54 @@ class KpiSaleReportController extends Controller
         ]);
 
     }
+
+    public function report_sales_for_month_year_selected(Request $request){
+        $year = $request->year;
+        $dolar = 1200;
+        $query = DB::table("sales")->where("sales.deleted_at", NULL)
+                                        ->whereYear("sales.created_at", $year)
+                                        ->select(
+                                            DB::raw("DATE_FORMAT(sales.created_at, '%Y-%m') as date_format_month"),
+                                            DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD', sales.total * $dolar, 'sales.total')),2) as sale_total")
+                                        )
+                                        ->groupBy("date_format_month")
+                                        ->get();
+        $query_last = DB::table("sales")->where("sales.deleted_at", NULL)
+                                        ->whereYear("sales.created_at", $year-1)
+                                        ->select(
+                                            DB::raw("DATE_FORMAT(sales.created_at, '%Y-%m') as date_format_month"),
+                                            DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD', sales.total * $dolar, 'sales.total')),2) as sale_total")
+                                        )
+                                        ->groupBy("date_format_month")
+                                        ->get();
+
+        $query_discount = DB::table("sales")->where("sales.deleted_at", NULL)
+                                            ->join("sale_details", "sale_details.sale_id", "=", "sales.id")
+                                            ->where("sale_details.deleted_at", NULL)
+                                            ->whereYear("sales.created_at", $year)
+                                            ->where("sale_details.code_discount", "<>", NULL)
+                                            ->select(
+                                            DB::raw("ROUND(SUM(IF(sale_details.currency = 'USD', sale_details.discount * $dolar, 'sale_details.discount')),2) as discount_total"),
+                                            DB::raw("COUNT(*) as count_total")
+                                        )
+                                        ->get();
+        $query_cupon = DB::table("sales")->where("sales.deleted_at", NULL)
+                                            ->join("sale_details", "sale_details.sale_id", "=", "sales.id")
+                                            ->where("sale_details.deleted_at", NULL)
+                                            ->whereYear("sales.created_at", $year)
+                                            ->where("sale_details.code_cupon", "<>", NULL)
+                                            ->select(
+                                            DB::raw("ROUND(SUM(IF(sale_details.currency = 'USD', sale_details.discount * $dolar, 'sale_details.discount')),2) as discount_total"),
+                                            DB::raw("COUNT(*) as count_total")
+                                        )
+                                        ->get();
+
+        return response()->json([
+            "query_cupon" => $query_cupon,
+            "query_discount" => $query_discount,
+            "sales_for_month_year_last" => $query_last,
+            "sales_form_month_year_total" => $query->sum("sale_total"),
+            "sales_for_month_year" => $query,
+        ]);
+    }
 }
