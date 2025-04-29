@@ -102,6 +102,7 @@ Route::group([
         Route::post("report_sales_country_for_year", [KpiSaleReportController::class, "report_sales_country_for_year"]);
         Route::post("report_sales_week_categorias", [KpiSaleReportController::class, "report_sales_week_categorias"]);
         Route::post("report_sales_week_discounts", [KpiSaleReportController::class, "report_sales_week_discounts"]);
+        Route::post("report_sales_month_selected", [KpiSaleReportController::class, "report_sales_month_selected"]);
     });
 });
 

@@ -129,4 +129,47 @@ class KpiSaleReportController extends Controller
             "porcentageV" => $porcentageV,
         ]);
     }
+
+    public function report_sales_month_selected(Request $request){
+
+        $year = $request->year;
+        $month = $request->month;
+
+        $sales_for_day_of_month = DB::table("sales")->where("sales.deleted_at", NULL)
+                                          ->whereYear("sales.created_at", $year)
+                                          ->whereMonth("sales.created_at", $month)
+                                          ->select(
+                                            DB::raw("DATE_FORMAT(sales.created_at,'%Y-%m-%d') as date_format"),
+                                                     DB::raw("DATE_FORMAT(sales.created_at, '%m-%d') as date_format_day"),
+                                                     DB::raw("ROUND(SUM(sales.total),2) as sales_total")
+                                          )
+                                          ->groupBy("date_format","date_format_day")
+                                          ->get();
+
+
+        //metodo para obtener el mes anterior
+        $month_last = Carbon::parse($year.'-'.$month.'-'.'01')->subMonth();
+
+        // dd($month_last);
+
+        $sales_for_month_last = DB::table("sales")->where("sales.deleted_at", NULL)
+                                ->whereYear("sales.created_at", $month_last->format("Y"))
+                                ->whereMonth("sales.created_at", $month_last->format("m"))
+                                ->select(DB::raw("ROUND(SUM(sales.total),2) as sales_total"))
+                                ->get()
+                                ->sum("sales_total");
+
+        $porcentageV = 0;
+        if($sales_for_month_last > 0){
+            $porcentageV = (($sales_for_day_of_month->sum("sales_total")-$sales_for_month_last)/$sales_for_month_last)*100;
+        }
+
+        return response()->json([
+            "porcentageV" => round($porcentageV,2),
+            // "sales_for_month_last" => $sales_for_month_last,
+            "total_sales_for_month" => round($sales_for_day_of_month->sum("sales_total"),2),
+            "sales_for_day_of_month" => ($sales_for_day_of_month),
+        ]);
+
+    }
 }
