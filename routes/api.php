@@ -100,6 +100,7 @@ Route::group([
         "prefix" => "kpi"
     ], function ($router) {
         Route::post("report_sales_country_for_year", [KpiSaleReportController::class, "report_sales_country_for_year"]);
+        Route::post("report_sales_week_categorias", [KpiSaleReportController::class, "report_sales_week_categorias"]);
     });
 });
 
