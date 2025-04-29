@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
 use App\Http\Controllers\Admin\Product\ProductVariationsAnidadoController;
 use App\Http\Controllers\Admin\Product\ProductVariationsController;
+use App\Http\Controllers\Admin\Sale\KpiSaleReportController;
 use App\Http\Controllers\Admin\Sale\SalesController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\DolarController;
@@ -93,6 +94,13 @@ Route::group([
     Route::resource("discounts", DiscountController::class);
 
     Route::post("sales/list", [SalesController::class, "list"]);
+
+    Route::group([
+
+        "prefix" => "kpi"
+    ], function ($router) {
+        Route::post("report_sales_country_for_year", [KpiSaleReportController::class, "report_sales_country_for_year"]);
+    });
 });
 
 Route::get("sales/list-excel", [SalesController::class, "list_excel"]);

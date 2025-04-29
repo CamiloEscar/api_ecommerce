@@ -27,7 +27,7 @@ class SaleSeeder extends Seeder
                 "name" => $faker->name(),
                 "surname" => $faker->lastName(),
                 "company" =>  $faker->word(),
-                "country_region" =>  $faker->word(),
+                "country_region" =>  $faker->randomElement(['Peru', 'Argentina', 'Bolivia', 'Brasil', 'Chile', 'Uruguay']),
                 "address" =>  $faker->word(),
                 "street" =>  $faker->word(),
                 "city" =>  $faker->word(),
