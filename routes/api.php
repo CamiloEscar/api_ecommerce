@@ -99,6 +99,7 @@ Route::group([
 
         "prefix" => "kpi"
     ], function ($router) {
+        Route::get("config", [KpiSaleReportController::class, "config"]);
         Route::post("report_sales_country_for_year", [KpiSaleReportController::class, "report_sales_country_for_year"]);
         Route::post("report_sales_week_categorias", [KpiSaleReportController::class, "report_sales_week_categorias"]);
         Route::post("report_sales_week_discounts", [KpiSaleReportController::class, "report_sales_week_discounts"]);

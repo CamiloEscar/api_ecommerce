@@ -9,11 +9,42 @@ use Illuminate\Support\Facades\DB;
 
 class KpiSaleReportController extends Controller
 {
+
+    public function config(){
+        $months_name = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+
+        return response()->json([
+            "year" =>date("Y"),
+            "month" =>date("m"),
+            "meses" => $months_name,
+        ]);
+    }
     public function report_sales_country_for_year(Request $request){
 
         $year = $request->year;
         $month = $request->month;
         $dolar = 1200;
+
+        $sales_for_month = DB::table("sales")->where("sales.deleted_at", NULL)
+                                ->whereYear("sales.created_at", $year)
+                                // ->whereMonth("sales.created_at", $month)
+                                ->select(DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as sales_total"))
+                                ->get()
+                                ->sum("sales_total");
+
+        // $month_last = Carbon::parse($year.'-'.$month.'-'.'01')->subMonth();
+
+        $sales_for_year = DB::table("sales")->where("sales.deleted_at", NULL)
+                                ->whereYear("sales.created_at", $year - 1)
+                                // ->whereMonth("sales.created_at", $month_last->format("m"))
+                                ->select(DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as sales_total"))
+                                ->get()
+                                ->sum("sales_total");
+
+        $porcentageV = 0;
+        if($sales_for_year > 0){
+            $porcentageV = (($sales_for_month - $sales_for_year)/$sales_for_year)*100;
+        }
 
         $query = DB::table("sales")->where("sales.deleted_at", NULL)
                     ->join("sale_addres", "sale_addres.sale_id", "=", "sales.id")
@@ -27,11 +58,13 @@ class KpiSaleReportController extends Controller
                 DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as total_sales"))
                 ->groupBy("country_region")
                 ->orderBy("total_sales", "desc");
-        $query= $query->get();
+        $query= $query->take(6)->get();
 
 
         return response()->json([
-            "sales_for_country" => $query
+            "sales_for_country" => $query,
+            "porcentageV" => round($porcentageV,2),
+            "sales_for_year" => round($sales_for_year, 2)
         ]);
     }
 
