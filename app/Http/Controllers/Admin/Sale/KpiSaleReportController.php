@@ -404,4 +404,31 @@ class KpiSaleReportController extends Controller
             "sale_month_categories" => $sales_month_categories,
         ]);
     }
+
+    public function report_sales_for_brand(Request $request){
+
+        $year = $request->year;
+        $month = $request->month;
+        $dolar = 1200;
+
+        $query = DB::table("sales")->where("sales.deleted_at", NULL)
+                                        ->join("sale_details","sale_details.sale_id","=","sales.id")
+                                        ->join("products","sale_details.product_id","=","products.id")
+                                        ->join("brands","products.brand_id","=","brands.id")
+                                        ->where("sale_details.deleted_at", NULL)
+                                        ->whereYear("sales.created_at", $year)
+                                        ->whereMonth("sales.created_at", $month)
+                                        ->select(
+                                            "brands.name as brand_name",
+                                                     "brands.id as brand_t_id",
+                                            DB::raw("ROUND(SUM(IF(sale_details.currency = 'USD', sale_details.total * $dolar, sale_details.total)), 2) as brand_total"),
+                                            DB::raw("ROUND(SUM(sale_details.quantity), 2) as quantity_total")
+                                        )
+                                        ->groupBy("brand_name", "brand_t_id")
+                                        ->get();
+
+        return response()->json([
+            "sales_for_brand" => $query,
+        ]);
+    }
 }
