@@ -366,14 +366,17 @@ class KpiSaleReportController extends Controller
                                                 DB::raw("ROUND(SUM(IF(sale_details.currency = 'USD', sale_details.total * $dolar, sale_details.total)) / SUM(sale_details.quantity), 2) as categories_avg")
                                             )
                                             ->groupBy("categorie_name")
+                                            ->orderBy("categories_total", "desc")
+                                            ->take(5)
                                             ->get();
 
 
         return response()->json([
             "sale_form_month" => $sales_for_month,
             "sale_form_month_categorie" => $query->sum("categories_total"),
-            "porcentageV" => $porcentageV,
+            "porcentageV" => round($porcentageV,2),
             "sale_for_categories" => $query,
+            "sales_total" => round($sales_for_month,2),
         ]);
     }
 
