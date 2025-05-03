@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
 use App\Http\Controllers\Admin\Product\ProductVariationsAnidadoController;
 use App\Http\Controllers\Admin\Product\ProductVariationsController;
+use App\Http\Controllers\Admin\Sale\KpiSaleReportController;
+use App\Http\Controllers\Admin\Sale\SalesController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\DolarController;
 use App\Http\Controllers\Ecommerce\CartController;
@@ -90,7 +92,29 @@ Route::group([
     Route::resource("cupones", CuponeController::class);
 
     Route::resource("discounts", DiscountController::class);
+
+    Route::post("sales/list", [SalesController::class, "list"]);
+
+    Route::group([
+
+        "prefix" => "kpi"
+    ], function ($router) {
+        Route::get("config", [KpiSaleReportController::class, "config"]);
+        Route::post("report_sales_country_for_year", [KpiSaleReportController::class, "report_sales_country_for_year"]);
+        Route::post("report_sales_week_categorias", [KpiSaleReportController::class, "report_sales_week_categorias"]);
+        Route::post("report_sales_week_discounts", [KpiSaleReportController::class, "report_sales_week_discounts"]);
+        Route::post("report_sales_month_selected", [KpiSaleReportController::class, "report_sales_month_selected"]);
+        Route::post("report_sales_for_month_year_selected", [KpiSaleReportController::class, "report_sales_for_month_year_selected"]);
+        Route::post("report_discount_cupone_year", [KpiSaleReportController::class, "report_discount_cupone_year"]);
+        Route::post("report_sales_for_categories", [KpiSaleReportController::class, "report_sales_for_categories"]);
+        Route::post("report_sales_for_categories_details", [KpiSaleReportController::class, "report_sales_for_categories_details"]);
+        Route::post("report_sales_for_brand", [KpiSaleReportController::class, "report_sales_for_brand"]);
+    });
 });
+
+Route::get("sales/list-excel", [SalesController::class, "list_excel"]);
+Route::get("sales/report-pdf/{id}", [SalesController::class, "report_pdf"]);
+
 
 
 Route::group([
@@ -123,6 +147,7 @@ Route::group([
         Route::post("profile_client", [AuthController::class, "update"]);
 
         Route::resource('reviews', ReviewController::class);
+
 
     });
 
