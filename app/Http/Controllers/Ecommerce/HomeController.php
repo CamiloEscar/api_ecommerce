@@ -41,7 +41,7 @@ class HomeController extends Controller
         $sliders_productos = Slider::where("state", 1)->where("type_slider", 3)->orderBy("id", "asc")->get();
 
         // $products_comics = Product::where("state", 2)->where("categorie_first_id", 50)->inRandomOrder()->limit(6)->get();
-        $products_comics = Product::where("state", 2)->where("categorie_first_id", 47)->where("categorie_second_id", 63)->inRandomOrder()->limit(6)->get();
+        $products_comics = Product::where("state", 2)->where("categorie_first_id", 38)->where("categorie_second_id", 10)->inRandomOrder()->limit(6)->get();
         $products_carousel = Product::where("state", 2)->whereIn("categorie_first_id", $categories_randoms->pluck("id"))->inRandomOrder()->get();
 
 
@@ -148,6 +148,7 @@ class HomeController extends Controller
 
             "discount_flash" => $DISCOUNT_FLASH,
             "discount_flash_product" => $DISCOUNT_FLASH_PRODUCTS,
+
         ]);
     }
 
