@@ -26,6 +26,7 @@ class Sale extends Model
         "description",
         "n_transaccion",
         "preference_id",
+        "shipping_cost_id",
         //
         "created_at",
         "updated_at",
@@ -50,6 +51,9 @@ class Sale extends Model
 
     public function user(){
         return $this->belongsTo(User::class);
+    }
+    public function shipp(){
+        return $this->belongsTo(ShippingCost::class);
     }
 
     public function scopeFilterAdvanceAdmin($query, $search,

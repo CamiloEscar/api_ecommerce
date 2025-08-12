@@ -12,8 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
-
-
+use Laravel\Socialite\Facades\Socialite;
 
 // use Validator;
 
@@ -27,9 +26,46 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'facebookLogin']]);
     }
 
+    public function redirect() {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    public function callback()
+{
+    $fbUser = Socialite::driver('facebook')->user();
+
+    $user = User::firstOrCreate(
+        ['email' => $fbUser->getEmail()],
+        [
+            'name' => $fbUser->getName(),
+            'type_user' => 2,
+            'uniqd' => uniqid(),
+            'email_verified_at' => now(),
+            'fb' => 'facebook',
+        ]
+    );
+
+    $token = auth('api')->login($user);
+
+    // Codificamos los datos para pasarlos como query string
+    $query = http_build_query([
+        'token' => $token,
+        'name' => $user->name,
+        'email' => $user->email,
+        'surname' => $user->surname,
+        'phone' => $user->phone,
+        'address_city' => $user->address_city,
+        'fb' => $user->fb,
+        'sexo' => $user->sexo,
+        'bio' => $user->bio,
+        'avatar' => $user->avatar,
+    ]);
+
+    return redirect()->to("http://localhost:4200/register?$query");
+}
 
     /**
      * Register a User.
@@ -249,4 +285,18 @@ class AuthController extends Controller
             ]
         ]);
     }
+
+    public function facebookLogin(Request $request) {
+    $token = $request->access_token;
+    $fbUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
+
+    $user = User::firstOrCreate(['email' => $fbUser->getEmail()], [
+        'name' => $fbUser->getName(),
+        'email_verified_at' => now(),
+        'type_user' => 2,
+    ]);
+
+    $jwt = auth('api')->login($user);
+    return response()->json(['access_token' => $jwt, 'user' => $user]);
+}
 }
