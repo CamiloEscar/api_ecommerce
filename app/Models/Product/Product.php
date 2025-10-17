@@ -22,6 +22,7 @@ class Product extends Model
         'resumen',
         'imagen',
         'state',
+        'cost',
         'description',
         'tags',
         'brand_id',

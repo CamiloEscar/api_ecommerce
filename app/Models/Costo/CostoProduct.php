@@ -1,35 +1,20 @@
 <?php
 
-namespace App\Models\Sale;
+namespace App\Models\Costo;
 
 use App\Models\Product\Product;
-use App\Models\Product\ProductVariation;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Cart extends Model
+class CostoProduct extends Model
 {
     use HasFactory;
     use SoftDeletes;
     protected $fillable = [
-        "user_id",
-        "product_id",
-        "type_discount",
-        "discount",
-        "type_campaing",
-        "code_cupon",
-        "code_costo",
-        "code_discount",
-        "product_variation_id",
-        "quantity",
-        "price_unit",
-        "subtotal",
-        "total",
-        "currency",
-        "updated_at"
+        'costo_id',
+        'product_id',
     ];
 
     public function setCreatedAtAttribute($value)
@@ -43,16 +28,7 @@ class Cart extends Model
         $this->attributes["updated_at"] = Carbon::now();
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    public function product()
-    {
+    public function product(){
         return $this->belongsTo(Product::class);
-    }
-    public function product_variation()
-    {
-        return $this->belongsTo(ProductVariation::class);
     }
 }
