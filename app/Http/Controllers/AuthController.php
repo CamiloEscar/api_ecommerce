@@ -14,11 +14,61 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
+
+/**
+ * @OA\Tag(
+ *     name="Autenticación",
+ *     description="Operaciones relacionadas al login y autenticación de usuarios"
+ * )
+ */
+
+
+/**
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+*/
+
+
 // use Validator;
 
 
 class AuthController extends Controller
 {
+
+    /**
+ * @OA\Post(
+ *     path="/api/auth/login",
+ *     summary="Login administrador",
+ *     tags={"Autenticación"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"email", "password"},
+ *             @OA\Property(property="email", type="string", example="admin@admin.com"),
+ *             @OA\Property(property="password", type="string", example="12345678")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Login exitoso",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="access_token", type="string"),
+ *             @OA\Property(property="token_type", type="string", example="bearer"),
+ *             @OA\Property(property="expires_in", type="integer"),
+ *             @OA\Property(property="user", type="object",
+ *                 @OA\Property(property="full_name", type="string", example="Admin User"),
+ *                 @OA\Property(property="email", type="string", example="admin@admin.com")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=401, description="Credenciales inválidas")
+ * )
+ */
+
     /**
      * Create a new AuthController instance.
      *
@@ -227,6 +277,30 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+    /**
+ * @OA\Post(
+ *     path="/api/auth/me",
+ *     summary="Obtener datos del usuario autenticado",
+ *     tags={"Autenticación"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Datos del usuario",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="name", type="string", example="Juan"),
+ *             @OA\Property(property="surname", type="string", example="Pérez"),
+ *             @OA\Property(property="email", type="string", example="admin@admin.com"),
+ *             @OA\Property(property="phone", type="string", example="123456789"),
+ *             @OA\Property(property="avatar", type="string", example="http://localhost/storage/users/avatar.jpg")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="No autenticado"
+ *     )
+ * )
+ */
     public function me()
     {
         $user = User::find(auth('api')->user()->id);

@@ -1,0 +1,449 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Home",
+        "description": "Descripcion de los endpoints del home",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000"
+        }
+    ],
+    "paths": {
+        "/api/auth/me": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Obtener datos del usuario autenticado",
+                "operationId": "f0b15943f55143d36f606a2dbd1d2366",
+                "responses": {
+                    "200": {
+                        "description": "Datos del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Juan"
+                                        },
+                                        "surname": {
+                                            "type": "string",
+                                            "example": "Pérez"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "admin@admin.com"
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "123456789"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "example": "http://localhost/storage/users/avatar.jpg"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ecommerce/menus": {
+            "get": {
+                "tags": [
+                    "Menu de las categorias"
+                ],
+                "summary": "Obtiene el listado de menús con categorías y subcategorías",
+                "description": "Listado de todos los registros de los productos del home",
+                "operationId": "e9dc67116a59470aa8591c8c798232d7",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "categories_menus": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Funkos"
+                                                    },
+                                                    "icon": {
+                                                        "type": "string",
+                                                        "example": "<svg>...</svg>"
+                                                    },
+                                                    "categories": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 3
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Series de TV"
+                                                                },
+                                                                "imagen": {
+                                                                    "type": "string",
+                                                                    "format": "url",
+                                                                    "example": "http://127.0.0.1:8000/storage/categories/POMe1ibHLQXUApyuS9DGaUFMNyvtVtY62jhoAPpV.jpg"
+                                                                },
+                                                                "subcategories": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "id": {
+                                                                                "type": "integer",
+                                                                                "example": 7
+                                                                            },
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "example": "Disney"
+                                                                            },
+                                                                            "imagen": {
+                                                                                "type": "string",
+                                                                                "example": null,
+                                                                                "nullable": true
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ecommerce/producto/{slug}": {
+            "get": {
+                "tags": [
+                    "Producto"
+                ],
+                "summary": "Obtener detalles de un producto",
+                "description": "Obtener detalles de un producto por slug",
+                "operationId": "8bb19cc5671252c4757ca45348bfac9f",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Slug del producto",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "funko-pop-marvel-spider-man-simbionte-especial"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles del producto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "product": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Funko Pop! Marvel: Spider-Man Simbionte (Especial)"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "funko-pop-marvel-spider-man-simbionte-especial"
+                                                },
+                                                "sku": {
+                                                    "type": "string",
+                                                    "example": "Funko-Spiderman-Simbionte"
+                                                },
+                                                "price_ars": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 150
+                                                },
+                                                "price_usd": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 40
+                                                },
+                                                "resumen": {
+                                                    "type": "string",
+                                                    "example": "Figura Funko Pop! de Spider-Man con traje simbionte..."
+                                                },
+                                                "imagen": {
+                                                    "type": "string",
+                                                    "format": "url",
+                                                    "example": "http://127.0.0.1:8000/storage/products/DhdVBVqKH5PTZzBHLe2b1lREKP9UHk6einNdjX4e.jpg"
+                                                },
+                                                "state": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "format": "html",
+                                                    "example": "<p>Figura coleccionable Funko Pop...</p>"
+                                                },
+                                                "tags": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "item_id": {
+                                                                "type": "integer",
+                                                                "example": 1714412401001
+                                                            },
+                                                            "item_text": {
+                                                                "type": "string",
+                                                                "example": "funko"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "tags_parse": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "funko"
+                                                    }
+                                                },
+                                                "brand_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "brand": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Banpresto"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "categorie_first_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "categorie_first": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Funkos"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "categorie_second_id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "categorie_second": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Series de TV"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "categorie_third_id": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "categorie_third": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 8
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Marvel"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "stock": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-13 05:42:59"
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "format": "url"
+                                                    }
+                                                },
+                                                "discount_g": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "variations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "avg_reviews": {
+                                                    "type": "number",
+                                                    "example": 0
+                                                },
+                                                "count_reviews": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "specifications": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "product_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "attribute_id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            },
+                                                            "attribute": {
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Tamaño"
+                                                                    },
+                                                                    "type_attribute": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "propertie_id": {
+                                                                "type": "integer",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "propertie": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "value_add": {
+                                                                "type": "string",
+                                                                "example": "Funko Pop Spiderman 2 Marvel"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Producto no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Autenticación",
+            "description": "Autenticación"
+        },
+        {
+            "name": "Menu de las categorias",
+            "description": "Menu de las categorias"
+        },
+        {
+            "name": "Producto",
+            "description": "Producto"
+        }
+    ]
+}

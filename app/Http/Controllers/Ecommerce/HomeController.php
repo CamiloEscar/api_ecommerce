@@ -15,9 +15,106 @@ use App\Models\Slider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
+/**
+* @OA\Info(
+*             title="API Home",
+*             version="1.0",
+*             description="Descripcion de los endpoints del home"
+* )
+*
+* @OA\Server(url="http://127.0.0.1:8000")
+*/
+
+
 class HomeController extends Controller
 {
     //
+
+   /**
+ * Listado de todos los registros de los productos del home
+ *
+ * @OA\Get(
+ *     path="/api/ecommerce/menus",
+ *     tags={"Menu de las categorias"},
+ *     summary="Obtiene el listado de menús con categorías y subcategorías",
+ *     @OA\Response(
+ *         response=200,
+ *         description="OK",
+ *         @OA\JsonContent(
+ *             @OA\Property(
+ *                 property="categories_menus",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(
+ *                         property="id",
+ *                         type="integer",
+ *                         example=1
+ *                     ),
+ *                     @OA\Property(
+ *                         property="name",
+ *                         type="string",
+ *                         example="Funkos"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="icon",
+ *                         type="string",
+ *                         example="<svg>...</svg>"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="categories",
+ *                         type="array",
+ *                         @OA\Items(
+ *                             type="object",
+ *                             @OA\Property(
+ *                                 property="id",
+ *                                 type="integer",
+ *                                 example=3
+ *                             ),
+ *                             @OA\Property(
+ *                                 property="name",
+ *                                 type="string",
+ *                                 example="Series de TV"
+ *                             ),
+ *                             @OA\Property(
+ *                                 property="imagen",
+ *                                 type="string",
+ *                                 format="url",
+ *                                 example="http://127.0.0.1:8000/storage/categories/POMe1ibHLQXUApyuS9DGaUFMNyvtVtY62jhoAPpV.jpg"
+ *                             ),
+ *                             @OA\Property(
+ *                                 property="subcategories",
+ *                                 type="array",
+ *                                 @OA\Items(
+ *                                     type="object",
+ *                                     @OA\Property(
+ *                                         property="id",
+ *                                         type="integer",
+ *                                         example=7
+ *                                     ),
+ *                                     @OA\Property(
+ *                                         property="name",
+ *                                         type="string",
+ *                                         example="Disney"
+ *                                     ),
+ *                                     @OA\Property(
+ *                                         property="imagen",
+ *                                         type="string",
+ *                                         nullable=true,
+ *                                         example=null
+ *                                     )
+ *                                 )
+ *                             )
+ *                         )
+ *                     )
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
+
+
 
     public function home(Request $request)
     {
@@ -182,6 +279,103 @@ class HomeController extends Controller
         ]);
 
     }
+
+/**
+ * Obtener detalles de un producto por slug
+ *
+ * @OA\Get(
+ *     path="/api/ecommerce/producto/{slug}",
+ *     summary="Obtener detalles de un producto",
+ *     tags={"Producto"},
+ *     @OA\Parameter(
+ *         name="slug",
+ *         in="path",
+ *         required=true,
+ *         description="Slug del producto",
+ *         @OA\Schema(type="string", example="funko-pop-marvel-spider-man-simbionte-especial")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Detalles del producto",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="product", type="object",
+ *                 @OA\Property(property="id", type="integer", example=2),
+ *                 @OA\Property(property="title", type="string", example="Funko Pop! Marvel: Spider-Man Simbionte (Especial)"),
+ *                 @OA\Property(property="slug", type="string", example="funko-pop-marvel-spider-man-simbionte-especial"),
+ *                 @OA\Property(property="sku", type="string", example="Funko-Spiderman-Simbionte"),
+ *                 @OA\Property(property="price_ars", type="number", format="float", example=150),
+ *                 @OA\Property(property="price_usd", type="number", format="float", example=40),
+ *                 @OA\Property(property="resumen", type="string", example="Figura Funko Pop! de Spider-Man con traje simbionte..."),
+ *                 @OA\Property(property="imagen", type="string", format="url", example="http://127.0.0.1:8000/storage/products/DhdVBVqKH5PTZzBHLe2b1lREKP9UHk6einNdjX4e.jpg"),
+ *                 @OA\Property(property="state", type="integer", example=2),
+ *                 @OA\Property(property="description", type="string", format="html", example="<p>Figura coleccionable Funko Pop...</p>"),
+ *
+ *                 @OA\Property(property="tags", type="array",
+ *                     @OA\Items(type="object",
+ *                         @OA\Property(property="item_id", type="integer", example=1714412401001),
+ *                         @OA\Property(property="item_text", type="string", example="funko")
+ *                     )
+ *                 ),
+ *                 @OA\Property(property="tags_parse", type="array",
+ *                     @OA\Items(type="string", example="funko")
+ *                 ),
+ *
+ *                 @OA\Property(property="brand_id", type="integer", example=2),
+ *                 @OA\Property(property="brand", type="object",
+ *                     @OA\Property(property="id", type="integer", example=2),
+ *                     @OA\Property(property="name", type="string", example="Banpresto")
+ *                 ),
+ *
+ *                 @OA\Property(property="categorie_first_id", type="integer", example=1),
+ *                 @OA\Property(property="categorie_first", type="object",
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="name", type="string", example="Funkos")
+ *                 ),
+ *                 @OA\Property(property="categorie_second_id", type="integer", example=3),
+ *                 @OA\Property(property="categorie_second", type="object",
+ *                     @OA\Property(property="id", type="integer", example=3),
+ *                     @OA\Property(property="name", type="string", example="Series de TV")
+ *                 ),
+ *                 @OA\Property(property="categorie_third_id", type="integer", example=8),
+ *                 @OA\Property(property="categorie_third", type="object",
+ *                     @OA\Property(property="id", type="integer", example=8),
+ *                     @OA\Property(property="name", type="string", example="Marvel")
+ *                 ),
+
+ *                 @OA\Property(property="stock", type="integer", example=20),
+ *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-13 05:42:59"),
+ *                 @OA\Property(property="images", type="array", @OA\Items(type="string", format="url")),
+ *                 @OA\Property(property="discount_g", type="string", nullable=true, example=null),
+ *                 @OA\Property(property="variations", type="array", @OA\Items(type="object")),
+ *                 @OA\Property(property="avg_reviews", type="number", example=0),
+ *                 @OA\Property(property="count_reviews", type="integer", example=0),
+
+ *                 @OA\Property(property="specifications", type="array",
+ *                     @OA\Items(type="object",
+ *                         @OA\Property(property="id", type="integer", example=1),
+ *                         @OA\Property(property="product_id", type="integer", example=2),
+ *                         @OA\Property(property="attribute_id", type="integer", example=3),
+ *                         @OA\Property(property="attribute", type="object",
+ *                             @OA\Property(property="name", type="string", example="Tamaño"),
+ *                             @OA\Property(property="type_attribute", type="integer", example=1)
+ *                         ),
+ *                         @OA\Property(property="propertie_id", type="integer", nullable=true, example=null),
+ *                         @OA\Property(property="propertie", type="string", nullable=true, example=null),
+ *                         @OA\Property(property="value_add", type="string", example="Funko Pop Spiderman 2 Marvel")
+ *                     )
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Producto no encontrado",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Producto no encontrado")
+ *         )
+ *     )
+ * )
+ */
 
     public function show_product(Request $request, $slug){
 
