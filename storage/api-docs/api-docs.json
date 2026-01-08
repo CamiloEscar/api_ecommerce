@@ -1,0 +1,965 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Home",
+        "description": "Descripcion de los endpoints del home",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000"
+        }
+    ],
+    "paths": {
+        "/api/admin/costoenvio": {
+            "get": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Listado de costos de envío",
+                "operationId": "435cc0e09ae0a55f5e7a24a697261de8",
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido correctamente"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Crear costo de envío",
+                "operationId": "dcb4b18fa8316ab8dad9a54b608b414e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code",
+                                    "type_discount",
+                                    "discount",
+                                    "type_count",
+                                    "type_costo",
+                                    "state"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "BUENOS AIRES"
+                                    },
+                                    "type_discount": {
+                                        "description": "1 porcentaje, 2 monto fijo",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "discount": {
+                                        "type": "number",
+                                        "example": 15
+                                    },
+                                    "type_count": {
+                                        "description": "1 ilimitado, 2 limitado",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "num_use": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "type_costo": {
+                                        "description": "1 producto, 2 categoría, 3 marca",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "state": {
+                                        "description": "1 activo, 2 inactivo",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Costo de envío creado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/costoenvio/config": {
+            "get": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Configuración de costos",
+                "operationId": "56f73578f9e1612309aa2f92f61248af",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/costoenvio/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Detalle de un costo de envío",
+                "operationId": "edebc9cd8c01c4af3fe4925c64b1584c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle obtenido"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Actualizar costo de envío",
+                "operationId": "314b22df02426678179d0274a4e0b28c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "discount": {
+                                        "type": "number",
+                                        "example": 20
+                                    },
+                                    "state": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Costo de envío actualizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Eliminar costo de envío",
+                "operationId": "4fcc0930cbecf6aa40adb37bbc5d7f9e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Costo eliminado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/categories": {
+            "get": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Listado de categorías",
+                "operationId": "0e7c9a893772c6eba517f3e78559fbe1",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Crear categoría",
+                "operationId": "9bff03bcc040cd2bf0c2ea1d57a72056",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Electrónica"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/categories/config": {
+            "get": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Configuración de categorías",
+                "operationId": "c14cb24fce32e2546601f8facd3c5caa",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Detalle de categoría",
+                "operationId": "692d5492b71d71cf28a3ed40b2d10cac",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Actualizar categoría",
+                "operationId": "40aaf3fe827e72d0c82b968de21544c4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Actualizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Eliminar categoría",
+                "operationId": "7ef46f9f6bb3f8a6f09dbc9708146f1e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/index": {
+            "post": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Listado de productos con filtros",
+                "operationId": "03e42c0cb52fdd5d6b374cd8a6afea93",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "search": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/config": {
+            "get": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Configuración de productos",
+                "operationId": "ac9ccafb1b3797f1cc1ebb0eaf8c7630",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/imagens": {
+            "post": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Subir imagen de producto",
+                "operationId": "bfdac9b9ac6aa8223cad90cbf6f4bcd6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Imagen subida"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/imagens/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Eliminar imagen",
+                "operationId": "0ae3d4b9260013d3e5755fb7d5a07d3f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/me": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Obtener datos del usuario autenticado",
+                "operationId": "f0b15943f55143d36f606a2dbd1d2366",
+                "responses": {
+                    "200": {
+                        "description": "Datos del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Juan"
+                                        },
+                                        "surname": {
+                                            "type": "string",
+                                            "example": "Pérez"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "admin@admin.com"
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "123456789"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "example": "http://localhost/storage/users/avatar.jpg"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ecommerce/menus": {
+            "get": {
+                "tags": [
+                    "Menu de las categorias"
+                ],
+                "summary": "Obtiene el listado de menús con categorías y subcategorías",
+                "description": "Listado de todos los registros de los productos del home",
+                "operationId": "e9dc67116a59470aa8591c8c798232d7",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "categories_menus": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Funkos"
+                                                    },
+                                                    "icon": {
+                                                        "type": "string",
+                                                        "example": "<svg>...</svg>"
+                                                    },
+                                                    "categories": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 3
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Series de TV"
+                                                                },
+                                                                "imagen": {
+                                                                    "type": "string",
+                                                                    "format": "url",
+                                                                    "example": "http://127.0.0.1:8000/storage/categories/POMe1ibHLQXUApyuS9DGaUFMNyvtVtY62jhoAPpV.jpg"
+                                                                },
+                                                                "subcategories": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "id": {
+                                                                                "type": "integer",
+                                                                                "example": 7
+                                                                            },
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "example": "Disney"
+                                                                            },
+                                                                            "imagen": {
+                                                                                "type": "string",
+                                                                                "example": null,
+                                                                                "nullable": true
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ecommerce/producto/{slug}": {
+            "get": {
+                "tags": [
+                    "Producto"
+                ],
+                "summary": "Obtener detalles de un producto",
+                "description": "Obtener detalles de un producto por slug",
+                "operationId": "8bb19cc5671252c4757ca45348bfac9f",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Slug del producto",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "funko-pop-marvel-spider-man-simbionte-especial"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles del producto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "product": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Funko Pop! Marvel: Spider-Man Simbionte (Especial)"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "funko-pop-marvel-spider-man-simbionte-especial"
+                                                },
+                                                "sku": {
+                                                    "type": "string",
+                                                    "example": "Funko-Spiderman-Simbionte"
+                                                },
+                                                "price_ars": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 150
+                                                },
+                                                "price_usd": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 40
+                                                },
+                                                "resumen": {
+                                                    "type": "string",
+                                                    "example": "Figura Funko Pop! de Spider-Man con traje simbionte..."
+                                                },
+                                                "imagen": {
+                                                    "type": "string",
+                                                    "format": "url",
+                                                    "example": "http://127.0.0.1:8000/storage/products/DhdVBVqKH5PTZzBHLe2b1lREKP9UHk6einNdjX4e.jpg"
+                                                },
+                                                "state": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "format": "html",
+                                                    "example": "<p>Figura coleccionable Funko Pop...</p>"
+                                                },
+                                                "tags": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "item_id": {
+                                                                "type": "integer",
+                                                                "example": 1714412401001
+                                                            },
+                                                            "item_text": {
+                                                                "type": "string",
+                                                                "example": "funko"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "tags_parse": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "funko"
+                                                    }
+                                                },
+                                                "brand_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "brand": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Banpresto"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "categorie_first_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "categorie_first": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Funkos"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "categorie_second_id": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "categorie_second": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 3
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Series de TV"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "categorie_third_id": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "categorie_third": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 8
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Marvel"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "stock": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-01-13 05:42:59"
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "format": "url"
+                                                    }
+                                                },
+                                                "discount_g": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "variations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "avg_reviews": {
+                                                    "type": "number",
+                                                    "example": 0
+                                                },
+                                                "count_reviews": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "specifications": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "product_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "attribute_id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            },
+                                                            "attribute": {
+                                                                "properties": {
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Tamaño"
+                                                                    },
+                                                                    "type_attribute": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "propertie_id": {
+                                                                "type": "integer",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "propertie": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "value_add": {
+                                                                "type": "string",
+                                                                "example": "Funko Pop Spiderman 2 Marvel"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Producto no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Admin - Costos de Envío",
+            "description": "Admin - Costos de Envío"
+        },
+        {
+            "name": "Admin - Categories",
+            "description": "Admin - Categories"
+        },
+        {
+            "name": "Admin - Products",
+            "description": "Admin - Products"
+        },
+        {
+            "name": "Autenticación",
+            "description": "Autenticación"
+        },
+        {
+            "name": "Menu de las categorias",
+            "description": "Menu de las categorias"
+        },
+        {
+            "name": "Producto",
+            "description": "Producto"
+        }
+    ]
+}

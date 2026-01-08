@@ -18,6 +18,22 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    /**
+ * @OA\Post(
+ *   path="/api/admin/products/index",
+ *   tags={"Admin - Products"},
+ *   summary="Listado de productos con filtros",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\RequestBody(
+ *     @OA\JsonContent(
+ *       @OA\Property(property="search", type="string"),
+ *       @OA\Property(property="status", type="boolean")
+ *     )
+ *   ),
+ *   @OA\Response(response=200, description="OK")
+ * )
+ */
     public function index(Request $request)
     {
         $search = $request->search;
@@ -36,6 +52,15 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+ * @OA\Get(
+ *   path="/api/admin/products/config",
+ *   tags={"Admin - Products"},
+ *   summary="Configuración de productos",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Response(response=200, description="OK")
+ * )
+ */
     public function config()
     {
 
@@ -79,6 +104,30 @@ class ProductController extends Controller
             "message" => 200,
         ]);
     }
+
+    /**
+ * @OA\Post(
+ *   path="/api/admin/products/imagens",
+ *   tags={"Admin - Products"},
+ *   summary="Subir imagen de producto",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\RequestBody(
+ *     required=true,
+ *     @OA\MediaType(
+ *       mediaType="multipart/form-data",
+ *       @OA\Schema(
+ *         required={"image"},
+ *         @OA\Property(
+ *           property="image",
+ *           type="string",
+ *           format="binary"
+ *         )
+ *       )
+ *     )
+ *   ),
+ *   @OA\Response(response=200, description="Imagen subida")
+ * )
+ */
 
     public function imagens(Request $request)
     {
@@ -163,6 +212,21 @@ class ProductController extends Controller
         ]);
     }
 
+    /**
+ * @OA\Delete(
+ *   path="/api/admin/products/imagens/{id}",
+ *   tags={"Admin - Products"},
+ *   summary="Eliminar imagen",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Parameter(
+ *     name="id",
+ *     in="path",
+ *     required=true,
+ *     @OA\Schema(type="integer")
+ *   ),
+ *   @OA\Response(response=204, description="Eliminada")
+ * )
+ */
     public function delete_imagens(string $id) {
         $product = ProductImage::findOrFail($id);
         if ($product->imagen) {

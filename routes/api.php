@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Costo\CostoController;
 use App\Http\Controllers\Admin\Cupone\CuponeController;
 use App\Http\Controllers\Admin\Discount\DiscountController;
 use App\Http\Controllers\Admin\Product\ProductController;
@@ -50,6 +51,8 @@ Route::group([
     Route::post('/verified_email', [AuthController::class, 'verified_email'])->name('verified_email');
     Route::post('/verified_code', [AuthController::class, 'verified_code'])->name('verified_code');
     Route::post('/new_password', [AuthController::class, 'new_password'])->name('new_password');
+
+    Route::post('/social/facebook', [AuthController::class, 'facebookLogin']);
 });
 
 //grupo para el adminisitrador, rutas necesarias para gestionar las rutas de categorias
@@ -91,6 +94,10 @@ Route::group([
 
     Route::resource("cupones", CuponeController::class);
 
+    Route::get("costoenvio/config", [CostoController::class, "config"]);
+
+    Route::resource("costoenvio", CostoController::class);
+
     Route::resource("discounts", DiscountController::class);
 
     Route::post("sales/list", [SalesController::class, "list"]);
@@ -131,6 +138,8 @@ Route::group([
     ], function($router){
         Route::delete('carts/delete_all', [CartController::class, "delete_all"]);
         Route::post('carts/apply_cupon', [CartController::class, "apply_cupon"]);
+        Route::post('carts/apply_costo', [CartController::class, "apply_costo"]);
+        Route::post('carts/remove_costo', [CartController::class, "remove_costo"]);
         Route::resource('carts', CartController::class);
 
 

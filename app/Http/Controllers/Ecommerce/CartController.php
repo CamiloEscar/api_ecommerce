@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Ecommerce;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Cart\CartEcommerceCollection;
 use App\Http\Resources\Ecommerce\Cart\CartEcommerceResource;
+use App\Models\Costo\Costo;
 use App\Models\Cupone\Cupone;
 use App\Models\Product\Product;
 use App\Models\Product\ProductVariation;
@@ -90,114 +91,219 @@ class CartController extends Controller
         ]);
     }
 
-    public function apply_cupon(Request $request){
-        $cupon = Cupone::where("code", $request->code_cupon)->where("state", 1)->first();
+    public function apply_cupon(Request $request)
+{
+    $cupon = Cupone::where("code", $request->code_cupon)->where("state", 1)->first();
 
-        if(!$cupon){
-            return response()->json(["message" => 403, "message_text" => "El cupon ingresado no existe o ya caduco"]);
+    if (!$cupon) {
+        return response()->json([
+            "message" => 403,
+            "message_text" => "El cupón ingresado no existe o ya caducó"
+        ]);
+    }
+
+    $user = auth('api')->user();
+    $carts = Cart::where("user_id", $user->id)->get();
+
+    $costo_total = 0;
+
+    foreach ($carts as $cart) {
+        // 🔒 Evitar aplicar varias veces el mismo cupón
+        if ($cart->code_cupon === $cupon->code) {
+            continue;
         }
 
+        $applyDiscount = false;
+
+        // --- Nivel producto ---
+        if ($cupon->type_cupone == 1) {
+            foreach ($cupon->products as $cupon_product) {
+                if ($cupon_product->product_id == $cart->product_id) {
+                    $applyDiscount = true;
+                    break;
+                }
+            }
+        }
+
+        // --- Nivel categoría ---
+        if ($cupon->type_cupone == 2) {
+            foreach ($cupon->categories as $cupon_category) {
+                if ($cupon_category->categorie_id == $cart->product->categorie_first_id) {
+                    $applyDiscount = true;
+                    break;
+                }
+            }
+        }
+
+        // --- Nivel marca ---
+        if ($cupon->type_cupone == 3) {
+            foreach ($cupon->brands as $cupon_brand) {
+                if ($cupon_brand->brand_id == $cart->product->brand_id) {
+                    $applyDiscount = true;
+                    break;
+                }
+            }
+        }
+
+        if ($applyDiscount) {
+            $precioBase = $cart->price_unit;
+            $subtotal = $precioBase;
+
+            if ($cupon->type_discount == 1) { // porcentaje
+                $subtotal = $precioBase - ($precioBase * ($cupon->discount * 0.01));
+            }
+            if ($cupon->type_discount == 2) { // monto fijo
+                $subtotal = max(0, $precioBase - $cupon->discount);
+            }
+
+            $total = $subtotal * $cart->quantity;
+
+            // Si ya había costo de envío, se lo volvemos a sumar
+            if ($cart->code_costo && $cart->discount && $cart->type_discount == 2) {
+                $total += $cart->discount;
+            }
+
+            $cart->update([
+                "type_discount" => $cupon->type_discount,
+                "discount" => $cupon->discount,
+                "code_cupon" => $cupon->code,
+                "subtotal" => $subtotal,
+                "total" => $total,
+                "type_campaing" => NULL,
+                "code_discount" => NULL,
+            ]);
+        }
+    }
+
+    return response()->json([
+        "message" => 200,
+        "message_text" => "Cupón aplicado correctamente"
+    ]);
+}
+
+    public function apply_costo(Request $request)
+{
+    $costo = Costo::where("code", $request->code_costo)->where("state", 1)->first();
+
+    if (!$costo) {
+        return response()->json([
+            "message" => 403,
+            "message_text" => "El costo ingresado no existe o ya caducó"
+        ]);
+    }
+
+    $user = auth('api')->user();
+    $carts = Cart::where("user_id", $user->id)->get();
+
+    // inicializar acumulador de costo total añadido
+    $costo_total = 0;
+
+    foreach ($carts as $cart) {
+        // 🔒 Evitar aplicar varias veces el mismo costo
+        if ($cart->code_costo === $costo->code) {
+            continue;
+        }
+
+        $applyCosto = false;
+
+        // --- Nivel producto ---
+        if ($costo->type_costo == 1) {
+            foreach ($costo->products as $costo_product) {
+                if ($costo_product->product_id == $cart->product_id) {
+                    $applyCosto = true;
+                    break;
+                }
+            }
+        }
+
+        // --- Nivel categoría ---
+        if ($costo->type_costo == 2) {
+            foreach ($costo->categories as $costo_category) {
+                if ($costo_category->categorie_id == $cart->product->categorie_first_id) {
+                    $applyCosto = true;
+                    break;
+                }
+            }
+        }
+
+        // --- Nivel marca ---
+        if ($costo->type_costo == 3) {
+            foreach ($costo->brands as $costo_brand) {
+                if ($costo_brand->brand_id == $cart->product->brand_id) {
+                    $applyCosto = true;
+                    break;
+                }
+            }
+        }
+
+        if ($applyCosto) {
+            $subtotal = $cart->subtotal ?: $cart->price_unit;
+            $originalTotal = $subtotal * $cart->quantity;
+            $total = $originalTotal;
+
+            if ($costo->type_discount == 1) { // porcentaje
+                $total += ($total * ($costo->discount * 0.01));
+            }
+            if ($costo->type_discount == 2) { // monto fijo
+                $total += $costo->discount;
+            }
+
+            // compute added amount for reporting
+            $added = $total - $originalTotal;
+            $costo_total += $added;
+
+            $cart->update([
+                "type_discount" => $costo->type_discount,
+                "discount" => $costo->discount,
+                "code_costo" => $costo->code,
+                "subtotal" => $subtotal,
+                "total" => $total,
+                "type_campaing" => NULL,
+                "code_discount" => NULL,
+            ]);
+        }
+    }
+
+    return response()->json([
+        "message" => 200,
+        "message_text" => "Costo de envío aplicado correctamente",
+        "costo" => $costo_total
+    ]);
+}
+
+    public function remove_costo(Request $request)
+    {
         $user = auth('api')->user();
         $carts = Cart::where("user_id", $user->id)->get();
 
-        foreach ($carts as $key => $cart) {
-            if($cupon->type_cupone == 1){  //1 es a nivel de producto
-                $is_exists_product_cupon = false;       //existe?
-                foreach ($cupon->products as $cupon_product) { //products es una relacion al modelo auxiliar
-                    if($cupon_product->product_id == $cart->product_id){
-                        $is_exists_product_cupon = true;
-                        break;
-                    };
-                }
-                if($is_exists_product_cupon){
-                    $subtotal = 0;
-                    if($cupon->type_discount == 1){ //porcentaje
-                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount*0.01);
-                    };
-                    if($cupon->type_discount == 2){ //monto fijo
-                        $subtotal = $cart->price_unit - $cupon->discount;
-                    };
+        $removed_amount = 0;
 
-                    // if(!$cart->code_discount){  //si ya tiene codigo de descuento hecho no hace falta
-                        $cart->update([
-                            "type_discount" => $cupon->type_discount,
-                            "discount" => $cupon->discount,
-                            "code_cupon" => $cupon->code,
-                            "subtotal" => $subtotal,
-                            "total" => $subtotal*$cart->quantity,
-                            "type_campaing" => NULL,
-                            "code_discount" => NULL,
-                        ]);
-                    // };
-                }
+        foreach ($carts as $cart) {
+            if ($cart->code_costo) {
+                // revert to original subtotal/total based on price_unit and quantity
+                $originalSubtotal = $cart->price_unit;
+                $originalTotal = $originalSubtotal * $cart->quantity;
 
-            };
-            if($cupon->type_cupone == 2){  //1 es a nivel de categoria
-                $is_exists_categorie_cupon = false;       //existe?
-                foreach ($cupon->categories as $cupon_product) { //products es una relacion al modelo auxiliar
-                    if($cupon_product->categorie_id == $cart->product->categorie_first_id){
-                        $is_exists_categorie_cupon = true;
-                        break;
-                    };
-                }
-                if($is_exists_categorie_cupon){
-                    $subtotal = 0;
-                    if($cupon->type_discount == 1){ //porcentaje
-                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount*0.01);
-                    };
-                    if($cupon->type_discount == 2){ //monto fijo
-                        $subtotal = $cart->price_unit - $cupon->discount;
-                    };
+                // calculate difference to report removed amount
+                $removed_amount += ($cart->total - $originalTotal);
 
-                    // if(!$cart->code_discount){  //si ya tiene codigo de descuento hecho no hace falta
-                        $cart->update([
-                            "type_discount" => $cupon->type_discount,
-                            "discount" => $cupon->discount,
-                            "code_cupon" => $cupon->code,
-                            "subtotal" => $subtotal,
-                            "total" => $subtotal*$cart->quantity,
-                            "type_campaing" => NULL,
-                            "code_discount" => NULL,
-                        ]);
-                    // };
-                }
-            };
-            if($cupon->type_cupone == 3){  //1 es a nivel de marca
-                $is_exists_brand_cupon = false;       //existe?
-                foreach ($cupon->brands as $cupon_product) { //products es una relacion al modelo auxiliar
-                    if($cupon_product->brand_id == $cart->product->brand_id){
-                        $is_exists_brand_cupon = true;
-                        break;
-                    };
-                }
-                if($is_exists_brand_cupon){
-                    $subtotal = 0;
-                    if($cupon->type_discount == 1){ //porcentaje
-                        $subtotal = $cart->price_unit - $cart->price_unit * ($cupon->discount*0.01);
-                    };
-                    if($cupon->type_discount == 2){ //monto fijo
-                        $subtotal = $cart->price_unit - $cupon->discount;
-                    };
-
-                    // if(!$cart->code_discount){  //si ya tiene codigo de descuento hecho no hace falta
-                        $cart->update([
-                            "type_discount" => $cupon->type_discount,
-                            "discount" => $cupon->discount,
-                            "code_cupon" => $cupon->code,
-                            "subtotal" => $subtotal,
-                            "total" => $subtotal*$cart->quantity,
-                            "type_campaing" => NULL,
-                            "code_discount" => NULL,
-                        ]);
-                    // };
-                }
-            };
+                $cart->update([
+                    'type_discount' => NULL,
+                    'discount' => 0,
+                    'code_costo' => NULL,
+                    'subtotal' => $originalSubtotal,
+                    'total' => $originalTotal,
+                ]);
+            }
         }
 
         return response()->json([
-            "message" => 200,
+            'message' => 200,
+            'message_text' => 'Costo de envío removido correctamente',
+            'removed' => $removed_amount
         ]);
     }
+
 
     /**
      * Display the specified resource.

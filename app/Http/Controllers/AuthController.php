@@ -12,7 +12,25 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 
+
+/**
+ * @OA\Tag(
+ *     name="Autenticación",
+ *     description="Operaciones relacionadas al login y autenticación de usuarios"
+ * )
+ */
+
+
+/**
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+*/
 
 
 // use Validator;
@@ -20,6 +38,37 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
+
+    /**
+ * @OA\Post(
+ *     path="/api/auth/login",
+ *     summary="Login administrador",
+ *     tags={"Autenticación"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"email", "password"},
+ *             @OA\Property(property="email", type="string", example="admin@admin.com"),
+ *             @OA\Property(property="password", type="string", example="12345678")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Login exitoso",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="access_token", type="string"),
+ *             @OA\Property(property="token_type", type="string", example="bearer"),
+ *             @OA\Property(property="expires_in", type="integer"),
+ *             @OA\Property(property="user", type="object",
+ *                 @OA\Property(property="full_name", type="string", example="Admin User"),
+ *                 @OA\Property(property="email", type="string", example="admin@admin.com")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=401, description="Credenciales inválidas")
+ * )
+ */
+
     /**
      * Create a new AuthController instance.
      *
@@ -27,9 +76,46 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'facebookLogin']]);
     }
 
+    public function redirect() {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    public function callback()
+{
+    $fbUser = Socialite::driver('facebook')->user();
+
+    $user = User::firstOrCreate(
+        ['email' => $fbUser->getEmail()],
+        [
+            'name' => $fbUser->getName(),
+            'type_user' => 2,
+            'uniqd' => uniqid(),
+            'email_verified_at' => now(),
+            'fb' => 'facebook',
+        ]
+    );
+
+    $token = auth('api')->login($user);
+
+    // Codificamos los datos para pasarlos como query string
+    $query = http_build_query([
+        'token' => $token,
+        'name' => $user->name,
+        'email' => $user->email,
+        'surname' => $user->surname,
+        'phone' => $user->phone,
+        'address_city' => $user->address_city,
+        'fb' => $user->fb,
+        'sexo' => $user->sexo,
+        'bio' => $user->bio,
+        'avatar' => $user->avatar,
+    ]);
+
+    return redirect()->to("http://localhost:4200/register?$query");
+}
 
     /**
      * Register a User.
@@ -191,6 +277,30 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+    /**
+ * @OA\Post(
+ *     path="/api/auth/me",
+ *     summary="Obtener datos del usuario autenticado",
+ *     tags={"Autenticación"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Datos del usuario",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="name", type="string", example="Juan"),
+ *             @OA\Property(property="surname", type="string", example="Pérez"),
+ *             @OA\Property(property="email", type="string", example="admin@admin.com"),
+ *             @OA\Property(property="phone", type="string", example="123456789"),
+ *             @OA\Property(property="avatar", type="string", example="http://localhost/storage/users/avatar.jpg")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="No autenticado"
+ *     )
+ * )
+ */
     public function me()
     {
         $user = User::find(auth('api')->user()->id);
@@ -249,4 +359,18 @@ class AuthController extends Controller
             ]
         ]);
     }
+
+    public function facebookLogin(Request $request) {
+    $token = $request->access_token;
+    $fbUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
+
+    $user = User::firstOrCreate(['email' => $fbUser->getEmail()], [
+        'name' => $fbUser->getName(),
+        'email_verified_at' => now(),
+        'type_user' => 2,
+    ]);
+
+    $jwt = auth('api')->login($user);
+    return response()->json(['access_token' => $jwt, 'user' => $user]);
+}
 }

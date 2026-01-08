@@ -13,6 +13,18 @@ class CategorieController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    /**
+ * @OA\Get(
+ *   path="/api/admin/categories",
+ *   tags={"Admin - Categories"},
+ *   summary="Listado de categorías",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Response(response=200, description="OK")
+ * )
+ */
+
+
     public function index(Request $request)
     {
         $search = $request->search;
@@ -25,6 +37,15 @@ class CategorieController extends Controller
         ]);
     }
 
+    /**
+ * @OA\Get(
+ *   path="/api/admin/categories/config",
+ *   tags={"Admin - Categories"},
+ *   summary="Configuración de categorías",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Response(response=200, description="OK")
+ * )
+ */
     public function config()
     {
 
@@ -40,6 +61,24 @@ class CategorieController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+    /**
+ * @OA\Post(
+ *   path="/api/admin/categories",
+ *   tags={"Admin - Categories"},
+ *   summary="Crear categoría",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\RequestBody(
+ *     required=true,
+ *     @OA\JsonContent(
+ *       required={"name"},
+ *       @OA\Property(property="name", type="string", example="Electrónica"),
+ *       @OA\Property(property="status", type="boolean", example=true)
+ *     )
+ *   ),
+ *   @OA\Response(response=201, description="Creado")
+ * )
+ */
     public function store(Request $request)
     {
         $is_exists = Categorie::where("name", $request->name)->first();
@@ -72,6 +111,22 @@ class CategorieController extends Controller
     /**
      * Display the specified resource.
      */
+
+    /**
+ * @OA\Get(
+ *   path="/api/admin/categories/{id}",
+ *   tags={"Admin - Categories"},
+ *   summary="Detalle de categoría",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Parameter(
+ *     name="id",
+ *     in="path",
+ *     required=true,
+ *     @OA\Schema(type="integer")
+ *   ),
+ *   @OA\Response(response=200, description="OK")
+ * )
+ */
     public function show(string $id)
     {
         $categorie = Categorie::findOrFail($id);
@@ -82,6 +137,28 @@ class CategorieController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    /**
+ * @OA\Put(
+ *   path="/api/admin/categories/{id}",
+ *   tags={"Admin - Categories"},
+ *   summary="Actualizar categoría",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Parameter(
+ *     name="id",
+ *     in="path",
+ *     required=true,
+ *     @OA\Schema(type="integer")
+ *   ),
+ *   @OA\RequestBody(
+ *     @OA\JsonContent(
+ *       @OA\Property(property="name", type="string"),
+ *       @OA\Property(property="status", type="boolean")
+ *     )
+ *   ),
+ *   @OA\Response(response=200, description="Actualizado")
+ * )
+ */
     public function update(Request $request, string $id)
     {
         $is_exists = Categorie::where("id", "<>", $id)->where("name", $request->name)->first();
@@ -122,6 +199,22 @@ class CategorieController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+
+    /**
+ * @OA\Delete(
+ *   path="/api/admin/categories/{id}",
+ *   tags={"Admin - Categories"},
+ *   summary="Eliminar categoría",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Parameter(
+ *     name="id",
+ *     in="path",
+ *     required=true,
+ *     @OA\Schema(type="integer")
+ *   ),
+ *   @OA\Response(response=204, description="Eliminado")
+ * )
+ */
     public function destroy(string $id)
     {
         $categorie = Categorie::findOrFail($id);
