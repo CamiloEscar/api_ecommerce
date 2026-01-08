@@ -105,6 +105,8 @@ class CartController extends Controller
     $user = auth('api')->user();
     $carts = Cart::where("user_id", $user->id)->get();
 
+    $costo_total = 0;
+
     foreach ($carts as $cart) {
         // 🔒 Evitar aplicar varias veces el mismo cupón
         if ($cart->code_cupon === $cupon->code) {
@@ -193,6 +195,9 @@ class CartController extends Controller
     $user = auth('api')->user();
     $carts = Cart::where("user_id", $user->id)->get();
 
+    // inicializar acumulador de costo total añadido
+    $costo_total = 0;
+
     foreach ($carts as $cart) {
         // 🔒 Evitar aplicar varias veces el mismo costo
         if ($cart->code_costo === $costo->code) {
@@ -233,7 +238,8 @@ class CartController extends Controller
 
         if ($applyCosto) {
             $subtotal = $cart->subtotal ?: $cart->price_unit;
-            $total = $subtotal * $cart->quantity;
+            $originalTotal = $subtotal * $cart->quantity;
+            $total = $originalTotal;
 
             if ($costo->type_discount == 1) { // porcentaje
                 $total += ($total * ($costo->discount * 0.01));
@@ -241,6 +247,10 @@ class CartController extends Controller
             if ($costo->type_discount == 2) { // monto fijo
                 $total += $costo->discount;
             }
+
+            // compute added amount for reporting
+            $added = $total - $originalTotal;
+            $costo_total += $added;
 
             $cart->update([
                 "type_discount" => $costo->type_discount,
@@ -256,9 +266,43 @@ class CartController extends Controller
 
     return response()->json([
         "message" => 200,
-        "message_text" => "Costo de envío aplicado correctamente"
+        "message_text" => "Costo de envío aplicado correctamente",
+        "costo" => $costo_total
     ]);
 }
+
+    public function remove_costo(Request $request)
+    {
+        $user = auth('api')->user();
+        $carts = Cart::where("user_id", $user->id)->get();
+
+        $removed_amount = 0;
+
+        foreach ($carts as $cart) {
+            if ($cart->code_costo) {
+                // revert to original subtotal/total based on price_unit and quantity
+                $originalSubtotal = $cart->price_unit;
+                $originalTotal = $originalSubtotal * $cart->quantity;
+
+                // calculate difference to report removed amount
+                $removed_amount += ($cart->total - $originalTotal);
+
+                $cart->update([
+                    'type_discount' => NULL,
+                    'discount' => 0,
+                    'code_costo' => NULL,
+                    'subtotal' => $originalSubtotal,
+                    'total' => $originalTotal,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 200,
+            'message_text' => 'Costo de envío removido correctamente',
+            'removed' => $removed_amount
+        ]);
+    }
 
 
     /**

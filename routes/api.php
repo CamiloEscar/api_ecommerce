@@ -139,6 +139,7 @@ Route::group([
         Route::delete('carts/delete_all', [CartController::class, "delete_all"]);
         Route::post('carts/apply_cupon', [CartController::class, "apply_cupon"]);
         Route::post('carts/apply_costo', [CartController::class, "apply_costo"]);
+        Route::post('carts/remove_costo', [CartController::class, "remove_costo"]);
         Route::resource('carts', CartController::class);
 
 

@@ -19,6 +19,18 @@ class CostoController extends Controller
     /**
      * Display a listing of the resource.
      */
+    /**
+     * @OA\Get(
+     *   path="/api/admin/costoenvio",
+     *   tags={"Admin - Costos de Envío"},
+     *   summary="Listado de costos de envío",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="Listado obtenido correctamente"
+     *   )
+     * )
+     */
     public function index(Request $request)
     {
         $costos = Costo::where('code', 'like', '%' . $request->search . '%')->orderby('id', 'desc')->paginate(25);
@@ -29,6 +41,15 @@ class CostoController extends Controller
         ]);
     }
 
+    /**
+ * @OA\Get(
+ *   path="/api/admin/costoenvio/config",
+ *   tags={"Admin - Costos de Envío"},
+ *   summary="Configuración de costos",
+ *   security={{"bearerAuth":{}}},
+ *   @OA\Response(response=200, description="OK")
+ * )
+ */
     public function config()
     { //extraemos los datos que necesitamos para el seleccionable de la lista de registros de cupones
         $products = Product::where("state", 2)->orderBy("id", "desc")->get();
@@ -66,6 +87,49 @@ class CostoController extends Controller
     }
     /**
      * Store a newly created resource in storage.
+     */
+
+    /**
+     * @OA\Post(
+     *   path="/api/admin/costoenvio",
+     *   tags={"Admin - Costos de Envío"},
+     *   summary="Crear costo de envío",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"code","type_discount","discount","type_count","type_costo","state"},
+     *       @OA\Property(property="code", type="string", example="BUENOS AIRES"),
+     *       @OA\Property(
+     *         property="type_discount",
+     *         type="integer",
+     *         description="1 porcentaje, 2 monto fijo",
+     *         example=1
+     *       ),
+     *       @OA\Property(property="discount", type="number", example=15),
+     *       @OA\Property(
+     *         property="type_count",
+     *         type="integer",
+     *         description="1 ilimitado, 2 limitado",
+     *         example=1
+     *       ),
+     *       @OA\Property(property="num_use", type="integer", example=10),
+     *       @OA\Property(
+     *         property="type_costo",
+     *         type="integer",
+     *         description="1 producto, 2 categoría, 3 marca",
+     *         example=2
+     *       ),
+     *       @OA\Property(
+     *         property="state",
+     *         type="integer",
+     *         description="1 activo, 2 inactivo",
+     *         example=1
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Costo de envío creado")
+     * )
      */
     public function store(Request $request)
     {
@@ -108,6 +172,21 @@ class CostoController extends Controller
     /**
      * Display the specified resource.
      */
+        /**
+     * @OA\Get(
+     *   path="/api/admin/costoenvio/{id}",
+     *   tags={"Admin - Costos de Envío"},
+     *   summary="Detalle de un costo de envío",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     example=1
+     *   ),
+     *   @OA\Response(response=200, description="Detalle obtenido")
+     * )
+     */
     public function show(string $id)
     {
         $COSTO = Costo::findOrFail($id);
@@ -119,6 +198,28 @@ class CostoController extends Controller
 
     /**
      * Update the specified resource in storage.
+     */
+        /**
+     * @OA\Put(
+     *   path="/api/admin/costoenvio/{id}",
+     *   tags={"Admin - Costos de Envío"},
+     *   summary="Actualizar costo de envío",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     example=1
+     *   ),
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="discount", type="number", example=20),
+     *       @OA\Property(property="state", type="integer", example=2)
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Costo de envío actualizado")
+     * )
      */
     public function update(Request $request, string $id)
     {
@@ -168,6 +269,21 @@ class CostoController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     */
+        /**
+     * @OA\Delete(
+     *   path="/api/admin/costoenvio/{id}",
+     *   tags={"Admin - Costos de Envío"},
+     *   summary="Eliminar costo de envío",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     example=1
+     *   ),
+     *   @OA\Response(response=200, description="Costo eliminado")
+     * )
      */
     public function destroy(string $id)
     {

@@ -11,6 +11,510 @@
         }
     ],
     "paths": {
+        "/api/admin/costoenvio": {
+            "get": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Listado de costos de envío",
+                "operationId": "435cc0e09ae0a55f5e7a24a697261de8",
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido correctamente"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Crear costo de envío",
+                "operationId": "dcb4b18fa8316ab8dad9a54b608b414e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code",
+                                    "type_discount",
+                                    "discount",
+                                    "type_count",
+                                    "type_costo",
+                                    "state"
+                                ],
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "BUENOS AIRES"
+                                    },
+                                    "type_discount": {
+                                        "description": "1 porcentaje, 2 monto fijo",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "discount": {
+                                        "type": "number",
+                                        "example": 15
+                                    },
+                                    "type_count": {
+                                        "description": "1 ilimitado, 2 limitado",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "num_use": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "type_costo": {
+                                        "description": "1 producto, 2 categoría, 3 marca",
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "state": {
+                                        "description": "1 activo, 2 inactivo",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Costo de envío creado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/costoenvio/config": {
+            "get": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Configuración de costos",
+                "operationId": "56f73578f9e1612309aa2f92f61248af",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/costoenvio/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Detalle de un costo de envío",
+                "operationId": "edebc9cd8c01c4af3fe4925c64b1584c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle obtenido"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Actualizar costo de envío",
+                "operationId": "314b22df02426678179d0274a4e0b28c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "discount": {
+                                        "type": "number",
+                                        "example": 20
+                                    },
+                                    "state": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Costo de envío actualizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Costos de Envío"
+                ],
+                "summary": "Eliminar costo de envío",
+                "operationId": "4fcc0930cbecf6aa40adb37bbc5d7f9e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Costo eliminado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/categories": {
+            "get": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Listado de categorías",
+                "operationId": "0e7c9a893772c6eba517f3e78559fbe1",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Crear categoría",
+                "operationId": "9bff03bcc040cd2bf0c2ea1d57a72056",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Electrónica"
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Creado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/categories/config": {
+            "get": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Configuración de categorías",
+                "operationId": "c14cb24fce32e2546601f8facd3c5caa",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Detalle de categoría",
+                "operationId": "692d5492b71d71cf28a3ed40b2d10cac",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Actualizar categoría",
+                "operationId": "40aaf3fe827e72d0c82b968de21544c4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Actualizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Categories"
+                ],
+                "summary": "Eliminar categoría",
+                "operationId": "7ef46f9f6bb3f8a6f09dbc9708146f1e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/index": {
+            "post": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Listado de productos con filtros",
+                "operationId": "03e42c0cb52fdd5d6b374cd8a6afea93",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "search": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/config": {
+            "get": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Configuración de productos",
+                "operationId": "ac9ccafb1b3797f1cc1ebb0eaf8c7630",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/imagens": {
+            "post": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Subir imagen de producto",
+                "operationId": "bfdac9b9ac6aa8223cad90cbf6f4bcd6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Imagen subida"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/products/imagens/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin - Products"
+                ],
+                "summary": "Eliminar imagen",
+                "operationId": "0ae3d4b9260013d3e5755fb7d5a07d3f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/auth/me": {
             "post": {
                 "tags": [
@@ -433,6 +937,18 @@
         }
     },
     "tags": [
+        {
+            "name": "Admin - Costos de Envío",
+            "description": "Admin - Costos de Envío"
+        },
+        {
+            "name": "Admin - Categories",
+            "description": "Admin - Categories"
+        },
+        {
+            "name": "Admin - Products",
+            "description": "Admin - Products"
+        },
         {
             "name": "Autenticación",
             "description": "Autenticación"
