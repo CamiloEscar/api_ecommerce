@@ -11,7 +11,9 @@ use App\Models\User;
 // use Illuminate\Container\Attributes\Storage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 
@@ -76,7 +78,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'facebookLogin']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'login_google']]);
     }
 
     public function redirect() {
@@ -136,19 +138,26 @@ class AuthController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        $user = new User;
-        $user->name = request()->name;
-        $user->surname = request()->surname;
-        $user->phone = request()->phone;
-        $user->type_user = 2;
-        $user->email = request()->email;
-        $user->uniqd = uniqid();
-        $user->password = bcrypt(request()->password);
-        $user->save();
+        user = User::created([
+            'name' => $request->name,
+            'surname' => $request->surname,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'type_user' => 2,
+            'uniqd' => uniqid(),
+        ]);
 
-        Mail::to(request()->email)->send(new VerifiedMail($user));
+        try{
+            Mail::to($user->email)->send(new verified_email($user));
+        } catch (\Exception $e) {
+            Log::error("Error enviado correo: ". $e->getMessage());
+        }
 
-        return response()->json($user, 201);
+        return response()->json([
+            'message' => 'User successfully registered',
+            'user' => $user
+        ], 201);
     }
 
     public function update(Request $request){
@@ -360,17 +369,69 @@ class AuthController extends Controller
         ]);
     }
 
-    public function facebookLogin(Request $request) {
-    $token = $request->access_token;
-    $fbUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
-
-    $user = User::firstOrCreate(['email' => $fbUser->getEmail()], [
-        'name' => $fbUser->getName(),
-        'email_verified_at' => now(),
-        'type_user' => 2,
+    // --- REGISTRO MANUAL (Desde el formulario de tu web) ---
+public function register(Request $request) {
+    // Validamos que lleguen todos los campos necesarios
+    $validator = Validator::make($request->all(), [
+        'name' => 'required',
+        'surname' => 'required',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:6',
+        'phone' => 'required',
     ]);
 
-    $jwt = auth('api')->login($user);
-    return response()->json(['access_token' => $jwt, 'user' => $user]);
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 400);
+    }
+
+    $user = User::create([
+        'name' => $request->name,
+        'surname' => $request->surname,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'type_user' => 2, // Cliente
+        'password' => bcrypt($request->password), // ¡ESTO ES CLAVE! Encripta la pass
+    ]);
+
+    // Omitimos el envío de mail si falla para que el registro no se detenga
+    try {
+        Mail::to($user->email)->send(new VerifiedMail($user));
+    } catch (\Exception $e) {
+        Log::info("No se pudo enviar el correo, pero el usuario se creó.");
+    }
+
+    return response()->json(['message' => 'Usuario registrado con éxito', 'user' => $user]);
+}
+
+// --- REGISTRO/LOGIN CON GOOGLE ---
+public function login_google(Request $request) {
+    try {
+        $user_google = Socialite::driver('google')->userFromToken($request->access_token);
+        $user = User::where('email', $user_google->getEmail())->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $user_google->offsetGet('given_name') ?? $user_google->getName(),
+                'surname' => $user_google->offsetGet('family_name') ?? '',
+                'email' => $user_google->getEmail(),
+                'password' => bcrypt(Str::random(16)),
+                'phone' => '00000000',
+                'type_user' => 2,
+                'email_verified_at' => now(), // Verificado automático
+            ]);
+        }
+
+        $token = auth('api')->login($user);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'user' => [
+                'full_name' => $user-> . ' '. $user->surname,
+                'email' => $user->email,
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error en Google: ' . $e->getMessage()], 500);
+    }
 }
 }

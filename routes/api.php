@@ -51,8 +51,7 @@ Route::group([
     Route::post('/verified_email', [AuthController::class, 'verified_email'])->name('verified_email');
     Route::post('/verified_code', [AuthController::class, 'verified_code'])->name('verified_code');
     Route::post('/new_password', [AuthController::class, 'new_password'])->name('new_password');
-
-    Route::post('/social/facebook', [AuthController::class, 'facebookLogin']);
+    Route::post('/social/google', [AuthController::class, 'login_google']);
 });
 
 //grupo para el adminisitrador, rutas necesarias para gestionar las rutas de categorias
