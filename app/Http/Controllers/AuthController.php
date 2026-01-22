@@ -10,9 +10,11 @@ use App\Mail\VerifiedMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+<<<<<<< HEAD
 use Illuminate\Support\Str; // Importante para Str::random()
+=======
+>>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
 use Laravel\Socialite\Facades\Socialite;
 
 /**
@@ -34,12 +36,16 @@ class AuthController extends Controller
 {
     public function __construct()
     {
+<<<<<<< HEAD
         // Definimos qué rutas no necesitan token JWT para ser accedidas
         $this->middleware('auth:api', ['except' => [
             'login', 'register', 'login_ecommerce', 'verified_auth', 
             'verified_email', 'verified_code', 'new_password', 
             'login_google'
         ]]);
+=======
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'facebookLogin']]);
+>>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
     }
 
     /**
@@ -59,6 +65,7 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
+<<<<<<< HEAD
         $user = User::create([
             'name' => $request->name,
             'surname' => $request->surname,
@@ -74,6 +81,19 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             Log::info("No se pudo enviar el correo: " . $e->getMessage());
         }
+=======
+        $user = new User;
+        $user->name = request()->name;
+        $user->surname = request()->surname;
+        $user->phone = request()->phone;
+        $user->type_user = 2;
+        $user->email = request()->email;
+        $user->uniqd = uniqid();
+        $user->password = bcrypt(request()->password);
+        $user->save();
+
+        Mail::to(request()->email)->send(new VerifiedMail($user));
+>>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
 
         return response()->json($user, 201);
     }
@@ -196,6 +216,7 @@ class AuthController extends Controller
         ]);
     }
 
+<<<<<<< HEAD
     // --- MÉTODOS DE VERIFICACIÓN Y PERFIL ---
 
     public function update(Request $request){
@@ -231,3 +252,19 @@ class AuthController extends Controller
         return response()->json(["message" => 200]);
     }
 }
+=======
+    public function facebookLogin(Request $request) {
+    $token = $request->access_token;
+    $fbUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
+
+    $user = User::firstOrCreate(['email' => $fbUser->getEmail()], [
+        'name' => $fbUser->getName(),
+        'email_verified_at' => now(),
+        'type_user' => 2,
+    ]);
+
+    $jwt = auth('api')->login($user);
+    return response()->json(['access_token' => $jwt, 'user' => $user]);
+}
+}
+>>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
