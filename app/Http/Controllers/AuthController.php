@@ -12,14 +12,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
-<<<<<<< HEAD
-<<<<<<< HEAD
-use Illuminate\Support\Str; // Importante para Str::random()
-=======
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
-=======
-use Illuminate\Support\Str;
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
 use Laravel\Socialite\Facades\Socialite;
 
 
@@ -46,22 +38,6 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
-<<<<<<< HEAD
-    public function __construct()
-    {
-<<<<<<< HEAD
-        // Definimos qué rutas no necesitan token JWT para ser accedidas
-        $this->middleware('auth:api', ['except' => [
-            'login', 'register', 'login_ecommerce', 'verified_auth', 
-            'verified_email', 'verified_code', 'new_password', 
-            'login_google'
-        ]]);
-=======
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'facebookLogin']]);
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
-    }
-=======
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
 
     /**
  * @OA\Post(
@@ -100,7 +76,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'login_google']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'facebookLogin']]);
     }
 
     public function redirect() {
@@ -160,27 +136,6 @@ class AuthController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        $user = User::create([
-=======
-        user = User::created([
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
-            'name' => $request->name,
-            'surname' => $request->surname,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'type_user' => 2,
-            'uniqd' => uniqid(),
-        ]);
-
-        try{
-            Mail::to($user->email)->send(new verified_email($user));
-        } catch (\Exception $e) {
-            Log::error("Error enviado correo: ". $e->getMessage());
-        }
-=======
         $user = new User;
         $user->name = request()->name;
         $user->surname = request()->surname;
@@ -192,12 +147,8 @@ class AuthController extends Controller
         $user->save();
 
         Mail::to(request()->email)->send(new VerifiedMail($user));
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
 
-        return response()->json([
-            'message' => 'User successfully registered',
-            'user' => $user
-        ], 201);
+        return response()->json($user, 201);
     }
 
     public function update(Request $request){
@@ -409,99 +360,6 @@ class AuthController extends Controller
         ]);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    // --- MÉTODOS DE VERIFICACIÓN Y PERFIL ---
-=======
-    // --- REGISTRO MANUAL (Desde el formulario de tu web) ---
-public function register(Request $request) {
-    // Validamos que lleguen todos los campos necesarios
-    $validator = Validator::make($request->all(), [
-        'name' => 'required',
-        'surname' => 'required',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:6',
-        'phone' => 'required',
-    ]);
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
-
-    if ($validator->fails()) {
-        return response()->json($validator->errors(), 400);
-    }
-
-    $user = User::create([
-        'name' => $request->name,
-        'surname' => $request->surname,
-        'email' => $request->email,
-        'phone' => $request->phone,
-        'type_user' => 2, // Cliente
-        'password' => bcrypt($request->password), // ¡ESTO ES CLAVE! Encripta la pass
-    ]);
-
-    // Omitimos el envío de mail si falla para que el registro no se detenga
-    try {
-        Mail::to($user->email)->send(new VerifiedMail($user));
-    } catch (\Exception $e) {
-        Log::info("No se pudo enviar el correo, pero el usuario se creó.");
-    }
-
-    return response()->json(['message' => 'Usuario registrado con éxito', 'user' => $user]);
-}
-
-// --- REGISTRO/LOGIN CON GOOGLE ---
-public function login_google(Request $request) {
-    try {
-        $user_google = Socialite::driver('google')->userFromToken($request->access_token);
-        $user = User::where('email', $user_google->getEmail())->first();
-
-        if (!$user) {
-            $user = User::create([
-                'name' => $user_google->offsetGet('given_name') ?? $user_google->getName(),
-                'surname' => $user_google->offsetGet('family_name') ?? '',
-                'email' => $user_google->getEmail(),
-                'password' => bcrypt(Str::random(16)),
-                'phone' => '00000000',
-                'type_user' => 2,
-                'email_verified_at' => now(), // Verificado automático
-            ]);
-        }
-
-        $token = auth('api')->login($user);
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'user' => [
-                'full_name' => $user-> . ' '. $user->surname,
-                'email' => $user->email,
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Error en Google: ' . $e->getMessage()], 500);
-    }
-<<<<<<< HEAD
-
-    public function verified_email(Request $request) {
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            $user->update(["code_verified" => uniqid()]);
-            Mail::to($user->email)->send(new ForgotPasswordMail($user));
-            return response()->json(["message" => "Código enviado", "status" => 200]);
-        }
-        return response()->json(["message" => "No encontrado", "status" => 403], 403);
-    }
-
-    public function verified_code(Request $request) {
-        $user = User::where('code_verified', $request->code)->first();
-        return $user ? response()->json(["message" => 200]) : response()->json(['message' => 403], 403);
-    }
-
-    public function new_password(Request $request) {
-        $user = User::where('code_verified', $request->code)->first();
-        $user->update(['password' => bcrypt($request->new_password), 'code_verified' => null]);
-        return response()->json(["message" => 200]);
-    }
-}
-=======
     public function facebookLogin(Request $request) {
     $token = $request->access_token;
     $fbUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
@@ -516,8 +374,3 @@ public function login_google(Request $request) {
     return response()->json(['access_token' => $jwt, 'user' => $user]);
 }
 }
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
-=======
-}
-}
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
