@@ -2,288 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use App\Mail\ForgotPasswordMail;
 use App\Mail\VerifiedMail;
 use App\Models\User;
-// use Illuminate\Container\Attributes\Storage;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
-<<<<<<< HEAD
-<<<<<<< HEAD
-use Illuminate\Support\Str; // Importante para Str::random()
-=======
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
-=======
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
 use Laravel\Socialite\Facades\Socialite;
-
-
-/**
- * @OA\Tag(
- *     name="Autenticación",
- *     description="Operaciones relacionadas al login y autenticación de usuarios"
- * )
- */
-
-
-/**
- * @OA\SecurityScheme(
- *     securityScheme="bearerAuth",
- *     type="http",
- *     scheme="bearer",
- *     bearerFormat="JWT"
- * )
-*/
-
-
-// use Validator;
-
 
 class AuthController extends Controller
 {
-<<<<<<< HEAD
     public function __construct()
     {
-<<<<<<< HEAD
-        // Definimos qué rutas no necesitan token JWT para ser accedidas
-        $this->middleware('auth:api', ['except' => [
-            'login', 'register', 'login_ecommerce', 'verified_auth', 
-            'verified_email', 'verified_code', 'new_password', 
-            'login_google'
-        ]]);
-=======
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'facebookLogin']]);
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
-    }
-=======
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
-
-    /**
- * @OA\Post(
- *     path="/api/auth/login",
- *     summary="Login administrador",
- *     tags={"Autenticación"},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\JsonContent(
- *             required={"email", "password"},
- *             @OA\Property(property="email", type="string", example="admin@admin.com"),
- *             @OA\Property(property="password", type="string", example="12345678")
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Login exitoso",
- *         @OA\JsonContent(
- *             @OA\Property(property="access_token", type="string"),
- *             @OA\Property(property="token_type", type="string", example="bearer"),
- *             @OA\Property(property="expires_in", type="integer"),
- *             @OA\Property(property="user", type="object",
- *                 @OA\Property(property="full_name", type="string", example="Admin User"),
- *                 @OA\Property(property="email", type="string", example="admin@admin.com")
- *             )
- *         )
- *     ),
- *     @OA\Response(response=401, description="Credenciales inválidas")
- * )
- */
-
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'login_ecommerce', 'verified_auth', 'verified_email', 'verified_code', 'new_password', 'redirect', 'callback', 'login_google']]);
-    }
-
-    public function redirect() {
-        return Socialite::driver('facebook')->redirect();
-    }
-
-    public function callback()
-{
-    $fbUser = Socialite::driver('facebook')->user();
-
-    $user = User::firstOrCreate(
-        ['email' => $fbUser->getEmail()],
-        [
-            'name' => $fbUser->getName(),
-            'type_user' => 2,
-            'uniqd' => uniqid(),
-            'email_verified_at' => now(),
-            'fb' => 'facebook',
-        ]
-    );
-
-    $token = auth('api')->login($user);
-
-    // Codificamos los datos para pasarlos como query string
-    $query = http_build_query([
-        'token' => $token,
-        'name' => $user->name,
-        'email' => $user->email,
-        'surname' => $user->surname,
-        'phone' => $user->phone,
-        'address_city' => $user->address_city,
-        'fb' => $user->fb,
-        'sexo' => $user->sexo,
-        'bio' => $user->bio,
-        'avatar' => $user->avatar,
-    ]);
-
-    return redirect()->to("http://localhost:4200/register?$query");
-}
-
-    /**
-     * Register a User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function register()
-    {
-        $validator = Validator::make(request()->all(), [
-            'name' => 'required',
-            'surname' => 'required',
-            'phone' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
+        $this->middleware('auth:api', [
+            'except' => [
+                'login',
+                'register',
+                'login_ecommerce',
+                'verified_auth',
+                'verified_email',
+                'verified_code',
+                'new_password',
+                'redirect',
+                'callback',
+                'facebookLogin'
+            ]
         ]);
+    }
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
-        }
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-        $user = User::create([
-=======
-        user = User::created([
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
-            'name' => $request->name,
-            'surname' => $request->surname,
-            'phone' => $request->phone,
+    /* -----------------------------
+     | LOGIN ADMIN
+     |-----------------------------*/
+    public function login(Request $request)
+    {
+        if (!$token = auth('api')->attempt([
             'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'type_user' => 2,
-            'uniqd' => uniqid(),
-        ]);
-
-        try{
-            Mail::to($user->email)->send(new verified_email($user));
-        } catch (\Exception $e) {
-            Log::error("Error enviado correo: ". $e->getMessage());
-        }
-=======
-        $user = new User;
-        $user->name = request()->name;
-        $user->surname = request()->surname;
-        $user->phone = request()->phone;
-        $user->type_user = 2;
-        $user->email = request()->email;
-        $user->uniqd = uniqid();
-        $user->password = bcrypt(request()->password);
-        $user->save();
-
-        Mail::to(request()->email)->send(new VerifiedMail($user));
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
-
-        return response()->json([
-            'message' => 'User successfully registered',
-            'user' => $user
-        ], 201);
-    }
-
-    public function update(Request $request){
-
-        if($request->password){
-            $user = User::find(auth('api')->user()->id);
-            $user->update([
-                "password" => bcrypt($request->password)
-            ]);
-            return response()->json([
-            "message" => 200
-        ]);
-        }
-
-        $is_exists_email = User::where('id',"<>", auth('api')->user()->id)
-                                ->where('email', $request->email)->first();
-        if($is_exists_email) {
-            return response()->json([
-                "message" => 403,
-                "message_text" => "El usuario ya esta registrado"
-            ]);
-        }
-
-        $user = User::find(auth('api')->user()->id);
-        if($request->hasFile('file_imagen')){
-            if ($user->avatar) {
-                Storage::delete($user->avatar);
-            }
-            $path = Storage::putFile("users", $request->file("file_imagen"));
-            $request->request->add(["avatar" => $path]);
-        }
-        $user->update($request->all());
-        return response()->json([
-            "message" => 200
-        ]);
-    }
-
-    public function verified_email(Request $request)
-    {
-        $user = User::where('email', $request->email)->first();
-
-        if ($user) {
-            $user->update(["code_verified" => uniqid()]);
-            Mail::to($user->email)->send(new ForgotPasswordMail($user));
-
-            return response()->json([
-                "message" => "Código de verificación enviado correctamente.",
-                "status" => 200
-            ]);
-        } else {
-            return response()->json([
-                "message" => "El correo no está registrado.",
-                "status" => 403
-            ], 403);
-        }
-    }
-
-    public function verified_code(Request $request)
-    {
-        $user = User::where('code_verified', $request->code)->first();
-        if ($user) {
-            return response()->json(["message" => 200]);
-        } else {
-            return response()->json(['message' => 403], 403);
-        }
-    }
-    public function new_password(Request $request)
-    {
-        $user = User::where('code_verified', $request->code)->first();
-        $user->update(['password' => bcrypt($request->new_password), 'code_verified' => null]);
-        return response()->json(["message" => 200]);
-    }
-
-
-    /**
-     * Get a JWT via given credentials.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function login()
-    {
-        $credentials = request(['email', 'password']);
-
-        if (! $token = auth('api')->attempt([
-            'email' => request()->email,
-            'password' => request()->password,
+            'password' => $request->password,
             'type_user' => 1
         ])) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -291,233 +50,268 @@ class AuthController extends Controller
 
         return $this->respondWithToken($token);
     }
-    public function login_ecommerce()
-    {
-        $credentials = request(['email', 'password']);
 
-        if (! $token = auth('api')->attempt([
-            'email' => request()->email,
-            'password' => request()->password,
+    /* -----------------------------
+     | LOGIN ECOMMERCE
+     |-----------------------------*/
+    public function login_ecommerce(Request $request)
+    {
+        if (!$token = auth('api')->attempt([
+            'email' => $request->email,
+            'password' => $request->password,
             'type_user' => 2
         ])) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         if (!auth('api')->user()->email_verified_at) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Email no verificado'], 401);
         }
 
         return $this->respondWithToken($token);
     }
 
-    public function verified_auth(Request $request)
+    /* -----------------------------
+     | REGISTRO
+     |-----------------------------*/
+    public function register(Request $request)
     {
-        $user = User::where('uniqd', $request->code_user)->first();
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'surname' => 'required|string',
+            'phone' => 'required|string',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8'
+        ]);
 
-        if ($user) {
-            $user->update(["email_verified_at" => now()]);
-            return response()->json(["success" => 200]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
         }
-        return response()->json(["mensaje" => 403]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'surname' => $request->surname,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'type_user' => 2,
+            'uniqd' => uniqid()
+        ]);
+
+        try {
+            Mail::to($user->email)->send(new VerifiedMail($user));
+        } catch (\Exception $e) {
+            Log::warning('Error enviando email: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'message' => 'Usuario registrado correctamente',
+            'user' => $user
+        ], 201);
     }
 
-    /**
-     * Get the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-
-    /**
- * @OA\Post(
- *     path="/api/auth/me",
- *     summary="Obtener datos del usuario autenticado",
- *     tags={"Autenticación"},
- *     security={{"bearerAuth":{}}},
- *     @OA\Response(
- *         response=200,
- *         description="Datos del usuario",
- *         @OA\JsonContent(
- *             @OA\Property(property="name", type="string", example="Juan"),
- *             @OA\Property(property="surname", type="string", example="Pérez"),
- *             @OA\Property(property="email", type="string", example="admin@admin.com"),
- *             @OA\Property(property="phone", type="string", example="123456789"),
- *             @OA\Property(property="avatar", type="string", example="http://localhost/storage/users/avatar.jpg")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="No autenticado"
- *     )
- * )
- */
+    /* -----------------------------
+     | PERFIL
+     |-----------------------------*/
     public function me()
     {
-        $user = User::find(auth('api')->user()->id);
+        $user = auth('api')->user();
+
         return response()->json([
             'name' => $user->name,
             'surname' => $user->surname,
             'phone' => $user->phone,
             'email' => $user->email,
             'bio' => $user->bio,
-            'fb' => $user->fb,
-            'ig' => $user->ig,
             'sexo' => $user->sexo,
             'address_city' => $user->address_city,
-            'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
+            'avatar' => $user->avatar
+                ? asset('storage/' . $user->avatar)
+                : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png'
         ]);
     }
 
-    /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+    /* -----------------------------
+     | UPDATE PERFIL
+     |-----------------------------*/
+    public function update(Request $request)
+    {
+        $user = auth('api')->user();
+
+        if ($request->password) {
+            $user->update([
+                'password' => bcrypt($request->password)
+            ]);
+            return response()->json(['message' => 'Password actualizado']);
+        }
+
+        if ($request->hasFile('file_imagen')) {
+            if ($user->avatar) {
+                Storage::delete($user->avatar);
+            }
+            $path = Storage::putFile('users', $request->file('file_imagen'));
+            $request->merge(['avatar' => $path]);
+        }
+
+        $user->update($request->except(['password', 'file_imagen']));
+
+        return response()->json(['message' => 'Perfil actualizado']);
+    }
+
+    /* -----------------------------
+     | LOGOUT
+     |-----------------------------*/
     public function logout()
     {
         auth('api')->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Logout exitoso']);
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function refresh()
-    {
-        return $this->respondWithToken(auth('api')->refresh());
-    }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+    /* -----------------------------
+     | TOKEN
+     |-----------------------------*/
     protected function respondWithToken($token)
     {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
-            "user" => [
-                "full_name" => auth('api')->user()->name . ' ' . auth('api')->user()->surname,
-                "email" => auth('api')->user()->email,
-            ]
+            'user' => auth('api')->user()
         ]);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    // --- MÉTODOS DE VERIFICACIÓN Y PERFIL ---
-=======
-    // --- REGISTRO MANUAL (Desde el formulario de tu web) ---
-public function register(Request $request) {
-    // Validamos que lleguen todos los campos necesarios
-    $validator = Validator::make($request->all(), [
-        'name' => 'required',
-        'surname' => 'required',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:6',
-        'phone' => 'required',
-    ]);
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
+    /* -----------------------------
+     | FACEBOOK LOGIN
+     |-----------------------------*/
 
-    if ($validator->fails()) {
-        return response()->json($validator->errors(), 400);
-    }
-
-    $user = User::create([
-        'name' => $request->name,
-        'surname' => $request->surname,
-        'email' => $request->email,
-        'phone' => $request->phone,
-        'type_user' => 2, // Cliente
-        'password' => bcrypt($request->password), // ¡ESTO ES CLAVE! Encripta la pass
+     public function facebookLogin(Request $request)
+{
+    $request->validate([
+        'access_token' => 'required|string'
     ]);
 
-    // Omitimos el envío de mail si falla para que el registro no se detenga
     try {
-        Mail::to($user->email)->send(new VerifiedMail($user));
-    } catch (\Exception $e) {
-        Log::info("No se pudo enviar el correo, pero el usuario se creó.");
-    }
+        $fbUser = Socialite::driver('facebook')
+            ->stateless()
+            ->userFromToken($request->access_token);
 
-    return response()->json(['message' => 'Usuario registrado con éxito', 'user' => $user]);
-}
+        // ⚠️ Facebook puede NO devolver email
+        $email = $fbUser->getEmail();
 
-// --- REGISTRO/LOGIN CON GOOGLE ---
-public function login_google(Request $request) {
-    try {
-        $user_google = Socialite::driver('google')->userFromToken($request->access_token);
-        $user = User::where('email', $user_google->getEmail())->first();
+        if (!$email) {
+            $email = 'fb_' . $fbUser->getId() . '@facebook.local';
+        }
+
+        $user = User::where('facebook_id', $fbUser->getId())
+            ->orWhere('email', $email)
+            ->first();
 
         if (!$user) {
             $user = User::create([
-                'name' => $user_google->offsetGet('given_name') ?? $user_google->getName(),
-                'surname' => $user_google->offsetGet('family_name') ?? '',
-                'email' => $user_google->getEmail(),
-                'password' => bcrypt(Str::random(16)),
-                'phone' => '00000000',
-                'type_user' => 2,
-                'email_verified_at' => now(), // Verificado automático
+                'name'              => $fbUser->getName() ?? 'Usuario Facebook',
+                'email'             => $email,
+                'facebook_id'       => $fbUser->getId(),
+                'email_verified_at' => $fbUser->getEmail() ? now() : null,
+                'type_user'         => 2,
+                'password'          => bcrypt(\Illuminate\Support\Str::random(32)),
             ]);
+        } else {
+            if (!$user->facebook_id) {
+                $user->update(['facebook_id' => $fbUser->getId()]);
+            }
         }
 
         $token = auth('api')->login($user);
+
         return response()->json([
             'access_token' => $token,
-            'token_type' => 'bearer',
-            'user' => [
-                'full_name' => $user-> . ' '. $user->surname,
-                'email' => $user->email,
-            ]
+            'needs_email'  => str_ends_with($email, '@facebook.local'),
+            'user'         => $user
         ]);
+
     } catch (\Exception $e) {
-        return response()->json(['error' => 'Error en Google: ' . $e->getMessage()], 500);
-    }
-<<<<<<< HEAD
-
-    public function verified_email(Request $request) {
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            $user->update(["code_verified" => uniqid()]);
-            Mail::to($user->email)->send(new ForgotPasswordMail($user));
-            return response()->json(["message" => "Código enviado", "status" => 200]);
-        }
-        return response()->json(["message" => "No encontrado", "status" => 403], 403);
+        return response()->json([
+            'error' => 'Error autenticando con Facebook',
+            'details' => $e->getMessage()
+        ], 422);
     }
 
-    public function verified_code(Request $request) {
-        $user = User::where('code_verified', $request->code)->first();
-        return $user ? response()->json(["message" => 200]) : response()->json(['message' => 403], 403);
     }
 
-    public function new_password(Request $request) {
-        $user = User::where('code_verified', $request->code)->first();
-        $user->update(['password' => bcrypt($request->new_password), 'code_verified' => null]);
-        return response()->json(["message" => 200]);
-    }
+   public function completeEmail(Request $request) {
+  $request->validate([
+    'email' => 'required|email|unique:users,email'
+  ]);
+
+  $user = auth()->user();
+  $user->email = $request->email;
+  $user->email_verified_at = now();
+  $user->save();
+
+  return response()->json([
+    'message' => 'Email actualizado',
+    'user' => $user
+  ]);
 }
-=======
-    public function facebookLogin(Request $request) {
-    $token = $request->access_token;
-    $fbUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
 
-    $user = User::firstOrCreate(['email' => $fbUser->getEmail()], [
-        'name' => $fbUser->getName(),
-        'email_verified_at' => now(),
-        'type_user' => 2,
+public function googleLogin(Request $request)
+{
+    $request->validate([
+        'access_token' => 'required|string'
     ]);
 
-    $jwt = auth('api')->login($user);
-    return response()->json(['access_token' => $jwt, 'user' => $user]);
+    try {
+        $googleUser = Socialite::driver('google')
+            ->stateless()
+            ->userFromToken($request->access_token);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Token de Google inválido'
+        ], 401);
+    }
+
+    // 🚨 Edge case: Google sin email
+    if (!$googleUser->getEmail()) {
+        return response()->json([
+            'needs_email' => true,
+            'google_id' => $googleUser->getId(),
+            'name' => $googleUser->getName()
+        ]);
+    }
+
+    $user = User::where('google_id', $googleUser->getId())
+        ->orWhere('email', $googleUser->getEmail())
+        ->first();
+
+    if (!$user) {
+        $user = User::create([
+            'name' => $googleUser->getName() ?? 'Usuario Google',
+            'email' => $googleUser->getEmail(),
+            'google_id' => $googleUser->getId(),
+            'email_verified_at' => now(),
+            'type_user' => 2,
+            'password' => bcrypt(Str::random(16))
+        ]);
+    } else {
+        if (!$user->google_id) {
+            $user->update([
+                'google_id' => $googleUser->getId()
+            ]);
+        }
+    }
+
+    $token = auth('api')->login($user);
+
+    return response()->json([
+        'access_token' => $token,
+        'user' => $user
+    ]);
 }
-}
->>>>>>> parent of 95fcbfb (Fix: corregido AuthController, registro manual y login con Google)
-=======
-}
-}
->>>>>>> parent of 2f1ee2e (Correccion login con google, falta corregir algunas cosas)
+
+
+
+
+
+
+
+   }
