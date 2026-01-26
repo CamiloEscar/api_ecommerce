@@ -37,7 +37,7 @@ class User extends Authenticatable implements JWTSubject
 
         'address_city',
         'bio',
-        'fb',
+        'facebook_id',
         'sexo'
     ];
 

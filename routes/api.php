@@ -53,6 +53,11 @@ Route::group([
     Route::post('/new_password', [AuthController::class, 'new_password'])->name('new_password');
 
     Route::post('/social/facebook', [AuthController::class, 'facebookLogin']);
+    Route::post('/auth/social/google', [AuthController::class, 'googleLogin']);
+
+    Route::post('auth/complete-email', [AuthController::class, 'completeEmail'])
+  ->middleware('auth:sanctum');
+
 });
 
 //grupo para el adminisitrador, rutas necesarias para gestionar las rutas de categorias
