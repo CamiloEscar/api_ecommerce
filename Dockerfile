@@ -11,11 +11,12 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libicu-dev \
     libfreetype6-dev \
-    libjpeg62-turbo-dev
+    libjpeg62-turbo-dev \
+    libzip-dev
 
 # Instalar extensiones PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd intl pdo_mysql mbstring exif pcntl bcmath opcache
+    && docker-php-ext-install -j$(nproc) gd intl pdo_mysql mbstring exif pcntl bcmath opcache zip
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
