@@ -86,39 +86,88 @@ class SaleController extends Controller
         }
     }
 
-    public function mercadopagoCallbackSuccess(Request $request)
-    {
-        Log::info("=== MERCADOPAGO: Callback Success ===", $request->all());
+public function mercadopagoCallbackSuccess(Request $request)
+{
+    Log::info("=== MERCADOPAGO: Callback Success ===", $request->all());
 
-        $paymentId = $request->get('payment_id');
+    $paymentId = $request->get('payment_id');
+    $externalReference = $request->get('external_reference'); // user_id
 
-        try {
-            // Verificar y procesar el pago
-            $paymentInfo = $this->verifyMercadoPagoPayment($paymentId);
+    try {
+        // Verificar el pago con Mercado Pago
+        $paymentInfo = $this->verifyMercadoPagoPayment($paymentId);
 
-            if ($paymentInfo) {
-                Log::info("Pago verificado", ['payment' => $paymentInfo]);
+        if ($paymentInfo && $paymentInfo['status'] === 'approved') {
+            Log::info("Pago verificado y aprobado", ['payment' => $paymentInfo]);
 
-                // TODO: Aquí puedes guardar la orden en la base de datos
-                // $this->createSaleFromMercadoPago($paymentInfo);
-            }
-
-        } catch (\Exception $e) {
-            Log::error("Error verificando pago: " . $e->getMessage());
+            // 🆕 GUARDAR LA COMPRA EN LA BASE DE DATOS
+            $this->createSaleFromMercadoPago($paymentInfo, $externalReference);
         }
 
-        // Redirigir a Angular con los datos del pago
-        $frontendUrl = env("URL_TIENDA");
-        $redirectUrl = $frontendUrl . "/mercado-pago-success?" . http_build_query([
-            'payment_id' => $paymentId,
-            'status' => $request->get('status'),
-            'collection_status' => $request->get('collection_status'),
-            'payment_type' => $request->get('payment_type'),
-            'merchant_order_id' => $request->get('merchant_order_id'),
-        ]);
-
-        return redirect($redirectUrl);
+    } catch (\Exception $e) {
+        Log::error("Error procesando pago: " . $e->getMessage());
     }
+
+    // Redirigir a Angular
+    $frontendUrl = env("URL_TIENDA");
+    $redirectUrl = $frontendUrl . "/mercado-pago-success?" . http_build_query([
+        'payment_id' => $paymentId,
+        'status' => $request->get('status'),
+        'collection_status' => $request->get('collection_status'),
+        'payment_type' => $request->get('payment_type'),
+        'merchant_order_id' => $request->get('merchant_order_id'),
+    ]);
+
+    return redirect($redirectUrl);
+}
+
+// 🆕 NUEVO MÉTODO: Crear la venta desde Mercado Pago
+private function createSaleFromMercadoPago($paymentInfo, $userId)
+{
+    // Obtener datos temporales guardados
+    $saleTemp = SaleTemp::where("user_id", $userId)->first();
+
+    if (!$saleTemp) {
+        Log::error("No se encontró SaleTemp para user_id: " . $userId);
+        return;
+    }
+
+    // Crear la venta
+    $sale = Sale::create([
+        "user_id" => $userId,
+        "method_payment" => "MERCADOPAGO",
+        "currency_total" => "ARS",
+        "currency_payment" => "ARS",
+        "total" => $paymentInfo['transaction_amount'],
+        "subtotal" => $paymentInfo['transaction_amount'],
+        "n_transaccion" => $paymentInfo['id'],
+        "discount" => 0,
+        "price_dolar" => 0,
+        "description" => $saleTemp->description ?? "Compra con Mercado Pago",
+    ]);
+
+    Log::info("Sale creada", ['sale_id' => $sale->id]);
+
+    // Procesar carrito y crear detalles
+    $this->processCarts($sale);
+
+    // Crear dirección de envío
+    $saleAddress = json_decode($saleTemp->sale_address, true);
+    if ($saleAddress) {
+        $this->createSaleAddress($sale, $saleAddress);
+    }
+
+    // Enviar email de confirmación
+    $user = \App\Models\User::find($userId);
+    if ($user) {
+        $this->sendConfirmationEmail($sale);
+    }
+
+    // Limpiar datos temporales
+    $saleTemp->delete();
+
+    Log::info("Compra completada exitosamente", ['sale_id' => $sale->id]);
+}
 
     public function mercadopagoCallbackFailure(Request $request)
     {
