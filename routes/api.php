@@ -122,6 +122,10 @@ Route::group([
 Route::get("sales/list-excel", [SalesController::class, "list_excel"]);
 Route::get("sales/report-pdf/{id}", [SalesController::class, "report_pdf"]);
 
+Route::get('ecommerce/mercadopago/callback/success', [SaleController::class, 'mercadopagoCallbackSuccess']);
+Route::get('ecommerce/mercadopago/callback/failure', [SaleController::class, 'mercadopagoCallbackFailure']);
+Route::get('ecommerce/mercadopago/callback/pending', [SaleController::class, 'mercadopagoCallbackPending']);
+Route::post('ecommerce/mercadopago/webhook', [SaleController::class, 'mercadopagoWebhook']);
 
 
 Route::group([
@@ -165,12 +169,7 @@ Route::group([
     Route::post("filter-advance-product",  [HomeController::class, "filter_advance_product"]);
     Route::post("campaing-discount-link",  [HomeController::class, "campaing_discount_link"]);
 
-    Route::get('/ecommerce/mercadopago/callback/success', [SaleController::class, 'mercadopagoCallbackSuccess']);
-Route::get('/ecommerce/mercadopago/callback/failure', [SaleController::class, 'mercadopagoCallbackFailure']);
-Route::get('/ecommerce/mercadopago/callback/pending', [SaleController::class, 'mercadopagoCallbackPending']);
 
-// Webhook para notificaciones IPN (POST)
-Route::post('/ecommerce/mercadopago/webhook', [SaleController::class, 'mercadopagoWebhook']);
     //api dolar
     // Route::get('ecommerce/mercadopago', [SaleController::class, "mercadopago"]);
     // Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
