@@ -139,66 +139,99 @@ class SaleController extends Controller
     }
 
     //TODO: COLOCAR ESTO CUANDO HAGA LA INTEGRACION CON MERCADO PAGO
-    public function mercadopago(Request $request) {
+public function mercadopago(Request $request) {
     error_log("=== MERCADOPAGO ENDPOINT LLAMADO ===");
     error_log("Request: " . json_encode($request->all()));
-    error_log("Headers: " . json_encode($request->headers->all()));
 
-    // VALIDAR AUTENTICACIÓN
-    $user = auth('api')->user();
+    try {
+        // Validar usuario
+        $user = auth('api')->user();
+        if (!$user) {
+            return response()->json(['message' => 'No autenticado'], 401);
+        }
 
-    if (!$user) {
-        error_log("ERROR: Usuario no autenticado");
-        error_log("Token: " . $request->bearerToken());
-        return response()->json([
-            'message' => 'No autenticado. Por favor, inicia sesión nuevamente.'
-        ], 401);
-    }
+        error_log("Usuario autenticado: " . $user->id);
 
-    error_log("Usuario autenticado: " . $user->id);
+        // Configurar Mercado Pago
+        $mpKey = env("MERCADOPAGO_KEY");
+        if (!$mpKey) {
+            return response()->json(['message' => 'Mercado Pago no configurado'], 500);
+        }
 
-    MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
-    $client = new PreferenceClient();
-    $client->auto_return = "approved";
+        error_log("Configurando MP con key: " . substr($mpKey, 0, 20) . "...");
 
-    // Ahora sí es seguro usar $user->id
-    $carts = Cart::where("user_id", $user->id)->get();
-    $array_carts = [];
+        MercadoPagoConfig::setAccessToken($mpKey);
+        $client = new PreferenceClient();
 
-    foreach ($carts as $key => $cart) {
-        array_push($array_carts, [
-            "title" => $cart->product->title,
-            "quantity" => $cart->quantity,
-            "currency_id" => $cart->currency,
-            "unit_price" => $cart->total,
-        ]);
-    }
+        // Preparar los datos CORRECTAMENTE para MP
+        $priceUnit = floatval($request->get("price_unit"));
 
-    $datos = array(
-        "items"=> [
-            [
-                "title" => "NAME PRODUCT",
-                "quantity" => 1,
-                "currency_id" => 'ARS',
-                'unit_price' => intval($request->get("price_unit")),
+        $preference = $client->create([
+            "items" => [
+                [
+                    "title" => "Compra en Ecommerce Funkos",
+                    "description" => "Productos del carrito",
+                    "quantity" => 1,
+                    "currency_id" => "ARS",
+                    "unit_price" => $priceUnit,
+                ]
+            ],
+            "back_urls" => [
+                "success" => env("URL_TIENDA") . "mercado-pago-success",
+                "failure" => env("URL_TIENDA") . "mercado-pago-failure",
+                "pending" => env("URL_TIENDA") . "mercado-pago-pending"
+            ],
+            "auto_return" => "approved",
+            "statement_descriptor" => "ECOMMERCE_FUNKOS",
+            "external_reference" => "order_" . $user->id . "_" . time(),
+            "notification_url" => env("APP_URL") . "/api/ecommerce/mercadopago/webhook",
+            "payer" => [
+                "email" => $user->email,
+                "name" => $user->name ?? "Cliente",
             ]
-        ],
-        "back_urls" => array(
-            "success" => env("URL_TIENDA")."mercado-pago-success",
-            "failure" => env("URL_TIENDA")."mercado-pago-failure",
-            "pending" => env("URL_TIENDA")."mercado-pago-pending"
-        ),
-        "auto_return" => "approved",
-        "external_reference" => uniqid(),
-    );
+        ]);
 
-    $preference = $client->create($datos);
+        error_log("Preferencia creada exitosamente: " . json_encode($preference));
 
-    return response()->json([
-        "preference" => $preference,
-    ]);
+        return response()->json([
+            "preference" => $preference,
+        ]);
+
+    } catch (\MercadoPago\Exceptions\MPApiException $e) {
+        error_log("=== ERROR DE MERCADO PAGO ===");
+        error_log("Status Code: " . ($e->getStatusCode() ?? 'N/A'));
+        error_log("Message: " . $e->getMessage());
+
+        // Intentar obtener más detalles
+        try {
+            $apiResponse = $e->getApiResponse();
+            error_log("API Response: " . json_encode($apiResponse));
+
+            return response()->json([
+                'message' => 'Error de Mercado Pago',
+                'error' => $e->getMessage(),
+                'details' => $apiResponse
+            ], 500);
+        } catch (\Exception $e2) {
+            error_log("No se pudo obtener API Response");
+        }
+
+        return response()->json([
+            'message' => 'Error de Mercado Pago',
+            'error' => $e->getMessage(),
+        ], 500);
+
+    } catch (\Exception $e) {
+        error_log("=== ERROR GENERAL ===");
+        error_log("Error: " . $e->getMessage());
+        error_log("Trace: " . $e->getTraceAsString());
+
+        return response()->json([
+            'message' => 'Error al procesar el pago',
+            'error' => $e->getMessage()
+        ], 500);
+    }
 }
-
     //funcion para guardar la informacion del checkout de mercado pago, ya que se pierde la informacion cuando se hace una compra por mp
     public function checkout_temp(Request $request) {
 
