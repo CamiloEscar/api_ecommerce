@@ -124,6 +124,12 @@ public function mercadopagoCallbackSuccess(Request $request)
 // 🆕 NUEVO MÉTODO: Crear la venta desde Mercado Pago
 private function createSaleFromMercadoPago($paymentInfo, $userId)
 {
+    $exists = Sale::where('n_transaccion', $paymentInfo['id'])->exists();
+
+if ($exists) {
+    Log::warning("Pago ya procesado", ['payment_id' => $paymentInfo['id']]);
+    return;
+}
     // Obtener datos temporales guardados
     $saleTemp = SaleTemp::where("user_id", $userId)->first();
 
@@ -152,7 +158,7 @@ private function createSaleFromMercadoPago($paymentInfo, $userId)
     $this->processCarts($sale);
 
     // Crear dirección de envío
-    $saleAddress = json_decode($saleTemp->sale_addres, true);
+    $saleAddress = json_decode($saleTemp->sale_address, true);
     if ($saleAddress) {
         $this->createSaleAddress($sale, $saleAddress);
     }
@@ -162,7 +168,7 @@ private function createSaleFromMercadoPago($paymentInfo, $userId)
         $user = \App\Models\User::find($userId);
         if ($user) {
             // Recargar la venta con todas sus relaciones
-            $sale_complete = Sale::with(['sale_details', 'sale_address'])->findOrFail($sale->id);
+            $sale_complete = Sale::with(['sale_details', 'sale_addres'])->findOrFail($sale->id);
 
             Log::info("Enviando email a: " . $user->email);
             Mail::to($user->email)->send(new SaleMail($user, $sale_complete));
