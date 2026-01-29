@@ -1,6 +1,6 @@
 FROM php:8.2-cli
 
-# Instalar dependencias del sistema
+# Dependencias del sistema
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -14,35 +14,29 @@ RUN apt-get update && apt-get install -y \
     libjpeg62-turbo-dev \
     libzip-dev
 
-# Instalar extensiones PHP
+# Extensiones PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd intl pdo_mysql mbstring exif pcntl bcmath opcache zip
 
-# Instalar Composer
+# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Instalar Node.js
+# Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
 
-# Configurar directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos
 COPY . .
 
-# Dar permisos al script
 RUN chmod +x start.sh
 
-# Instalar dependencias y build
+# ⚠️ IMPORTANTE: NO optimize / NO jwt / NO cache acá
 RUN composer install --optimize-autoloader --no-dev \
     && npm install \
     && npm run build \
-    && php artisan optimize \
     && chmod -R 777 storage bootstrap/cache
 
-# Exponer puerto
 EXPOSE 8080
 
-# Comando de inicio
 CMD ["/app/start.sh"]
