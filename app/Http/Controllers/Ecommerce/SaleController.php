@@ -157,10 +157,19 @@ private function createSaleFromMercadoPago($paymentInfo, $userId)
         $this->createSaleAddress($sale, $saleAddress);
     }
 
-    // Enviar email de confirmación
-    $user = \App\Models\User::find($userId);
-    if ($user) {
-        $this->sendConfirmationEmail($sale);
+    // 🆕 ARREGLO: Enviar email de confirmación
+    try {
+        $user = \App\Models\User::find($userId);
+        if ($user) {
+            // Recargar la venta con todas sus relaciones
+            $sale_complete = Sale::with(['sale_details', 'sale_address'])->findOrFail($sale->id);
+
+            Log::info("Enviando email a: " . $user->email);
+            Mail::to($user->email)->send(new SaleMail($user, $sale_complete));
+            Log::info("Email enviado exitosamente");
+        }
+    } catch (\Exception $e) {
+        Log::error("Error enviando email: " . $e->getMessage());
     }
 
     // Limpiar datos temporales
@@ -293,25 +302,27 @@ private function createSaleFromMercadoPago($paymentInfo, $userId)
     }
 
     private function processCarts($sale)
-    {
-        $carts = Cart::where("user_id", auth("api")->user()->id)->get();
+{
+    $userId = $sale->user_id ?? auth("api")->user()->id;
+    $carts = Cart::where("user_id", $userId)->get();
 
-        foreach ($carts as $cart) {
-            // Crear detalle de venta
-            $new_detail = $cart->toArray();
-            $new_detail["sale_id"] = $sale->id;
-            SaleDetail::create($new_detail);
+    foreach ($carts as $cart) {
+        // Crear detalle de venta
+        $new_detail = $cart->toArray();
+        $new_detail["sale_id"] = $sale->id;
+        SaleDetail::create($new_detail);
 
-            // Actualizar stock
-            if ($cart->product_variation_id) {
-                $this->updateVariationStock($cart);
-            } else {
-                $this->updateProductStock($cart);
-            }
-
-            $cart->delete();
+        // Actualizar stock
+        if ($cart->product_variation_id) {
+            $this->updateVariationStock($cart);
+        } else {
+            $this->updateProductStock($cart);
         }
     }
+
+    // 🆕 Borrar carts AL FINAL (después de crear todos los detalles)
+    Cart::where("user_id", $userId)->delete();
+}
 
     private function updateVariationStock($cart)
     {
