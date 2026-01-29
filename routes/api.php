@@ -145,7 +145,7 @@ Route::group([
 
         Route::resource('user_address', UserAdressController::class);
 
-        Route::get('mercadopago', [SaleController::class, "mercadopago"]);
+        // Route::get('mercadopago', [SaleController::class, "mercadopago"]);
         Route::get('sale/{id}', [SaleController::class, "show"]);
         Route::post('checkout', [SaleController::class, "store"]);
         Route::post('checkout-temp', [SaleController::class, "checkout_temp"]);
@@ -165,6 +165,6 @@ Route::group([
     Route::post("campaing-discount-link",  [HomeController::class, "campaing_discount_link"]);
 
     //api dolar
-    // Route::get('mercadopago', [SaleController::class, "mercadopago"]);
+    Route::get('mercadopago', [SaleController::class, "mercadopago"]);
     // Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
 });
