@@ -141,6 +141,13 @@ class SaleController extends Controller
     //TODO: COLOCAR ESTO CUANDO HAGA LA INTEGRACION CON MERCADO PAGO
     public function mercadopago(Request $request) {
 
+        error_log("=== MERCADOPAGO ENDPOINT LLAMADO ===");
+    error_log("Request: " . json_encode($request->all()));
+    error_log("Headers: " . json_encode($request->headers->all()));
+
+    MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
+    $client = new PreferenceClient();
+
         MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
         $client = new PreferenceClient();
         $client->auto_return = "approved";
