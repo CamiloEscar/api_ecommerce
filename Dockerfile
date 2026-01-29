@@ -41,5 +41,19 @@ RUN composer install --optimize-autoloader --no-dev \
 # Exponer puerto
 EXPOSE 8080
 
+# Crear script de inicio
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "Container started..."\n\
+echo "Waiting 30 seconds for MySQL..."\n\
+sleep 30\n\
+echo "Running migrations..."\n\
+php artisan migrate --force || echo "Migration failed"\n\
+echo "Creating storage link..."\n\
+php artisan storage:link || echo "Storage link failed"\n\
+echo "Starting Laravel server on 0.0.0.0:8080..."\n\
+exec php artisan serve --host=0.0.0.0 --port=8080\n\
+' > /start.sh && chmod +x /start.sh
+
 # Comando de inicio
-CMD ["sh", "-c", "sleep 20 && php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8080"]
+CMD ["/start.sh"]
