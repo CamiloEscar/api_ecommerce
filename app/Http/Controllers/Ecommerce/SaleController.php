@@ -15,6 +15,7 @@ use App\Models\Sale\SaleDetail;
 use App\Models\Sale\SaleTemp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\MercadoPagoConfig;
@@ -139,124 +140,124 @@ class SaleController extends Controller
     }
 
     //TODO: COLOCAR ESTO CUANDO HAGA LA INTEGRACION CON MERCADO PAGO
-public function mercadopago(Request $request) {
-    error_log("=== MERCADOPAGO ENDPOINT LLAMADO ===");
-    error_log("Request: " . json_encode($request->all()));
+// public function mercadopago(Request $request) {
+//     error_log("=== MERCADOPAGO ENDPOINT LLAMADO ===");
+//     error_log("Request: " . json_encode($request->all()));
 
-    try {
-        // Validar usuario
-        $user = auth('api')->user();
-        if (!$user) {
-            return response()->json(['message' => 'No autenticado'], 401);
-        }
+//     try {
+//         // Validar usuario
+//         $user = auth('api')->user();
+//         if (!$user) {
+//             return response()->json(['message' => 'No autenticado'], 401);
+//         }
 
-        error_log("Usuario autenticado: " . $user->id);
+//         error_log("Usuario autenticado: " . $user->id);
 
-        // Obtener Access Token
-        $mpKey = env("MERCADOPAGO_KEY");
-        if (!$mpKey) {
-            return response()->json(['message' => 'Mercado Pago no configurado'], 500);
-        }
+//         // Obtener Access Token
+//         $mpKey = env("MERCADOPAGO_KEY");
+//         if (!$mpKey) {
+//             return response()->json(['message' => 'Mercado Pago no configurado'], 500);
+//         }
 
-        // Preparar datos
-        $priceUnit = floatval($request->get("price_unit"));
+//         // Preparar datos
+//         $priceUnit = floatval($request->get("price_unit"));
 
-        // Generar URLs completas
-        $baseUrl = env("URL_TIENDA");
+//         // Generar URLs completas
+//         $baseUrl = env("URL_TIENDA");
 
-        $data = [
-            "items" => [
-                [
-                    "title" => "Compra en Ecommerce Funkos",
-                    "quantity" => 1,
-                    "currency_id" => "ARS",
-                    "unit_price" => $priceUnit,
-                ]
-            ],
-            "back_urls" => [
-                "success" => $baseUrl . "/mercado-pago-success",
-                "failure" => $baseUrl . "/mercado-pago-failure",
-                "pending" => $baseUrl . "/mercado-pago-pending"
-            ],
-            "auto_return" => "approved",
-        ];
+//         $data = [
+//             "items" => [
+//                 [
+//                     "title" => "Compra en Ecommerce Funkos",
+//                     "quantity" => 1,
+//                     "currency_id" => "ARS",
+//                     "unit_price" => $priceUnit,
+//                 ]
+//             ],
+//             "back_urls" => [
+//                 "success" => $baseUrl . "/mercado-pago-success",
+//                 "failure" => $baseUrl . "/mercado-pago-failure",
+//                 "pending" => $baseUrl . "/mercado-pago-pending"
+//             ],
+//             "auto_return" => "approved",
+//         ];
 
-        error_log("Datos a enviar: " . json_encode($data));
+//         error_log("Datos a enviar: " . json_encode($data));
 
-        // Hacer petición HTTP con cURL
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.mercadopago.com/checkout/preferences');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $mpKey,
-        ]);
+//         // Hacer petición HTTP con cURL
+//         $ch = curl_init();
+//         curl_setopt($ch, CURLOPT_URL, 'https://api.mercadopago.com/checkout/preferences');
+//         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//         curl_setopt($ch, CURLOPT_POST, true);
+//         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+//         curl_setopt($ch, CURLOPT_HTTPHEADER, [
+//             'Content-Type: application/json',
+//             'Authorization: Bearer ' . $mpKey,
+//         ]);
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
+//         $response = curl_exec($ch);
+//         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+//         $curlError = curl_error($ch);
+//         curl_close($ch);
 
-        if ($curlError) {
-            error_log("cURL Error: " . $curlError);
-            return response()->json(['message' => 'Error de conexión', 'error' => $curlError], 500);
-        }
+//         if ($curlError) {
+//             error_log("cURL Error: " . $curlError);
+//             return response()->json(['message' => 'Error de conexión', 'error' => $curlError], 500);
+//         }
 
-        error_log("HTTP Code: " . $httpCode);
-        error_log("Response: " . $response);
+//         error_log("HTTP Code: " . $httpCode);
+//         error_log("Response: " . $response);
 
-        $responseData = json_decode($response, true);
+//         $responseData = json_decode($response, true);
 
-        if ($httpCode >= 200 && $httpCode < 300) {
-            // Éxito
-            return response()->json([
-                "preference" => $responseData,
-            ]);
-        } else {
-            // Error
-            error_log("=== ERROR DE MERCADO PAGO ===");
-            error_log("Response completa: " . json_encode($responseData));
+//         if ($httpCode >= 200 && $httpCode < 300) {
+//             // Éxito
+//             return response()->json([
+//                 "preference" => $responseData,
+//             ]);
+//         } else {
+//             // Error
+//             error_log("=== ERROR DE MERCADO PAGO ===");
+//             error_log("Response completa: " . json_encode($responseData));
 
-            return response()->json([
-                'message' => 'Error de Mercado Pago',
-                'http_code' => $httpCode,
-                'error' => $responseData['message'] ?? 'Error desconocido',
-                'details' => $responseData,
-            ], 500);
-        }
+//             return response()->json([
+//                 'message' => 'Error de Mercado Pago',
+//                 'http_code' => $httpCode,
+//                 'error' => $responseData['message'] ?? 'Error desconocido',
+//                 'details' => $responseData,
+//             ], 500);
+//         }
 
-    } catch (\Exception $e) {
-        error_log("=== ERROR GENERAL ===");
-        error_log("Error: " . $e->getMessage());
+//     } catch (\Exception $e) {
+//         error_log("=== ERROR GENERAL ===");
+//         error_log("Error: " . $e->getMessage());
 
-        return response()->json([
-            'message' => 'Error al procesar el pago',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-    //funcion para guardar la informacion del checkout de mercado pago, ya que se pierde la informacion cuando se hace una compra por mp
-    public function checkout_temp(Request $request) {
+//         return response()->json([
+//             'message' => 'Error al procesar el pago',
+//             'error' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+//     //funcion para guardar la informacion del checkout de mercado pago, ya que se pierde la informacion cuando se hace una compra por mp
+//     public function checkout_temp(Request $request) {
 
-        $sale_temp = SaleTemp::where("user_id",auth('api')->user()->id)->first();
-        if($sale_temp){
-            $sale_temp->update([
-                "description" => $request->description,
-                "sale_address" => json_encode($request->sale_address),
-            ]);
-        } else {
-            SaleTemp::create([
-                "user_id" => auth('api')->user()->id,
-                "description" => $request->description,
-                "sale_address" => json_encode($request->sale_address),
-            ]);
-        }
+//         $sale_temp = SaleTemp::where("user_id",auth('api')->user()->id)->first();
+//         if($sale_temp){
+//             $sale_temp->update([
+//                 "description" => $request->description,
+//                 "sale_address" => json_encode($request->sale_address),
+//             ]);
+//         } else {
+//             SaleTemp::create([
+//                 "user_id" => auth('api')->user()->id,
+//                 "description" => $request->description,
+//                 "sale_address" => json_encode($request->sale_address),
+//             ]);
+//         }
 
 
-        return response()->json(true);
-    }
+//         return response()->json(true);
+//     }
     //public function checkout_mercadopago
 
     // $nCart = $cart;
@@ -285,6 +286,221 @@ public function mercadopago(Request $request) {
     // }
     // //TODO: la eliminacion del carrito de compra
     // $cart->delete();
+
+    public function mercadopago(Request $request) {
+        Log::info("=== MERCADOPAGO ENDPOINT LLAMADO ===");
+        Log::info("Request: " . json_encode($request->all()));
+
+        try {
+            // Validar usuario
+            $user = auth('api')->user();
+            if (!$user) {
+                return response()->json(['message' => 'No autenticado'], 401);
+            }
+
+            Log::info("Usuario autenticado: " . $user->id);
+
+            // Obtener Access Token
+            $mpKey = env("MERCADOPAGO_KEY");
+            if (!$mpKey) {
+                return response()->json(['message' => 'Mercado Pago no configurado'], 500);
+            }
+
+            // Preparar datos
+            $priceUnit = floatval($request->get("price_unit"));
+
+            // ⚠️ CAMBIO IMPORTANTE: URLs apuntan al BACKEND (Railway)
+            $backendUrl = env("APP_URL"); // https://apiecommerce-production-9896.up.railway.app
+
+            $data = [
+                "items" => [
+                    [
+                        "title" => "Compra en Ecommerce Funkos",
+                        "quantity" => 1,
+                        "currency_id" => "ARS",
+                        "unit_price" => $priceUnit,
+                    ]
+                ],
+                "back_urls" => [
+                    "success" => $backendUrl . "/api/ecommerce/mercadopago/callback/success",
+                    "failure" => $backendUrl . "/api/ecommerce/mercadopago/callback/failure",
+                    "pending" => $backendUrl . "/api/ecommerce/mercadopago/callback/pending"
+                ],
+                "auto_return" => "approved",
+                "external_reference" => (string)$user->id, // Guardamos el user_id
+                "notification_url" => $backendUrl . "/api/ecommerce/mercadopago/webhook", // Para IPN
+            ];
+
+            Log::info("Datos a enviar: " . json_encode($data));
+
+            // Hacer petición HTTP con cURL
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://api.mercadopago.com/checkout/preferences');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $mpKey,
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlError) {
+                Log::error("cURL Error: " . $curlError);
+                return response()->json(['message' => 'Error de conexión', 'error' => $curlError], 500);
+            }
+
+            Log::info("HTTP Code: " . $httpCode);
+            Log::info("Response: " . $response);
+
+            $responseData = json_decode($response, true);
+
+            if ($httpCode >= 200 && $httpCode < 300) {
+                // Éxito
+                return response()->json([
+                    "preference" => $responseData,
+                ]);
+            } else {
+                // Error
+                Log::error("=== ERROR DE MERCADO PAGO ===");
+                Log::error("Response completa: " . json_encode($responseData));
+
+                return response()->json([
+                    'message' => 'Error de Mercado Pago',
+                    'http_code' => $httpCode,
+                    'error' => $responseData['message'] ?? 'Error desconocido',
+                    'details' => $responseData,
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("=== ERROR GENERAL ===");
+            Log::error("Error: " . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Error al procesar el pago',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // 🆕 CALLBACK: Mercado Pago redirige aquí cuando el pago es exitoso
+    public function mercadopagoCallbackSuccess(Request $request) {
+        Log::info("=== MERCADOPAGO SUCCESS CALLBACK ===");
+        Log::info("Params: " . json_encode($request->all()));
+
+        $paymentId = $request->get('payment_id');
+        $collectionId = $request->get('collection_id');
+        $collectionStatus = $request->get('collection_status');
+        $status = $request->get('status');
+        $externalReference = $request->get('external_reference'); // user_id
+        $paymentType = $request->get('payment_type');
+        $merchantOrderId = $request->get('merchant_order_id');
+        $preferenceId = $request->get('preference_id');
+
+        // TODO: Aquí puedes procesar el pago
+        // - Verificar el pago con la API de Mercado Pago
+        // - Guardar la orden en la base de datos
+        // - Enviar email de confirmación
+        // - etc.
+
+        try {
+            // Verificar el pago con la API de Mercado Pago (opcional pero recomendado)
+            $mpKey = env("MERCADOPAGO_KEY");
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://api.mercadopago.com/v1/payments/{$paymentId}");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $mpKey,
+            ]);
+
+            $paymentInfo = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $payment = json_decode($paymentInfo, true);
+                Log::info("Payment Info: " . json_encode($payment));
+
+                // Aquí procesas el pago según tu lógica de negocio
+                // Por ejemplo, crear la orden en tu base de datos
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error verificando pago: " . $e->getMessage());
+        }
+
+        // Redirigir a Angular (Frontend) con los datos del pago
+        $frontendUrl = env("URL_TIENDA"); // https://c0c94bc6b3ac.ngrok-free.app
+
+        $redirectUrl = $frontendUrl . "/mercado-pago-success?" . http_build_query([
+            'payment_id' => $paymentId,
+            'status' => $status,
+            'collection_status' => $collectionStatus,
+            'payment_type' => $paymentType,
+            'merchant_order_id' => $merchantOrderId,
+        ]);
+
+        return redirect($redirectUrl);
+    }
+
+    // 🆕 CALLBACK: Mercado Pago redirige aquí cuando el pago falla
+    public function mercadopagoCallbackFailure(Request $request) {
+        Log::info("=== MERCADOPAGO FAILURE CALLBACK ===");
+        Log::info("Params: " . json_encode($request->all()));
+
+        $frontendUrl = env("URL_TIENDA");
+        return redirect($frontendUrl . "/mercado-pago-failure");
+    }
+
+    // 🆕 CALLBACK: Mercado Pago redirige aquí cuando el pago está pendiente
+    public function mercadopagoCallbackPending(Request $request) {
+        Log::info("=== MERCADOPAGO PENDING CALLBACK ===");
+        Log::info("Params: " . json_encode($request->all()));
+
+        $frontendUrl = env("URL_TIENDA");
+        return redirect($frontendUrl . "/mercado-pago-pending");
+    }
+
+    // 🆕 WEBHOOK: Mercado Pago envía notificaciones IPN aquí (opcional pero recomendado)
+    public function mercadopagoWebhook(Request $request) {
+        Log::info("=== MERCADOPAGO WEBHOOK (IPN) ===");
+        Log::info("Body: " . json_encode($request->all()));
+
+        $type = $request->get('type');
+        $dataId = $request->get('data.id') ?? $request->input('data')['id'] ?? null;
+
+        if ($type === 'payment' && $dataId) {
+            // Consultar el pago
+            $mpKey = env("MERCADOPAGO_KEY");
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://api.mercadopago.com/v1/payments/{$dataId}");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $mpKey,
+            ]);
+
+            $paymentInfo = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                $payment = json_decode($paymentInfo, true);
+                Log::info("Webhook Payment Info: " . json_encode($payment));
+
+                // Aquí actualizas el estado del pago en tu base de datos
+                // según payment.status (approved, rejected, pending, etc.)
+            }
+        }
+
+        return response()->json(['status' => 'ok'], 200);
+    }
 
     /**
      * Display the specified resource.
