@@ -140,32 +140,41 @@ class SaleController extends Controller
 
     //TODO: COLOCAR ESTO CUANDO HAGA LA INTEGRACION CON MERCADO PAGO
     public function mercadopago(Request $request) {
-
-        error_log("=== MERCADOPAGO ENDPOINT LLAMADO ===");
+    error_log("=== MERCADOPAGO ENDPOINT LLAMADO ===");
     error_log("Request: " . json_encode($request->all()));
     error_log("Headers: " . json_encode($request->headers->all()));
 
+    // VALIDAR AUTENTICACIÓN
+    $user = auth('api')->user();
+
+    if (!$user) {
+        error_log("ERROR: Usuario no autenticado");
+        error_log("Token: " . $request->bearerToken());
+        return response()->json([
+            'message' => 'No autenticado. Por favor, inicia sesión nuevamente.'
+        ], 401);
+    }
+
+    error_log("Usuario autenticado: " . $user->id);
+
     MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
     $client = new PreferenceClient();
+    $client->auto_return = "approved";
 
-        MercadoPagoConfig::setAccessToken(env("MERCADOPAGO_KEY"));
-        $client = new PreferenceClient();
-        $client->auto_return = "approved";
+    // Ahora sí es seguro usar $user->id
+    $carts = Cart::where("user_id", $user->id)->get();
+    $array_carts = [];
 
-        $carts = Cart::where("user_id", auth('api')->user()->id)->get();
-        $array_carts = [];
+    foreach ($carts as $key => $cart) {
+        array_push($array_carts, [
+            "title" => $cart->product->title,
+            "quantity" => $cart->quantity,
+            "currency_id" => $cart->currency,
+            "unit_price" => $cart->total,
+        ]);
+    }
 
-        foreach ($carts as $key => $cart) {
-            array_push($array_carts, [
-                "title" => $cart->product->title,
-                "quantity" => $cart->quantity,
-                "currency_id" => $cart->currency,
-                "unit_price" => $cart->total,
-            ]);
-        }
-
-        $datos = array(
-        // "items"=> $array_carts,
+    $datos = array(
         "items"=> [
             [
                 "title" => "NAME PRODUCT",
@@ -174,12 +183,7 @@ class SaleController extends Controller
                 'unit_price' => intval($request->get("price_unit")),
             ]
         ],
-        "back_urls" =>array(
-            "success" => env("URL_TIENDA")."mercado-pago-success",
-            "failure" => env("URL_TIENDA")."mercado-pago-failure",
-            "pending" => env("URL_TIENDA")."mercado-pago-pending"
-        ),
-        "redirect_urls" =>array(
+        "back_urls" => array(
             "success" => env("URL_TIENDA")."mercado-pago-success",
             "failure" => env("URL_TIENDA")."mercado-pago-failure",
             "pending" => env("URL_TIENDA")."mercado-pago-pending"
@@ -187,12 +191,13 @@ class SaleController extends Controller
         "auto_return" => "approved",
         "external_reference" => uniqid(),
     );
-        $preference = $client->create($datos);
-        return response()->json([
-            "preference" => $preference,
-        ]);
 
-    }
+    $preference = $client->create($datos);
+
+    return response()->json([
+        "preference" => $preference,
+    ]);
+}
 
     //funcion para guardar la informacion del checkout de mercado pago, ya que se pierde la informacion cuando se hace una compra por mp
     public function checkout_temp(Request $request) {

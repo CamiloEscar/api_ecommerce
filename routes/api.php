@@ -165,6 +165,6 @@ Route::group([
     Route::post("campaing-discount-link",  [HomeController::class, "campaing_discount_link"]);
 
     //api dolar
-    Route::get('mercadopago', [SaleController::class, "mercadopago"]);
+    Route::get('ecommerce/mercadopago', [SaleController::class, "mercadopago"]);
     // Route::get('/dolar', [DolarController::class, 'obtenerDolar']);
 });

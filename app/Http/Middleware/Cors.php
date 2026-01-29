@@ -8,30 +8,35 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Cors
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
     public function handle(Request $request, Closure $next)
     {
         $allowedOrigins = [
             'http://localhost:4200',
             'http://localhost:5000',
+            'http://127.0.0.1:4200',
         ];
 
         $origin = $request->header('Origin');
 
-        if (in_array($origin, $allowedOrigins)) {
-            $response = $next($request);
-            $response->header('Access-Control-Allow-Origin', $origin);
-            $response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-            $response->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-            return $response;
+        // Manejar solicitudes OPTIONS (preflight)
+        if ($request->isMethod('OPTIONS')) {
+            return response('', 200)
+                ->header('Access-Control-Allow-Origin', $origin && in_array($origin, $allowedOrigins) ? $origin : '')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept')
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Max-Age', '86400');
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        if ($origin && in_array($origin, $allowedOrigins)) {
+            $response->headers->set('Access-Control-Allow-Origin', $origin);
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        }
+
+        return $response;
     }
 }
