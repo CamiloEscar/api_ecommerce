@@ -152,7 +152,7 @@ private function createSaleFromMercadoPago($paymentInfo, $userId)
     $this->processCarts($sale);
 
     // Crear dirección de envío
-    $saleAddress = json_decode($saleTemp->sale_address, true);
+    $saleAddress = json_decode($saleTemp->sale_addres, true);
     if ($saleAddress) {
         $this->createSaleAddress($sale, $saleAddress);
     }
