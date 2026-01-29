@@ -31,8 +31,6 @@ COPY . .
 
 RUN chmod +x start.sh
 
-RUN php artisan storage:link
-
 # ⚠️ IMPORTANTE: NO optimize / NO jwt / NO cache acá
 RUN composer install --optimize-autoloader --no-dev \
     && npm install \
