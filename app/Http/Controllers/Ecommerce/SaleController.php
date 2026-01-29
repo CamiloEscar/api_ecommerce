@@ -161,6 +161,9 @@ public function mercadopago(Request $request) {
         // Preparar datos
         $priceUnit = floatval($request->get("price_unit"));
 
+        // Generar URLs completas
+        $baseUrl = env("URL_TIENDA");
+
         $data = [
             "items" => [
                 [
@@ -171,9 +174,9 @@ public function mercadopago(Request $request) {
                 ]
             ],
             "back_urls" => [
-                "success" => env("URL_TIENDA") . "mercado-pago-success",
-                "failure" => env("URL_TIENDA") . "mercado-pago-failure",
-                "pending" => env("URL_TIENDA") . "mercado-pago-pending"
+                "success" => $baseUrl . "/mercado-pago-success",
+                "failure" => $baseUrl . "/mercado-pago-failure",
+                "pending" => $baseUrl . "/mercado-pago-pending"
             ],
             "auto_return" => "approved",
         ];
@@ -193,7 +196,13 @@ public function mercadopago(Request $request) {
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
+
+        if ($curlError) {
+            error_log("cURL Error: " . $curlError);
+            return response()->json(['message' => 'Error de conexión', 'error' => $curlError], 500);
+        }
 
         error_log("HTTP Code: " . $httpCode);
         error_log("Response: " . $response);
