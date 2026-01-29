@@ -152,25 +152,19 @@ public function mercadopago(Request $request) {
 
         error_log("Usuario autenticado: " . $user->id);
 
-        // Configurar Mercado Pago
+        // Obtener Access Token
         $mpKey = env("MERCADOPAGO_KEY");
         if (!$mpKey) {
             return response()->json(['message' => 'Mercado Pago no configurado'], 500);
         }
 
-        error_log("Configurando MP con key: " . substr($mpKey, 0, 20) . "...");
-
-        MercadoPagoConfig::setAccessToken($mpKey);
-        $client = new PreferenceClient();
-
-        // Preparar los datos CORRECTAMENTE para MP
+        // Preparar datos
         $priceUnit = floatval($request->get("price_unit"));
 
-        $preference = $client->create([
+        $data = [
             "items" => [
                 [
                     "title" => "Compra en Ecommerce Funkos",
-                    "description" => "Productos del carrito",
                     "quantity" => 1,
                     "currency_id" => "ARS",
                     "unit_price" => $priceUnit,
@@ -182,49 +176,51 @@ public function mercadopago(Request $request) {
                 "pending" => env("URL_TIENDA") . "mercado-pago-pending"
             ],
             "auto_return" => "approved",
-            "statement_descriptor" => "ECOMMERCE_FUNKOS",
-            "external_reference" => "order_" . $user->id . "_" . time(),
-            "notification_url" => env("APP_URL") . "/api/ecommerce/mercadopago/webhook",
-            "payer" => [
-                "email" => $user->email,
-                "name" => $user->name ?? "Cliente",
-            ]
+        ];
+
+        error_log("Datos a enviar: " . json_encode($data));
+
+        // Hacer petición HTTP con cURL
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://api.mercadopago.com/checkout/preferences');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $mpKey,
         ]);
 
-        error_log("Preferencia creada exitosamente: " . json_encode($preference));
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-        return response()->json([
-            "preference" => $preference,
-        ]);
+        error_log("HTTP Code: " . $httpCode);
+        error_log("Response: " . $response);
 
-    } catch (\MercadoPago\Exceptions\MPApiException $e) {
-        error_log("=== ERROR DE MERCADO PAGO ===");
-        error_log("Status Code: " . ($e->getStatusCode() ?? 'N/A'));
-        error_log("Message: " . $e->getMessage());
+        $responseData = json_decode($response, true);
 
-        // Intentar obtener más detalles
-        try {
-            $apiResponse = $e->getApiResponse();
-            error_log("API Response: " . json_encode($apiResponse));
+        if ($httpCode >= 200 && $httpCode < 300) {
+            // Éxito
+            return response()->json([
+                "preference" => $responseData,
+            ]);
+        } else {
+            // Error
+            error_log("=== ERROR DE MERCADO PAGO ===");
+            error_log("Response completa: " . json_encode($responseData));
 
             return response()->json([
                 'message' => 'Error de Mercado Pago',
-                'error' => $e->getMessage(),
-                'details' => $apiResponse
+                'http_code' => $httpCode,
+                'error' => $responseData['message'] ?? 'Error desconocido',
+                'details' => $responseData,
             ], 500);
-        } catch (\Exception $e2) {
-            error_log("No se pudo obtener API Response");
         }
-
-        return response()->json([
-            'message' => 'Error de Mercado Pago',
-            'error' => $e->getMessage(),
-        ], 500);
 
     } catch (\Exception $e) {
         error_log("=== ERROR GENERAL ===");
         error_log("Error: " . $e->getMessage());
-        error_log("Trace: " . $e->getTraceAsString());
 
         return response()->json([
             'message' => 'Error al procesar el pago',
