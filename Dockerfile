@@ -31,9 +31,6 @@ WORKDIR /app
 # Copiar archivos
 COPY . .
 
-# Dar permisos al script
-RUN chmod +x start.sh
-
 # Instalar dependencias y build
 RUN composer install --optimize-autoloader --no-dev \
     && npm install \
@@ -44,5 +41,5 @@ RUN composer install --optimize-autoloader --no-dev \
 # Exponer puerto
 EXPOSE 8080
 
-# Comando de inicio
-CMD ["./start.sh"]
+# Comando de inicio (todo en una línea)
+CMD ["sh", "-c", "echo 'Starting container...' && sleep 30 && php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8080"]
