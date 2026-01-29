@@ -31,6 +31,9 @@ WORKDIR /app
 # Copiar archivos
 COPY . .
 
+# Dar permisos al script
+RUN chmod +x start.sh
+
 # Instalar dependencias y build
 RUN composer install --optimize-autoloader --no-dev \
     && npm install \
@@ -40,3 +43,6 @@ RUN composer install --optimize-autoloader --no-dev \
 
 # Exponer puerto
 EXPOSE 8080
+
+# Comando de inicio
+CMD ["/app/start.sh"]
