@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ImageHelper;
+use App\Services\ImageService;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
@@ -174,11 +177,16 @@ class AuthController extends Controller
 
         $user = User::find(auth('api')->user()->id);
         if($request->hasFile('file_imagen')){
-            if ($user->avatar) {
-                Storage::delete($user->avatar);
+            $imageService = app(ImageService::class);
+            // Delete old avatar from Cloudinary if it exists
+            if ($user->avatar && strpos($user->avatar, 'http') === 0) {
+                $publicId = $imageService->getPublicIdFromUrl($user->avatar);
+                if ($publicId) {
+                    $imageService->delete($publicId);
+                }
             }
-            $path = Storage::putFile("users", $request->file("file_imagen"));
-            $request->request->add(["avatar" => $path]);
+            // Upload new avatar to Cloudinary
+            $user->avatar = $imageService->upload($request->file("file_imagen"), 'avatars');
         }
         $user->update($request->all());
         return response()->json([
@@ -314,7 +322,7 @@ class AuthController extends Controller
             'ig' => $user->ig,
             'sexo' => $user->sexo,
             'address_city' => $user->address_city,
-            'avatar' => $user->avatar ? env("APP_URL") . "storage/" . $user->avatar : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
+            'avatar' => ImageHelper::getImageUrl($user->avatar) ?? 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
         ]);
     }
 

@@ -532,7 +532,7 @@
 																														style="font-size:0pt; line-height:0pt; text-align:left;">
 																														<a href="#"
 																															target="_blank"><img
-																																src="{{ env("APP_URL").'storage/'.$cart->product->imagen }}"
+																																src="{{ \App\Helpers\ImageHelper::getImageUrl($cart->product->imagen) }}"
 																																border="0"
 																																width="230"
 																																height="180"

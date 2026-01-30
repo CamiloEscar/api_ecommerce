@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Costo;
 
+use App\Helpers\ImageHelper;
+
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Costo\CostoCollection;
 use App\Http\Resources\Costo\CostoResource;
@@ -67,14 +69,14 @@ class CostoController extends Controller
                     "id" => $product->id,
                     "title" => $product->title,
                     "slug" => $product->slug,
-                    "imagen" => env("APP_URL") . "storage/" . $product->imagen
+                    "imagen" => ImageHelper::getImageUrl($product->imagen)
                 ];
             }),
             "categories" => $categories->map(function ($categorie) {
                 return [
                     "id" => $categorie->id,
                     "name" => $categorie->name,
-                    "imagen" => env("APP_URL") . "storage/" . $categorie->imagen
+                    "imagen" => ImageHelper::getImageUrl($categorie->imagen)
                 ];
             }),
             "brands" => $brands->map(function ($brand) {

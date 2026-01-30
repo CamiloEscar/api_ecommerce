@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Product;
 
+use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,7 +19,7 @@ class CategorieResource extends JsonResource
             "id" => $this->resource->id,
             "name" => $this->resource->name,
             "icon" => $this->resource->icon,
-            "imagen" => $this->resource->imagen ? env("APP_URL") . "storage/" . $this->resource->imagen : null,
+            "imagen" => ImageHelper::getImageUrl($this->resource->imagen),
             "categorie_second_id" => $this->resource->categorie_second_id,
             "categorie_second" => $this->resource->categorie_second ? [
                 "name" => $this->resource->categorie_second->name

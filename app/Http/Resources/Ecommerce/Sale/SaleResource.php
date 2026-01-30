@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Ecommerce\Sale;
 
+use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,9 +19,7 @@ class SaleResource extends JsonResource
             "id" => $this->resource->id,
             "user_id" => $this->resource->user_id,
             "user" => $this->resource->user ? [
-    "avatar" => $this->resource->user->avatar
-        ? env('APP_URL') . "storage/" . $this->resource->user->avatar
-        : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
+    "avatar" => ImageHelper::getImageUrl($this->resource->user->avatar) ?? 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
     "full_name" => trim(
         ($this->resource->user->name ?? '') . ' ' . ($this->resource->user->surname ?? '')
     ),
@@ -47,7 +46,7 @@ class SaleResource extends JsonResource
                         'slug' => $sale_detail->product->slug,
                         'price_ars' => $sale_detail->product->price_ars,
                         'price_usd' => $sale_detail->product->price_usd,
-                        'imagen' => $sale_detail->product->imagen ? env('APP_URL') . "storage/" . $sale_detail->product->imagen : null,
+                        'imagen' => ImageHelper::getImageUrl($sale_detail->product->imagen),
                         'brand' => $sale_detail->product->brand ? [
                             "id" => $sale_detail->product->brand->id,
                             "name" => $sale_detail->product->brand->name

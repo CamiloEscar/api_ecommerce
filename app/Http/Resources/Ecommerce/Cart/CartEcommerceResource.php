@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Ecommerce\Cart;
 
+use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,7 +25,7 @@ class CartEcommerceResource extends JsonResource
                 'slug' => $this->resource->product->slug,
                 'price_ars' => $this->resource->product->price_ars,
                 'price_usd' => $this->resource->product->price_usd,
-                'imagen' => $this->resource->product->imagen ? env('APP_URL') . "storage/" . $this->resource->product->imagen : null,
+                'imagen' => ImageHelper::getImageUrl($this->resource->product->imagen),
                 'brand' => $this->resource->product->brand ? [
                     "id" => $this->resource->product->brand->id,
                     "name" => $this->resource->product->brand->name

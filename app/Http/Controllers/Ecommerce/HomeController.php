@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Ecommerce;
 
+use App\Helpers\ImageHelper;
+
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceCollection;
 use App\Http\Resources\Ecommerce\Product\ProductEcommerceResource;
@@ -186,7 +188,7 @@ class HomeController extends Controller
                     "title" => $slider->title,
                     "subtitle" => $slider->subtitle,
                     "label" => $slider->label,
-                    "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
+                    "imagen" => ImageHelper::getImageUrl($slider->imagen),
                     "link" => $slider->link,
                     "color" => $slider->color,
                     "state" => $slider->state,
@@ -201,7 +203,7 @@ class HomeController extends Controller
                     "id" => $categorie->id,
                     "name" => $categorie->name,
                     "products_count" => $categorie->product_categorie_firsts_count,
-                    "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : NULL,
+                    "imagen" => ImageHelper::getImageUrl($categorie->imagen),
                 ];
             }),
             "products_trending_new" => ProductEcommerceCollection::make($products_trending_new),
@@ -213,7 +215,7 @@ class HomeController extends Controller
                     "title" => $slider->title,
                     "subtitle" => $slider->subtitle,
                     "label" => $slider->label,
-                    "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
+                    "imagen" => ImageHelper::getImageUrl($slider->imagen),
                     "link" => $slider->link,
                     "color" => $slider->color,
                     "state" => $slider->state,
@@ -229,9 +231,7 @@ class HomeController extends Controller
                     "id" => $slider->id,
                     "title" => $slider->title,
                     "subtitle" => $slider->subtitle,
-                    "label" => $slider->label,
-                    "imagen" => $slider->imagen ? env("APP_URL") . "storage/" . $slider->imagen : NULL,
-                    "link" => $slider->link,
+                    "imagen" => ImageHelper::getImageUrl($slider->imagen),
                     "color" => $slider->color,
                     "state" => $slider->state,
                     "type_slider" => $slider->type_slider,
@@ -262,14 +262,9 @@ class HomeController extends Controller
                     "icon" => $departament->icon,
                     "categories" => $departament->categorie_seconds->map(function ($categorie) {
                         return [
-                            "id" => $categorie->id,
-                            "name" => $categorie->name,
-                            "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : NULL,
-                            "subcategories" => $categorie->categorie_seconds->map(function ($subcategorie) {
+                            "imagen" => ImageHelper::getImageUrl($categorie->imagen),(function ($subcategorie) {
                                 return [
-                                    "id" => $subcategorie->id,
-                                    "name" => $subcategorie->name,
-                                    "imagen" => $subcategorie->imagen ? env("APP_URL") . "storage/" . $subcategorie->imagen : NULL,
+                                    "imagen" => ImageHelper::getImageUrl($subcategorie->imagen),
                                 ];
                             })
                         ];
@@ -408,7 +403,7 @@ class HomeController extends Controller
                     "id" => $review->id,
                     "user" => [
                         "full_name" => $review->user->name . " " . $review->user->surname,
-                        'avatar' => $review->user->avatar ? env("APP_URL") . "storage/" . $review->user->avatar : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
+                        'avatar' => ImageHelper::getImageUrl($review->user->avatar) ?? 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
 
                     ],
                     "message" => $review->message,
@@ -435,9 +430,7 @@ class HomeController extends Controller
             "categories" => $categories->map(function ($categorie) {
                 return [
                     "id" => $categorie->id,
-                    "name" => $categorie->name,
-                    "products_count" => $categorie->product_categorie_firsts_count,
-                    "imagen" => $categorie->imagen ? env("APP_URL") . "storage/" . $categorie->imagen : NULL,
+                    "imagen" => ImageHelper::getImageUrl($categorie->imagen),
                 ];
             }),
             "brands" => $brands->map(function ($brand) {

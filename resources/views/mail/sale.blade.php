@@ -527,7 +527,7 @@
 																														style="font-size:0pt; line-height:0pt; text-align:left;">
 																														<a href="#"
 																															target="_blank"><img
-																																src="{{ env("APP_URL").'storage/'.$sale_detail->product->imagen }}"
+																																src="{{ \App\Helpers\ImageHelper::getImageUrl($sale_detail->product->imagen) }}"
 																																border="0"
 																																width="230"
 																																height="180"

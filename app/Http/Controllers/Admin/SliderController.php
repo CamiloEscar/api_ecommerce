@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
+use App\Services\ImageService;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class SliderController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -31,8 +40,7 @@ class SliderController extends Controller
                     "type_slider" => $slider->type_slider,
                     "price_original" => $slider->price_original,
                     "price_campaing" => $slider->price_campaing,
-                    "color" => $slider->color,
-                    "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
+                    "imagen" => ImageHelper::getImageUrl($slider->imagen),
                 ];
             })
         ]);
@@ -53,12 +61,8 @@ class SliderController extends Controller
                 return response()->json(["message" => "No se permiten archivos temporales"], 403);
             }
 
-            // Guardar la imagen en el disco 'public' bajo la carpeta 'categories'
-            $fileName = $file->hashName();
-            $path = $file->storeAs("slider", $fileName, "public");
-
-            // Guardar como 'categories/nombrearchivo' en la base de datos
-            $data['imagen'] = "slider/" . $fileName;
+            // ✅ Subir a Cloudinary
+            $data['imagen'] = $this->imageService->upload($file, 'sliders');
         }
 
         $slider = Slider::create($data);
@@ -90,8 +94,7 @@ class SliderController extends Controller
             "type_slider" => $slider->type_slider,
             "price_original" => $slider->price_original,
             "price_campaing" => $slider->price_campaing,
-            "color" => $slider->color,
-            "imagen" => env("APP_URL") . "storage/" . $slider->imagen,
+            "imagen" => ImageHelper::getImageUrl($slider->imagen),
         ]]);
     }
 

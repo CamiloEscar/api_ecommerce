@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Ecommerce\Product;
 
+use App\Helpers\ImageHelper;
 use App\Models\Product\ProductVariation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -117,7 +118,7 @@ class ProductEcommerceResource extends JsonResource
             'price_ars' => $this->resource->price_ars,
             'price_usd' => $this->resource->price_usd,
             'resumen' => $this->resource->resumen,
-            'imagen' => $this->resource->imagen ? env('APP_URL') . "storage/" . $this->resource->imagen : null,
+            'imagen' => ImageHelper::getImageUrl($this->resource->imagen),
             'state' => $this->resource->state,
             'description' => $this->resource->description,
             'tags' => $this->resource->tags ? json_decode($this->resource->tags, true) : [],
@@ -148,7 +149,7 @@ class ProductEcommerceResource extends JsonResource
             "images" => $this->resource->images->map(function ($image) {
                 return [
                     "id" => $image->id,
-                    "imagen" => env("APP_URL") . "storage/" . $image->imagen
+                    "imagen" => ImageHelper::getImageUrl($image->imagen)
 
                 ];
             }),

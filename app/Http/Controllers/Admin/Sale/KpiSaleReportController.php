@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Sale;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -436,7 +437,7 @@ class KpiSaleReportController extends Controller
             $product_most_sales->push([
                 "categorie_id" => $sales_month_categ->categorie_id,
                 "products" => $query_product_most_sales->map(function($item){
-                    $item->imagen = env("APP_URL")."storage/".$item->product_imagen;
+                    $item->imagen = ImageHelper::getImageUrl($item->product_imagen);
                     return $item;
                 }),
 
@@ -445,7 +446,7 @@ class KpiSaleReportController extends Controller
         return response()->json([
             "product_most_sales" => $product_most_sales,
             "sale_month_categories" => $sales_month_categories->map(function($item) {
-                $item->imagen = env("APP_URL")."storage/".$item->categorie_imagen;
+                $item->imagen = ImageHelper::getImageUrl($item->categorie_imagen);
                 return $item;
             })
         ]);

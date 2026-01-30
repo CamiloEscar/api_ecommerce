@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Costo;
 
+use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -29,7 +30,7 @@ class CostoResource extends JsonResource
                     'id' => $product_aux->product->id,
                     'title' => $product_aux->product->title,
                     "slug" => $product_aux->product->slug,
-                    'imagen' => env("APP_URL") . "storage/" . $product_aux->product->imagen,
+                    'imagen' => ImageHelper::getImageUrl($product_aux->product->imagen),
                     'id_aux' => $product_aux->id,
                 ];
             }),
@@ -37,7 +38,7 @@ class CostoResource extends JsonResource
                 return [
                     'id' => $categorie_aux->categorie->id,
                     'name' => $categorie_aux->categorie->name,
-                    'imagen' => env("APP_URL") . "storage/" . $categorie_aux->categorie->imagen,
+                    'imagen' => ImageHelper::getImageUrl($categorie_aux->categorie->imagen),
                     'id_aux' => $categorie_aux->id
                 ];
             }),
