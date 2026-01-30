@@ -17,10 +17,17 @@ class SaleResource extends JsonResource
         return [
             "id" => $this->resource->id,
             "user_id" => $this->resource->user_id,
-            "user" => [
-                "avatar" => $this->resource->user->avatar ? env('APP_URL'). "storage/" . $this->resource->user->avatar : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
-                "full_name" => $this->resource->user->name. ' ' . $this->resource->user->surname,
-            ],
+            "user" => $this->resource->user ? [
+    "avatar" => $this->resource->user->avatar
+        ? env('APP_URL') . "storage/" . $this->resource->user->avatar
+        : 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
+    "full_name" => trim(
+        ($this->resource->user->name ?? '') . ' ' . ($this->resource->user->surname ?? '')
+    ),
+] : [
+    "avatar" => 'https://cdn-icons-png.flaticon.com/512/12449/12449018.png',
+    "full_name" => 'Usuario eliminado',
+],
             "method_payment" => $this->resource->method_payment,
             "currency_total" => $this->resource->currency_total,
             "currency_payment" => $this->resource->currency_payment,

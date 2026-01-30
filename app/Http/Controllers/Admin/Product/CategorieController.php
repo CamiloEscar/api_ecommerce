@@ -5,26 +5,27 @@ namespace App\Http\Controllers\Admin\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Product\CategorieCollection;
 use App\Models\Product\Categorie;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class CategorieController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *   path="/api/admin/categories",
+     *   tags={"Admin - Categories"},
+     *   summary="Listado de categorías",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="OK")
+     * )
      */
-
-    /**
- * @OA\Get(
- *   path="/api/admin/categories",
- *   tags={"Admin - Categories"},
- *   summary="Listado de categorías",
- *   security={{"bearerAuth":{}}},
- *   @OA\Response(response=200, description="OK")
- * )
- */
-
-
     public function index(Request $request)
     {
         $search = $request->search;
@@ -38,17 +39,16 @@ class CategorieController extends Controller
     }
 
     /**
- * @OA\Get(
- *   path="/api/admin/categories/config",
- *   tags={"Admin - Categories"},
- *   summary="Configuración de categorías",
- *   security={{"bearerAuth":{}}},
- *   @OA\Response(response=200, description="OK")
- * )
- */
+     * @OA\Get(
+     *   path="/api/admin/categories/config",
+     *   tags={"Admin - Categories"},
+     *   summary="Configuración de categorías",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="OK")
+     * )
+     */
     public function config()
     {
-
         $categories_first = Categorie::where("categorie_second_id", NULL)->where("categorie_third_id", NULL)->get();
         $categories_seconds = Categorie::where("categorie_second_id", "<>", NULL)->where("categorie_third_id", NULL)->get();
 
@@ -59,26 +59,22 @@ class CategorieController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *   path="/api/admin/categories",
+     *   tags={"Admin - Categories"},
+     *   summary="Crear categoría",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"name"},
+     *       @OA\Property(property="name", type="string", example="Electrónica"),
+     *       @OA\Property(property="status", type="boolean", example=true)
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Creado")
+     * )
      */
-
-    /**
- * @OA\Post(
- *   path="/api/admin/categories",
- *   tags={"Admin - Categories"},
- *   summary="Crear categoría",
- *   security={{"bearerAuth":{}}},
- *   @OA\RequestBody(
- *     required=true,
- *     @OA\JsonContent(
- *       required={"name"},
- *       @OA\Property(property="name", type="string", example="Electrónica"),
- *       @OA\Property(property="status", type="boolean", example=true)
- *     )
- *   ),
- *   @OA\Response(response=201, description="Creado")
- * )
- */
     public function store(Request $request)
     {
         $is_exists = Categorie::where("name", $request->name)->first();
@@ -86,47 +82,42 @@ class CategorieController extends Controller
             return response()->json(["message" => "La categoría ya existe"], 403);
         }
 
-        $data = $request->except('imagen'); // Excluye la imagen de los datos
+        $data = $request->except('imagen');
 
+        // ✅ Subir a Cloudinary
         if ($request->hasFile("imagen")) {
             $file = $request->file("imagen");
 
-            // Validar que el archivo no tenga extensión .tmp
             if ($file->getClientOriginalExtension() === 'tmp') {
                 return response()->json(["message" => "No se permiten archivos temporales"], 403);
             }
 
-            // Guardar la imagen en el disco 'public' bajo la carpeta 'categories'
-            $fileName = $file->hashName();
-            $path = $file->storeAs("categories", $fileName, "public");
-
-            // Guardar como 'categories/nombrearchivo' en la base de datos
-            $data['imagen'] = "categories/" . $fileName;
+            $data['imagen'] = $this->imageService->upload($file, 'categories');
         }
 
         $categorie = Categorie::create($data);
-        return response()->json(["message" => 200]);
+
+        return response()->json([
+            "message" => 200,
+            "categorie" => $categorie
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *   path="/api/admin/categories/{id}",
+     *   tags={"Admin - Categories"},
+     *   summary="Detalle de categoría",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\Response(response=200, description="OK")
+     * )
      */
-
-    /**
- * @OA\Get(
- *   path="/api/admin/categories/{id}",
- *   tags={"Admin - Categories"},
- *   summary="Detalle de categoría",
- *   security={{"bearerAuth":{}}},
- *   @OA\Parameter(
- *     name="id",
- *     in="path",
- *     required=true,
- *     @OA\Schema(type="integer")
- *   ),
- *   @OA\Response(response=200, description="OK")
- * )
- */
     public function show(string $id)
     {
         $categorie = Categorie::findOrFail($id);
@@ -135,30 +126,26 @@ class CategorieController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *   path="/api/admin/categories/{id}",
+     *   tags={"Admin - Categories"},
+     *   summary="Actualizar categoría",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\RequestBody(
+     *     @OA\JsonContent(
+     *       @OA\Property(property="name", type="string"),
+     *       @OA\Property(property="status", type="boolean")
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Actualizado")
+     * )
      */
-
-    /**
- * @OA\Put(
- *   path="/api/admin/categories/{id}",
- *   tags={"Admin - Categories"},
- *   summary="Actualizar categoría",
- *   security={{"bearerAuth":{}}},
- *   @OA\Parameter(
- *     name="id",
- *     in="path",
- *     required=true,
- *     @OA\Schema(type="integer")
- *   ),
- *   @OA\RequestBody(
- *     @OA\JsonContent(
- *       @OA\Property(property="name", type="string"),
- *       @OA\Property(property="status", type="boolean")
- *     )
- *   ),
- *   @OA\Response(response=200, description="Actualizado")
- * )
- */
     public function update(Request $request, string $id)
     {
         $is_exists = Categorie::where("id", "<>", $id)->where("name", $request->name)->first();
@@ -169,62 +156,69 @@ class CategorieController extends Controller
         $categorie = Categorie::findOrFail($id);
         $data = $request->except('imagen');
 
+        // ✅ Actualizar imagen en Cloudinary
         if ($request->hasFile("imagen")) {
             $file = $request->file("imagen");
 
-            // Validar que el archivo no tenga extensión .tmp
             if ($file->getClientOriginalExtension() === 'tmp') {
                 return response()->json(["message" => "No se permiten archivos temporales"], 403);
             }
 
-            // Eliminar la imagen anterior del disco 'public'
+            // Eliminar imagen anterior de Cloudinary
             if ($categorie->imagen) {
-                Storage::disk("public")->delete($categorie->imagen);
+                $publicId = $this->imageService->getPublicIdFromUrl($categorie->imagen);
+                if ($publicId) {
+                    $this->imageService->delete($publicId);
+                }
             }
 
-            // Guardar la imagen en el disco 'public' bajo la carpeta 'categories'
-            $fileName = $file->hashName();
-            $path = $file->storeAs("categories", $fileName, "public");
-
-            // Guardar como 'categories/nombrearchivo' en la base de datos
-            $data['imagen'] = "categories/" . $fileName;
+            $data['imagen'] = $this->imageService->upload($file, 'categories');
         }
 
         $categorie->update($data);
-        return response()->json(["message" => "Categoría actualizada con éxito"], 200);
+
+        return response()->json([
+            "message" => 200,
+            "categorie" => $categorie
+        ]);
     }
 
-
-
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *   path="/api/admin/categories/{id}",
+     *   tags={"Admin - Categories"},
+     *   summary="Eliminar categoría",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     required=true,
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\Response(response=204, description="Eliminado")
+     * )
      */
-
-    /**
- * @OA\Delete(
- *   path="/api/admin/categories/{id}",
- *   tags={"Admin - Categories"},
- *   summary="Eliminar categoría",
- *   security={{"bearerAuth":{}}},
- *   @OA\Parameter(
- *     name="id",
- *     in="path",
- *     required=true,
- *     @OA\Schema(type="integer")
- *   ),
- *   @OA\Response(response=204, description="Eliminado")
- * )
- */
     public function destroy(string $id)
     {
         $categorie = Categorie::findOrFail($id);
 
-        //validar que la categoria no este en ningun producto
+        // Validar que la categoría no esté en ningún producto
         if ($categorie->product_categorie_firsts()->count() > 0 ||
-         $categorie->product_categorie_seconds()->count() > 0 ||
-         $categorie->product_categorie_thirds()->count() > 0) {
-            return response()->json(["message" => 403, "message_text" => "No se puede eliminar la categoría porque está en uso en productos"]);
-        };
+            $categorie->product_categorie_seconds()->count() > 0 ||
+            $categorie->product_categorie_thirds()->count() > 0) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "No se puede eliminar la categoría porque está en uso en productos"
+            ]);
+        }
+
+        // ✅ Eliminar imagen de Cloudinary
+        if ($categorie->imagen) {
+            $publicId = $this->imageService->getPublicIdFromUrl($categorie->imagen);
+            if ($publicId) {
+                $this->imageService->delete($publicId);
+            }
+        }
 
         $categorie->delete();
 

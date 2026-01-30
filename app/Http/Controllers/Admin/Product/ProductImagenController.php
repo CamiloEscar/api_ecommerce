@@ -3,47 +3,56 @@
 namespace App\Http\Controllers\Admin\Product;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product\ProductImage;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 
 class ProductImagenController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
     {
-        //
+        $this->imageService = $imageService;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $product_id = $request->product_id;
+
+        if ($request->hasFile("imagen")) {
+            $cloudinaryUrl = $this->imageService->upload($request->file("imagen"), 'products');
+
+            $product_imagen = ProductImage::create([
+                "imagen" => $cloudinaryUrl,
+                "product_id" => $product_id,
+            ]);
+
+            return response()->json([
+                "imagen" => [
+                    "id" => $product_imagen->id,
+                    "imagen" => $product_imagen->imagen
+                ],
+                "message" => 200,
+            ]);
+        }
+
+        return response()->json(["message" => "No se envió ninguna imagen"], 400);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $product_image = ProductImage::findOrFail($id);
+
+        if ($product_image->imagen) {
+            $publicId = $this->imageService->getPublicIdFromUrl($product_image->imagen);
+            if ($publicId) {
+                $this->imageService->delete($publicId);
+            }
+        }
+
+        $product_image->delete();
+
+        return response()->json(["message" => 200]);
     }
 }
