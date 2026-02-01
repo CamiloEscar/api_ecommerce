@@ -192,7 +192,14 @@ class ProductController extends Controller
         $request->request->add(["slug" => Str::slug($request->title)]);
         $request->request->add(["tags" => $request->multiselect]);
 
-        $product->update($request->all());
+        // $product->update($request->all());
+        $data = $request->all();
+
+$data['cost']  = (int) $request->cost;
+$data['state'] = (int) $request->state;
+
+$product->update($data);
+
 
         return response()->json([
             "message" => 200,
