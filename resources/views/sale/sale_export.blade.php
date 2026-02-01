@@ -19,7 +19,7 @@
         @foreach ($sales as $key => $sale)
         <tr>
             <td>{{ $key+1 }}</td>
-            <td>{{ $sale->user->name. ' '.$sale->user->surname }}</td>
+            <td>{{ $sale->user?->name }} {{ $sale->user?->surname }}</td>
             <td>{{ $sale->method_payment }}</td>
             <td>{{ $sale->currency_total }}</td>
             <td>{{ $sale->total }} {{ $sale->currency_payment }}</td>
