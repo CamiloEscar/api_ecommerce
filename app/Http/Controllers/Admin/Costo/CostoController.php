@@ -238,16 +238,17 @@ class CostoController extends Controller
         $COSTO->update($request->all());
 
         // Delete existing relationships using the correct approach
-        CostoCategorie::where('costo_id', $id)->delete();
+        CostoProduct::where('costo_id', $id)->delete();
         CostoCategorie::where('costo_id', $id)->delete();
         CostoBrand::where('costo_id', $id)->delete();
 
-        foreach ($request->product_selected as $key => $product_selec) {
-            CostoCategorie::create([
+        foreach ($request->product_selected as $product_selec) {
+            CostoProduct::create([
                 "costo_id" => $COSTO->id,
                 "product_id" => $product_selec["id"],
             ]);
         }
+
 
         foreach ($request->categorie_selected as $key => $categorie_selec) {
             CostoCategorie::create([
