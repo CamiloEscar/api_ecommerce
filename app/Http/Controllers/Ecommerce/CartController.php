@@ -103,7 +103,7 @@ class CartController extends Controller
     }
 
     $user = auth('api')->user();
-    $carts = Cart::where("user_id", $user->id)->get();
+    $carts = Cart::where("user_id", $user->id)->with('product')->get();
 
     $costo_total = 0;
 
@@ -193,7 +193,7 @@ class CartController extends Controller
     }
 
     $user = auth('api')->user();
-    $carts = Cart::where("user_id", $user->id)->get();
+    $carts = Cart::where("user_id", $user->id)->with('product')->get();
 
     // inicializar acumulador de costo total añadido
     $costo_total = 0;
@@ -284,7 +284,7 @@ class CartController extends Controller
     public function remove_costo(Request $request)
     {
         $user = auth('api')->user();
-        $carts = Cart::where("user_id", $user->id)->get();
+        $carts = Cart::where("user_id", $user->id)->with('product')->get();
 
         $removed_amount = 0;
 
