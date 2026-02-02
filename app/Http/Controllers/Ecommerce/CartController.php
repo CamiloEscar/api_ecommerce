@@ -199,6 +199,16 @@ class CartController extends Controller
     $costo_total = 0;
 
     foreach ($carts as $cart) {
+        // 🔒 PRIORIDAD MÁXIMA: Si el producto tiene cost = 1, NO aplica ningún costo de envío
+        if ($cart->product && $cart->product->cost == 1) {
+            continue;
+        }
+
+        // 🔒 Solo aplica costos si el producto tiene cost = 2 (producto con envío pago)
+        if (!$cart->product || $cart->product->cost != 2) {
+            continue;
+        }
+
         // 🔒 Evitar aplicar varias veces el mismo costo
         if ($cart->code_costo === $costo->code) {
             continue;
@@ -279,6 +289,11 @@ class CartController extends Controller
         $removed_amount = 0;
 
         foreach ($carts as $cart) {
+            // 🔒 Productos con cost = 1 no deben tener costo de envío
+            if ($cart->product && $cart->product->cost == 1) {
+                continue;
+            }
+
             if ($cart->code_costo) {
                 // revert to original subtotal/total based on price_unit and quantity
                 $originalSubtotal = $cart->price_unit;
