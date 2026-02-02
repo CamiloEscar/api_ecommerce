@@ -26,6 +26,7 @@ class CartEcommerceResource extends JsonResource
                 'price_ars' => $this->resource->product->price_ars,
                 'price_usd' => $this->resource->product->price_usd,
                 'imagen' => ImageHelper::getImageUrl($this->resource->product->imagen),
+                'cost' => $this->resource->product->cost,
                 'brand' => $this->resource->product->brand ? [
                     "id" => $this->resource->product->brand->id,
                     "name" => $this->resource->product->brand->name
