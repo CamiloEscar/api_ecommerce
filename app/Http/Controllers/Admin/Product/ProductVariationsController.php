@@ -121,6 +121,24 @@ class ProductVariationsController extends Controller
             return response()->json(["message" => 403, "message_text" => "Ya existe una variación con estas características"]);
         }
 
+            // NUEVA VALIDACIÓN DE STOCK
+            $product = \App\Models\Product\Product::find($request->product_id);
+            $product_stock = $product ? $product->stock : 0;
+
+            $sum_variations_stock = ProductVariation::where("product_id", $request->product_id)
+                ->where("product_variation_id", NULL)
+                ->sum("stock");
+
+            $sum_variations_stock += $request->stock;
+
+            if ($sum_variations_stock > $product_stock) {
+                return response()->json([
+                    "message" => 403,
+                    "message_text" => "El stock total de las variaciones ($sum_variations_stock) no puede superar el stock del producto ($product_stock)"
+                ]);
+            }
+            // FIN VALIDACIÓN
+
         $product_variation = ProductVariation::create($request->all());
         return response()->json(
             [
@@ -196,6 +214,25 @@ class ProductVariationsController extends Controller
         if ($is_valid_variation) {
             return response()->json(["message" => "Ya existe una variación con estas características"], 403);
         }
+
+        // NUEVA VALIDACIÓN DE STOCK
+        $product = \App\Models\Product\Product::find($request->product_id);
+        $product_stock = $product ? $product->stock : 0;
+
+        $sum_variations_stock = ProductVariation::where("product_id", $request->product_id)
+            ->where("id", "<>", $id)
+            ->where("product_variation_id", NULL)
+            ->sum("stock");
+
+        $sum_variations_stock += $request->stock;
+
+        if ($sum_variations_stock > $product_stock) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El stock total de las variaciones ($sum_variations_stock) no puede superar el stock del producto ($product_stock)"
+            ]);
+        }
+        // FIN VALIDACIÓN
 
         $product_variation = ProductVariation::findOrFail($id);
         $product_variation->update($request->all());

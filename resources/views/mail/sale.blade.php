@@ -310,8 +310,7 @@
 																										<multiline>
                                                                                                         ¡Grandes noticias,
 																											{{$user->name.' '.$user->surname}}! Tu
-																											pedido&rsquo;s
-																											ya está en el camión
+																											pedido ya está en el camión
 																											y en camino hacia ti.
                                                                                                             Solo haz clic en el botón
                                                                                                             de abajo para
@@ -454,6 +453,7 @@
 																																<multiline>
 																																	<strong>Detalles de
 																																		envio</strong>
+                                                                                                                                        <strong>Email:</strong> {{ $user->email }} <br />
 																																</multiline>
 																															</td>
 																														</tr>
@@ -579,8 +579,10 @@
                                                                                                                                         @endif
                                                                                                                                     @endif
 																																	<br />
-																																	<strong>Total:</strong>
-                                                                                                                                    {{ $sale_detail->total }}  {{ $sale_detail->currency}}
+																																	<strong>Cantidad:</strong> {{ $sale_detail->quantity }} <br />
+                                                                                                                                    <strong>Precio unitario:</strong> {{ $sale_detail->price_unit }} {{ $sale_detail->currency }} <br />
+                                                                                                                                    <strong>Subtotal:</strong> {{ $sale_detail->subtotal }} {{ $sale_detail->currency }} <br />
+                                                                                                                                    <strong>Total:</strong> {{ $sale_detail->total }} {{ $sale_detail->currency }}
 																																</multiline>
 																															</td>
 																														</tr>
@@ -669,58 +671,36 @@
 																																	cellpadding="0"
 																																	class="mw-100p">
 																																	<tr>
-																																		<td class="title-20 lh-30 a-right mt-left mw-auto"
-																																			width="100"
-																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 30px; text-align:right;">
-																																			<multiline>
-																																				<strong>Subtotal:</strong>
-																																			</multiline>
-																																		</td>
-																																		<td class="img mw-15"
-																																			width="20"
-																																			style="font-size:0pt; line-height:0pt; text-align:left;">
-																																		</td>
-																																		<td class="title-20 lh-30 mt-right"
-																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; line-height: 30px;">
-																																			<multiline>
-                                                                                                                                            {{ $sale->total }} {{ $sale->currency_payment }}
-																																			</multiline>
-																																		</td>
-																																	</tr>
-																																	<tr>
-																																		<td class="title-20 lh-30 a-right mt-left"
-																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 30px; text-align:right;">
-																																			<multiline>
-																																				<strong>Envio:</strong>
-																																			</multiline>
-																																		</td>
-																																		<td class="img mw-15"
-																																			style="font-size:0pt; line-height:0pt; text-align:left;">
-																																		</td>
-																																		<td class="title-20 lh-30 mt-right"
-																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; line-height: 30px;">
-																																			<multiline>
-																																				$0.00
-																																			</multiline>
-																																		</td>
-																																	</tr>
-																																	<tr>
-																																		<td class="title-20 lh-30 a-right mt-left"
-																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 30px; text-align:right;">
-																																			<multiline>
-																																				<strong>Impuestos:</strong>
-																																			</multiline>
-																																		</td>
-																																		<td class="img mw-15"
-																																			style="font-size:0pt; line-height:0pt; text-align:left;">
-																																		</td>
-																																		<td class="title-20 lh-30 mt-right"
-																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; line-height: 30px;">
-																																			<multiline>
-																																				$0.00
-																																			</multiline>
-																																		</td>
-																																	</tr>
+                                                                                                                                        <td class="title-20 lh-30 a-right">
+                                                                                                                                            <strong>Subtotal:</strong>
+                                                                                                                                        </td>
+                                                                                                                                        <td></td>
+                                                                                                                                        <td class="title-20 lh-30">
+                                                                                                                                            {{ $sale->subtotal }} {{ $sale->currency_payment }}
+                                                                                                                                        </td>
+                                                                                                                                    </tr>
+
+                                                                                                                                    @if($sale->discount > 0)
+                                                                                                                                    <tr>
+                                                                                                                                        <td class="title-20 lh-30 a-right">
+                                                                                                                                            <strong>Descuento:</strong>
+                                                                                                                                        </td>
+                                                                                                                                        <td></td>
+                                                                                                                                        <td class="title-20 lh-30">
+                                                                                                                                            - {{ $sale->discount }} {{ $sale->currency_payment }}
+                                                                                                                                        </td>
+                                                                                                                                    </tr>
+                                                                                                                                    @endif
+
+                                                                                                                                    <tr>
+                                                                                                                                        <td class="title-20 lh-30 a-right pt-10">
+                                                                                                                                            <strong>TOTAL:</strong>
+                                                                                                                                        </td>
+                                                                                                                                        <td></td>
+                                                                                                                                        <td class="title-20 lh-30 c-purple pt-10">
+                                                                                                                                            <strong>{{ $sale->total }} {{ $sale->currency_payment }}</strong>
+                                                                                                                                        </td>
+                                                                                                                                    </tr>
 																																	<tr>
 																																		<td class="title-20 lh-30 a-right mt-left pt-10"
 																																			style="font-size:20px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 30px; text-align:right; padding-top: 10px;">

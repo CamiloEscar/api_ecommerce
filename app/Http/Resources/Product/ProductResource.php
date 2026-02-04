@@ -25,6 +25,7 @@ class ProductResource extends JsonResource
             'resumen' => $this->resource->resumen,
             'imagen' => ImageHelper::getImageUrl($this->resource->imagen),
             'state' => $this->resource->state,
+            'cost' => $this->resource->cost,
             'description' => $this->resource->description,
             'tags' => $this->resource->tags ? json_decode($this->resource->tags, true) : [],
             'brand_id' => $this->resource->brand_id,
