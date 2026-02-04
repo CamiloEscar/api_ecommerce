@@ -154,7 +154,7 @@ Route::group([
         Route::post('carts/apply_cupon', [CartController::class, "apply_cupon"]);
         Route::post('carts/apply_costo', [CartController::class, "apply_costo"]);
         Route::post('carts/remove_costo', [CartController::class, "remove_costo"]);
-        Route::get('cart/validate-stock', [CartController::class, 'validate_stock']);
+        Route::get('carts/validate-stock', [CartController::class, 'validate_stock']);
         Route::resource('carts', CartController::class);
 
 
