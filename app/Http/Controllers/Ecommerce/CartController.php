@@ -7,6 +7,7 @@ use App\Http\Resources\Ecommerce\Cart\CartEcommerceCollection;
 use App\Http\Resources\Ecommerce\Cart\CartEcommerceResource;
 use App\Models\Costo\Costo;
 use App\Models\Cupone\Cupone;
+use App\Models\Cupone\CuponeUserUsage;
 use App\Models\Product\Product;
 use App\Models\Product\ProductVariation;
 use App\Models\Sale\Cart;
@@ -103,9 +104,25 @@ class CartController extends Controller
     }
 
     $user = auth('api')->user();
-    $carts = Cart::where("user_id", $user->id)->with('product')->get();
 
-    $costo_total = 0;
+        //  VALIDAR SI EL USUARIO YA USÓ ESTE CUPÓN
+    if ($cupon->hasBeenUsedByUser($user->id)) {
+        return response()->json([
+            "message" => 403,
+            "message_text" => "Ya has utilizado este cupón anteriormente"
+        ]);
+    }
+
+    $carts = Cart::where("user_id", $user->id)->get();
+
+    if ($carts->isEmpty()) {
+        return response()->json([
+            "message" => 403,
+            "message_text" => "No tienes productos en el carrito"
+        ]);
+    }
+
+        $appliedToAnyProduct = false;
 
     foreach ($carts as $cart) {
         // 🔒 Evitar aplicar varias veces el mismo cupón
@@ -146,6 +163,7 @@ class CartController extends Controller
         }
 
         if ($applyDiscount) {
+            $appliedToAnyProduct = true;
             $precioBase = $cart->price_unit;
             $subtotal = $precioBase;
 
@@ -175,6 +193,20 @@ class CartController extends Controller
         }
     }
 
+    if (!$appliedToAnyProduct) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "Este cupón no aplica a ninguno de los productos en tu carrito"
+            ]);
+        }
+
+        // ✅ REGISTRAR EL USO DEL CUPÓN
+        CuponeUserUsage::create([
+            'cupone_id' => $cupon->id,
+            'user_id' => $user->id,
+            'used_at' => now()
+        ]);
+
     return response()->json([
         "message" => 200,
         "message_text" => "Cupón aplicado correctamente"
@@ -193,22 +225,12 @@ class CartController extends Controller
     }
 
     $user = auth('api')->user();
-    $carts = Cart::where("user_id", $user->id)->with('product')->get();
+    $carts = Cart::where("user_id", $user->id)->get();
 
     // inicializar acumulador de costo total añadido
     $costo_total = 0;
 
     foreach ($carts as $cart) {
-        // 🔒 PRIORIDAD MÁXIMA: Si el producto tiene cost = 1, NO aplica ningún costo de envío
-        if ($cart->product && $cart->product->cost == 1) {
-            continue;
-        }
-
-        // 🔒 Solo aplica costos si el producto tiene cost = 2 (producto con envío pago)
-        if (!$cart->product || $cart->product->cost != 2) {
-            continue;
-        }
-
         // 🔒 Evitar aplicar varias veces el mismo costo
         if ($cart->code_costo === $costo->code) {
             continue;
@@ -284,16 +306,11 @@ class CartController extends Controller
     public function remove_costo(Request $request)
     {
         $user = auth('api')->user();
-        $carts = Cart::where("user_id", $user->id)->with('product')->get();
+        $carts = Cart::where("user_id", $user->id)->get();
 
         $removed_amount = 0;
 
         foreach ($carts as $cart) {
-            // 🔒 Productos con cost = 1 no deben tener costo de envío
-            if ($cart->product && $cart->product->cost == 1) {
-                continue;
-            }
-
             if ($cart->code_costo) {
                 // revert to original subtotal/total based on price_unit and quantity
                 $originalSubtotal = $cart->price_unit;
