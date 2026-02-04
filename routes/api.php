@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Product\CategorieController;
 use App\Http\Controllers\Admin\Product\AttributeProductController;
 use App\Http\Controllers\Admin\Product\BrandController;
 use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
+use App\Http\Controllers\Admin\Product\ProductStockMovementController;
 use App\Http\Controllers\Admin\Product\ProductVariationsAnidadoController;
 use App\Http\Controllers\Admin\Product\ProductVariationsController;
 use App\Http\Controllers\Admin\Sale\KpiSaleReportController;
@@ -101,6 +102,15 @@ Route::group([
     Route::resource("discounts", DiscountController::class);
 
     Route::post("sales/list", [SalesController::class, "list"]);
+
+    //stock
+    Route::prefix('product-stock-movements')->group(function () {
+    Route::get('/', [ProductStockMovementController::class, 'index']);
+    Route::post('/', [ProductStockMovementController::class, 'store']);
+    Route::get('/{id}', [ProductStockMovementController::class, 'show']);
+    Route::delete('/{id}', [ProductStockMovementController::class, 'destroy']);
+    Route::get('/summary/product', [ProductStockMovementController::class, 'summary']);
+});
 
     Route::group([
 
