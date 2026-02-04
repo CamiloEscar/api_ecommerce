@@ -26,9 +26,108 @@ class CartController extends Controller
         //obtiene los datos de la tabla cart
         $carts = Cart::where("user_id", $user->id)->get();
 
+        // ✅ Validar stock para cada item del carrito
+        foreach ($carts as $cart) {
+            $stockDisponible = 0;
+            $stockSuficiente = true;
+
+            if ($cart->product_variation_id) {
+                // Producto con variación
+                $variation = ProductVariation::find($cart->product_variation_id);
+                if ($variation) {
+                    $stockDisponible = $variation->stock;
+                    $stockSuficiente = $variation->stock >= $cart->quantity;
+                } else {
+                    $stockSuficiente = false;
+                    $stockDisponible = 0;
+                }
+            } else {
+                // Producto simple
+                $product = Product::find($cart->product_id);
+                if ($product) {
+                    $stockDisponible = $product->stock;
+                    $stockSuficiente = $product->stock >= $cart->quantity;
+                } else {
+                    $stockSuficiente = false;
+                    $stockDisponible = 0;
+                }
+            }
+
+            // Agregar información de stock al objeto cart
+            $cart->stock_disponible = $stockDisponible;
+            $cart->stock_suficiente = $stockSuficiente;
+        }
+
+
         //envia el json al front
         return response()->json([
             "carts" => CartEcommerceCollection::make($carts),
+        ]);
+    }
+
+    /**
+     * Validar stock antes del checkout
+     */
+    public function validate_stock()
+    {
+        $user = auth('api')->user();
+        $carts = Cart::where("user_id", $user->id)->get();
+
+        $items_sin_stock = [];
+        $items_stock_insuficiente = [];
+
+        foreach ($carts as $cart) {
+            if ($cart->product_variation_id) {
+                // Producto con variación
+                $variation = ProductVariation::find($cart->product_variation_id);
+
+                if (!$variation) {
+                    $items_sin_stock[] = [
+                        'cart_id' => $cart->id,
+                        'product_name' => $cart->product->title ?? 'Producto eliminado',
+                        'variation' => 'Variación no disponible'
+                    ];
+                } elseif ($variation->stock < $cart->quantity) {
+                    $items_stock_insuficiente[] = [
+                        'cart_id' => $cart->id,
+                        'product_name' => $cart->product->title,
+                        'variation' => $cart->product_variation->propertie->name ?? '',
+                        'cantidad_solicitada' => $cart->quantity,
+                        'stock_disponible' => $variation->stock
+                    ];
+                }
+            } else {
+                // Producto simple
+                $product = Product::find($cart->product_id);
+
+                if (!$product) {
+                    $items_sin_stock[] = [
+                        'cart_id' => $cart->id,
+                        'product_name' => 'Producto no disponible'
+                    ];
+                } elseif ($product->stock < $cart->quantity) {
+                    $items_stock_insuficiente[] = [
+                        'cart_id' => $cart->id,
+                        'product_name' => $product->title,
+                        'cantidad_solicitada' => $cart->quantity,
+                        'stock_disponible' => $product->stock
+                    ];
+                }
+            }
+        }
+
+        if (count($items_sin_stock) > 0 || count($items_stock_insuficiente) > 0) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "Algunos productos en tu carrito no están disponibles",
+                "items_sin_stock" => $items_sin_stock,
+                "items_stock_insuficiente" => $items_stock_insuficiente
+            ]);
+        }
+
+        return response()->json([
+            "message" => 200,
+            "message_text" => "Todos los productos están disponibles"
         ]);
     }
 

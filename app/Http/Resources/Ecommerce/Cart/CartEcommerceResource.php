@@ -71,6 +71,9 @@ class CartEcommerceResource extends JsonResource
             "subtotal" => $this->resource->subtotal,
             "total" => $this->resource->total,
             "currency" => $this->resource->currency,
+            // VALIDACIÓN DE STOCK
+            "stock_disponible" => $this->resource->stock_disponible ?? 0,
+            "stock_suficiente" => $this->resource->stock_suficiente ?? false,
             "created_at" => $this->resource->created_at->format("Y-m-d h:i A"),
         ];
     }
