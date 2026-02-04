@@ -105,11 +105,11 @@ Route::group([
 
     //stock
     Route::prefix('product-stock-movements')->group(function () {
+    Route::get('/summary/product', [ProductStockMovementController::class, 'summary']);
     Route::get('/', [ProductStockMovementController::class, 'index']);
     Route::post('/', [ProductStockMovementController::class, 'store']);
     Route::get('/{id}', [ProductStockMovementController::class, 'show']);
     Route::delete('/{id}', [ProductStockMovementController::class, 'destroy']);
-    Route::get('/summary/product', [ProductStockMovementController::class, 'summary']);
 });
 
     Route::group([
