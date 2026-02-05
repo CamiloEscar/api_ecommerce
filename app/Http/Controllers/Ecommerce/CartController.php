@@ -312,7 +312,7 @@ class CartController extends Controller
     ]);
 }
 
-    public function apply_costo(Request $request)
+public function apply_costo(Request $request)
 {
     $costo = Costo::where("code", $request->code_costo)->where("state", 1)->first();
 
@@ -326,11 +326,10 @@ class CartController extends Controller
     $user = auth('api')->user();
     $carts = Cart::where("user_id", $user->id)->get();
 
-    // inicializar acumulador de costo total añadido
     $costo_total = 0;
 
     foreach ($carts as $cart) {
-        // 🔒 Evitar aplicar varias veces el mismo costo
+        // Saltar si ya tiene este costo aplicado
         if ($cart->code_costo === $costo->code) {
             continue;
         }
@@ -368,29 +367,20 @@ class CartController extends Controller
         }
 
         if ($applyCosto) {
-            $subtotal = $cart->subtotal ?: $cart->price_unit;
-            $originalTotal = $subtotal * $cart->quantity;
-            $total = $originalTotal;
-
+            // Calcular el monto de envio SIN tocar subtotal ni total del item
+            $costoEnvioItem = 0;
             if ($costo->type_discount == 1) { // porcentaje
-                $total += ($total * ($costo->discount * 0.01));
+                $costoEnvioItem = ($cart->total) * ($costo->discount * 0.01);
             }
             if ($costo->type_discount == 2) { // monto fijo
-                $total += $costo->discount;
+                $costoEnvioItem = $costo->discount;
             }
 
-            // compute added amount for reporting
-            $added = $total - $originalTotal;
-            $costo_total += $added;
+            $costo_total += $costoEnvioItem;
 
+            // SOLO guardar la referencia al costo, NO modificar subtotal/total/type_discount/discount
             $cart->update([
-                "type_discount" => $costo->type_discount,
-                "discount" => $costo->discount,
                 "code_costo" => $costo->code,
-                "subtotal" => $subtotal,
-                "total" => $total,
-                "type_campaing" => NULL,
-                "code_discount" => NULL,
             ]);
         }
     }
@@ -407,23 +397,11 @@ class CartController extends Controller
         $user = auth('api')->user();
         $carts = Cart::where("user_id", $user->id)->get();
 
-        $removed_amount = 0;
-
         foreach ($carts as $cart) {
             if ($cart->code_costo) {
-                // revert to original subtotal/total based on price_unit and quantity
-                $originalSubtotal = $cart->price_unit;
-                $originalTotal = $originalSubtotal * $cart->quantity;
-
-                // calculate difference to report removed amount
-                $removed_amount += ($cart->total - $originalTotal);
-
+                // SOLO limpiar la referencia al costo, NO tocar subtotal/total/discount
                 $cart->update([
-                    'type_discount' => NULL,
-                    'discount' => 0,
                     'code_costo' => NULL,
-                    'subtotal' => $originalSubtotal,
-                    'total' => $originalTotal,
                 ]);
             }
         }
@@ -431,7 +409,6 @@ class CartController extends Controller
         return response()->json([
             'message' => 200,
             'message_text' => 'Costo de envío removido correctamente',
-            'removed' => $removed_amount
         ]);
     }
 
@@ -506,61 +483,40 @@ class CartController extends Controller
     //     ]);
     // }
 
-    public function update(Request $request, string $id)
+public function update(Request $request, string $id)
 {
     $user = auth('api')->user();
-
-    $cart = Cart::where("id", $id)
-        ->where("user_id", $user->id)
-        ->firstOrFail();
-
+    $cart = Cart::where("id", $id)->where("user_id", $user->id)->firstOrFail();
     $quantity = (int) $request->quantity;
 
     if ($quantity < 1) {
-        return response()->json([
-            "message" => 403,
-            "message_text" => "La cantidad mínima es 1"
-        ]);
+        return response()->json(["message" => 403, "message_text" => "La cantidad mínima es 1"]);
     }
 
-    // 🔒 VALIDAR STOCK REAL
+    // Validar stock...
     if ($cart->product_variation_id) {
         $variation = ProductVariation::find($cart->product_variation_id);
-
         if (!$variation || $variation->stock < $quantity) {
-            return response()->json([
-                "message" => 403,
-                "message_text" => "Stock insuficiente para esta variación"
-            ]);
+            return response()->json(["message" => 403, "message_text" => "Stock insuficiente"]);
         }
     } else {
         $product = Product::find($cart->product_id);
-
         if (!$product || $product->stock < $quantity) {
-            return response()->json([
-                "message" => 403,
-                "message_text" => "Stock insuficiente para este producto"
-            ]);
+            return response()->json(["message" => 403, "message_text" => "Stock insuficiente"]);
         }
     }
 
-    // 🔢 recalcular precios
+    // Recalcular: subtotal es el precio unitario con descuento, total es subtotal * quantity
+    // NO incluir costo de envio en el total del item
     $subtotal = $cart->subtotal ?: $cart->price_unit;
     $total = $subtotal * $quantity;
-
-    // ➕ sumar costo de envío fijo si existe
-    if ($cart->code_costo && $cart->type_discount == 2) {
-        $total += $cart->discount;
-    }
 
     $cart->update([
         "quantity" => $quantity,
         "total" => $total
     ]);
 
-    return response()->json([
-        "cart" => CartEcommerceResource::make($cart)
-    ]);
+    return response()->json(["cart" => CartEcommerceResource::make($cart)]);
 }
 
 
