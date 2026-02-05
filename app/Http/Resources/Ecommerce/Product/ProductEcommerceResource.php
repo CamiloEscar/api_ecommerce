@@ -119,6 +119,7 @@ class ProductEcommerceResource extends JsonResource
             'price_usd' => $this->resource->price_usd,
             'resumen' => $this->resource->resumen,
             'imagen' => ImageHelper::getImageUrl($this->resource->imagen),
+            "cost" => $this->resource->cost,
             'state' => $this->resource->state,
             'description' => $this->resource->description,
             'tags' => $this->resource->tags ? json_decode($this->resource->tags, true) : [],
