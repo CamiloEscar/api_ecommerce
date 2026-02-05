@@ -249,11 +249,8 @@ class HomeController extends Controller
         ]);
     }
 
-    public function menus(Request $request)
-{
-    $categories_menus = Categorie::with([
-            'categorie_seconds.categorie_thirds'
-        ])
+    public function menus(Request $request) {
+    $categories_menus = Categorie::with('categorie_seconds.categorie_thirds')
         ->whereNull("categorie_second_id")
         ->whereNull("categorie_third_id")
         ->orderBy("position", "desc")
@@ -269,11 +266,16 @@ class HomeController extends Controller
                     return [
                         "id" => $categorie->id,
                         "name" => $categorie->name,
-                        "imagen" => ImageHelper::getImageUrl($categorie->imagen),
+                        "imagen" => $categorie->imagen
+                            ? ImageHelper::getImageUrl($categorie->imagen)
+                            : null,
                         "subcategories" => $categorie->categorie_thirds->map(function ($subcategorie) {
                             return [
                                 "id" => $subcategorie->id,
                                 "name" => $subcategorie->name,
+                                "imagen" => $subcategorie->imagen
+                                    ? ImageHelper::getImageUrl($subcategorie->imagen)
+                                    : null,
                             ];
                         })->values(),
                     ];
@@ -282,7 +284,6 @@ class HomeController extends Controller
         })->values(),
     ]);
 }
-
 
 
 /**
