@@ -249,31 +249,45 @@ class HomeController extends Controller
         ]);
     }
 
-    public function menus(Request $request) {
-        $categories_menus = Categorie::where("categorie_second_id", NULL)
+    public function menus(Request $request)
+{
+    $categories_menus = Categorie::where("categorie_second_id", NULL)
         ->where("categorie_third_id", NULL)
         ->orderBy("position", "desc")
         ->get();
-        return response()->json([
-            "categories_menus" => $categories_menus->map(function ($departament) {
-                return [
-                    "id" => $departament->id,
-                    "name" => $departament->name,
-                    "icon" => $departament->icon,
-                    "categories" => $departament->categorie_seconds->map(function ($categorie) {
-                        return [
-                            "imagen" => ImageHelper::getImageUrl($categorie->imagen),(function ($subcategorie) {
-                                return [
-                                    "imagen" => ImageHelper::getImageUrl($subcategorie->imagen),
-                                ];
-                            })
-                        ];
-                    })
-                ];
-            }),
-        ]);
 
-    }
+    $categories_menus = Categorie::with([
+        'categorie_seconds.categorie_thirds'
+    ])
+    ->where("categorie_second_id", NULL)
+    ->where("categorie_third_id", NULL)
+    ->orderBy("position", "desc")
+    ->get();
+
+    return response()->json([
+        "categories_menus" => $categories_menus->map(function ($departament) {
+            return [
+                "id" => $departament->id,
+                "name" => $departament->name,
+                "icon" => $departament->icon,
+                "categories" => $departament->categorie_seconds->map(function ($categorie) {
+                    return [
+                        "id" => $categorie->id,
+                        "name" => $categorie->name,
+                        "imagen" => ImageHelper::getImageUrl($categorie->imagen),
+                        "subcategories" => $categorie->categorie_thirds->map(function ($subcategorie) {
+                            return [
+                                "id" => $subcategorie->id,
+                                "name" => $subcategorie->name,
+                            ];
+                        })->values(),
+                    ];
+                })->values(),
+            ];
+        })->values(),
+    ]);
+}
+
 
 /**
  * Obtener detalles de un producto por slug
