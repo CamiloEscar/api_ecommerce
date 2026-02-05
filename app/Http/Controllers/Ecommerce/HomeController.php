@@ -251,18 +251,13 @@ class HomeController extends Controller
 
     public function menus(Request $request)
 {
-    $categories_menus = Categorie::where("categorie_second_id", NULL)
-        ->where("categorie_third_id", NULL)
+    $categories_menus = Categorie::with([
+            'categorie_seconds.categorie_thirds'
+        ])
+        ->whereNull("categorie_second_id")
+        ->whereNull("categorie_third_id")
         ->orderBy("position", "desc")
         ->get();
-
-    $categories_menus = Categorie::with([
-        'categorie_seconds.categorie_thirds'
-    ])
-    ->where("categorie_second_id", NULL)
-    ->where("categorie_third_id", NULL)
-    ->orderBy("position", "desc")
-    ->get();
 
     return response()->json([
         "categories_menus" => $categories_menus->map(function ($departament) {
@@ -287,6 +282,7 @@ class HomeController extends Controller
         })->values(),
     ]);
 }
+
 
 
 /**
