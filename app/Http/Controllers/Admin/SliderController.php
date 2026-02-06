@@ -40,7 +40,7 @@ class SliderController extends Controller
                     "type_slider" => $slider->type_slider,
                     "price_original" => $slider->price_original,
                     "price_campaing" => $slider->price_campaing,
-                    "imagen" => ImageHelper::getImageUrl($slider->imagen),
+                    "imagen" => $slider->imagen, // ✅ Ya es URL de Cloudinary
                 ];
             })
         ]);
@@ -51,8 +51,9 @@ class SliderController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('imagen'); // Excluye la imagen de los datos
+        $data = $request->except('imagen');
 
+        // ✅ Subir a Cloudinary
         if ($request->hasFile("imagen")) {
             $file = $request->file("imagen");
 
@@ -61,20 +62,12 @@ class SliderController extends Controller
                 return response()->json(["message" => "No se permiten archivos temporales"], 403);
             }
 
-            // ✅ Subir a Cloudinary
             $data['imagen'] = $this->imageService->upload($file, 'sliders');
         }
 
         $slider = Slider::create($data);
-        return response()->json(["message" => 200]);
 
-        //probar
-        // if ($request->hasFile("image")) {
-        //     $path = Storage::putFile("sliders", $request->file("image"));
-        //     $request->request->add(["imagen" => $path]);
-        // }
-        // $slider = Slider::create($request->all());
-        // return response()->json(["message" => "Slider creado correctamente", "slider" => $slider]);
+        return response()->json(["message" => 200]);
     }
 
     /**
@@ -94,7 +87,7 @@ class SliderController extends Controller
             "type_slider" => $slider->type_slider,
             "price_original" => $slider->price_original,
             "price_campaing" => $slider->price_campaing,
-            "imagen" => ImageHelper::getImageUrl($slider->imagen),
+            "imagen" => $slider->imagen, // ✅ Ya es URL de Cloudinary
         ]]);
     }
 
@@ -103,7 +96,7 @@ class SliderController extends Controller
      */
     public function update(Request $request, string $id)
     {
-            $slider = Slider::findOrFail($id);
+        $slider = Slider::findOrFail($id);
         $data = $request->except('imagen');
 
         if ($request->hasFile("imagen")) {
@@ -114,31 +107,21 @@ class SliderController extends Controller
                 return response()->json(["message" => "No se permiten archivos temporales"], 403);
             }
 
-            // Eliminar la imagen anterior del disco 'public'
+            // ✅ Eliminar imagen anterior de Cloudinary
             if ($slider->imagen) {
-                Storage::disk("public")->delete($slider->imagen);
+                $publicId = $this->imageService->getPublicIdFromUrl($slider->imagen);
+                if ($publicId) {
+                    $this->imageService->delete($publicId);
+                }
             }
 
-            // Guardar la imagen en el disco 'public' bajo la carpeta 'categories'
-            $fileName = $file->hashName();
-            $path = $file->storeAs("sliders", $fileName, "public");
-
-            // Guardar como 'categories/nombrearchivo' en la base de datos
-            $data['imagen'] = "sliders/" . $fileName;
+            // ✅ Subir nueva imagen a Cloudinary
+            $data['imagen'] = $this->imageService->upload($file, 'sliders');
         }
 
         $slider->update($data);
-        return response()->json(["message" => "Categoría actualizada con éxito"], 200);
-        // $slider = Slider::findOrFail($id);
-        // if ($request->hasFile("image")) {
-        //     if ($slider->imagen) {
-        //         Storage::delete($slider->imagen);
-        //     }
-        //     $path = Storage::putFile("slider", $request->file("image"));
-        //     $request->request->add(["imagen" => $path]);
-        // }
-        // $slider->update($request->all());
-        // return response()->json(["message" => "Slider actualizado correctamente", "slider" => $slider]);
+
+        return response()->json(["message" => "Slider actualizado con éxito"], 200);
     }
 
     /**
@@ -147,6 +130,15 @@ class SliderController extends Controller
     public function destroy(string $id)
     {
         $slider = Slider::findOrFail($id);
+
+        // ✅ Eliminar imagen de Cloudinary
+        if ($slider->imagen) {
+            $publicId = $this->imageService->getPublicIdFromUrl($slider->imagen);
+            if ($publicId) {
+                $this->imageService->delete($publicId);
+            }
+        }
+
         $slider->delete();
 
         return response()->json(["message" => 200]);
