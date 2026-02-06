@@ -392,25 +392,26 @@ public function apply_costo(Request $request)
     ]);
 }
 
-public function remove_costo(Request $request)
-{
-    $user = auth('api')->user();
-    $carts = Cart::where("user_id", $user->id)->get();
+    public function remove_costo(Request $request)
+    {
+        $user = auth('api')->user();
+        $carts = Cart::where("user_id", $user->id)->get();
 
-    foreach ($carts as $cart) {
-        if ($cart->code_costo) {
-            // SOLO limpiar la referencia al costo, NO tocar subtotal/total/discount
-            $cart->update([
-                'code_costo' => NULL,
-            ]);
+        foreach ($carts as $cart) {
+            if ($cart->code_costo) {
+                // SOLO limpiar la referencia al costo, NO tocar subtotal/total/discount
+                $cart->update([
+                    'code_costo' => NULL,
+                ]);
+            }
         }
+
+        return response()->json([
+            'message' => 200,
+            'message_text' => 'Costo de envío removido correctamente',
+        ]);
     }
 
-    return response()->json([
-        'message' => 200,
-        'message_text' => 'Costo de envío removido correctamente',
-    ]);
-}
 
     /**
      * Display the specified resource.
