@@ -19,7 +19,7 @@ class CartEcommerceResource extends JsonResource
             "id" => $this->resource->id,
             "user_id" => $this->resource->user_id,
             "product_id" => $this->resource->product_id,
-            "product" => [
+            "product" => $this->resource->product ? [
                 "id" => $this->resource->product->id,
                 'title' => $this->resource->product->title,
                 'slug' => $this->resource->product->slug,
@@ -31,12 +31,13 @@ class CartEcommerceResource extends JsonResource
                     "id" => $this->resource->product->brand->id,
                     "name" => $this->resource->product->brand->name
                 ] : NULL,
-            ],
+            ] : NULL,
             "type_discount" => $this->resource->type_discount,
             "discount" => $this->resource->discount,
             "type_campaing" => $this->resource->type_campaing,
             "code_cupon" => $this->resource->code_cupon,
             "code_discount" => $this->resource->code_discount,
+            "code_costo" => $this->resource->code_costo ?? null,
             "product_variation_id" => $this->resource->product_variation_id,
             "product_variation" => $this->resource->product_variation ? [
                 'id' => $this->resource->product_variation->id,
