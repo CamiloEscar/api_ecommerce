@@ -135,61 +135,91 @@ class CartController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $user = auth('api')->user();
+{
+    $user = auth('api')->user();
 
-        //validamos si existe el producto con variacion
-        if ($request->product_variation_id) {
-            $is_exists_cart_variations = Cart::where("product_variation_id", $request->product_variation_id)
-                ->where("product_id", $request->product_id)
-                ->where("user_id", $user->id)
-                ->first();
+    //validamos si existe el producto con variacion
+    if ($request->product_variation_id) {
+        $is_exists_cart_variations = Cart::where("product_variation_id", $request->product_variation_id)
+            ->where("product_id", $request->product_id)
+            ->where("user_id", $user->id)
+            ->first();
 
-            if ($is_exists_cart_variations) {
-                return response()->json([
-                    "message" => 403,
-                    "message_text" => "El producto junto con la variacion ya ha sido agregado, aumente la cantidad en el carrito "
-                ]);
-            } else {
-                $variation = ProductVariation::find($request->product_variation_id);
-
-                if ($variation && $variation->stock < $request->quantity) {
-                    return response()->json([
-                        "message" => 403,
-                        "message_text" => "De esa variacion no se puede agregar mas productos en el carrito por falta de stock"
-                    ]);
-                }
-            }
+        if ($is_exists_cart_variations) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El producto junto con la variacion ya ha sido agregado, aumente la cantidad en el carrito "
+            ]);
         } else {
-            //sin variacion
-            $is_exists_cart_simple = Cart::where("product_variation_id", NULL)
-                ->where("product_id", $request->product_id)
-                ->where("user_id", $user->id)
-                ->first();
+            $variation = ProductVariation::find($request->product_variation_id);
 
-            if ($is_exists_cart_simple) {
+            if ($variation && $variation->stock < $request->quantity) {
                 return response()->json([
                     "message" => 403,
-                    "message_text" => "El producto ya ha sido agregado, aumente la cantidad en el carrito "
+                    "message_text" => "De esa variacion no se puede agregar mas productos en el carrito por falta de stock"
                 ]);
-            } else {
-                $product = Product::find($request->product_id);
-                if ($product->stock < $request->quantity) {
-                    return response()->json([
-                        "message" => 403,
-                        "message_text" => "No se puede agregar mas productos en el carrito por falta de stock"
-                    ]);
-                }
             }
         }
+    } else {
+        //sin variacion
+        $is_exists_cart_simple = Cart::where("product_variation_id", NULL)
+            ->where("product_id", $request->product_id)
+            ->where("user_id", $user->id)
+            ->first();
 
-        $request->request->add(["user_id" => $user->id]);
-        $cart = Cart::create($request->all());
-
-        return response()->json([
-            "cart" => CartEcommerceResource::make($cart)
-        ]);
+        if ($is_exists_cart_simple) {
+            return response()->json([
+                "message" => 403,
+                "message_text" => "El producto ya ha sido agregado, aumente la cantidad en el carrito "
+            ]);
+        } else {
+            $product = Product::find($request->product_id);
+            if ($product->stock < $request->quantity) {
+                return response()->json([
+                    "message" => 403,
+                    "message_text" => "No se puede agregar mas productos en el carrito por falta de stock"
+                ]);
+            }
+        }
     }
+
+    $request->request->add(["user_id" => $user->id]);
+    $cart = Cart::create($request->all());
+
+    // ✅ AGREGAR INFORMACIÓN DE STOCK ANTES DE DEVOLVER
+    $stockDisponible = 0;
+    $stockSuficiente = true;
+
+    if ($cart->product_variation_id) {
+        // Producto con variación
+        $variation = ProductVariation::find($cart->product_variation_id);
+        if ($variation) {
+            $stockDisponible = $variation->stock;
+            $stockSuficiente = $variation->stock >= $cart->quantity;
+        } else {
+            $stockSuficiente = false;
+            $stockDisponible = 0;
+        }
+    } else {
+        // Producto simple
+        $product = Product::find($cart->product_id);
+        if ($product) {
+            $stockDisponible = $product->stock;
+            $stockSuficiente = $product->stock >= $cart->quantity;
+        } else {
+            $stockSuficiente = false;
+            $stockDisponible = 0;
+        }
+    }
+
+    // Agregar información de stock al objeto cart
+    $cart->stock_disponible = $stockDisponible;
+    $cart->stock_suficiente = $stockSuficiente;
+
+    return response()->json([
+        "cart" => CartEcommerceResource::make($cart)
+    ]);
+}
 
     public function apply_cupon(Request $request)
 {
@@ -507,7 +537,6 @@ public function update(Request $request, string $id)
     }
 
     // Recalcular: subtotal es el precio unitario con descuento, total es subtotal * quantity
-    // NO incluir costo de envio en el total del item
     $subtotal = $cart->subtotal ?: $cart->price_unit;
     $total = $subtotal * $quantity;
 
@@ -515,6 +544,33 @@ public function update(Request $request, string $id)
         "quantity" => $quantity,
         "total" => $total
     ]);
+
+    // ✅ AGREGAR INFORMACIÓN DE STOCK ANTES DE DEVOLVER
+    $stockDisponible = 0;
+    $stockSuficiente = true;
+
+    if ($cart->product_variation_id) {
+        $variation = ProductVariation::find($cart->product_variation_id);
+        if ($variation) {
+            $stockDisponible = $variation->stock;
+            $stockSuficiente = $variation->stock >= $cart->quantity;
+        } else {
+            $stockSuficiente = false;
+            $stockDisponible = 0;
+        }
+    } else {
+        $product = Product::find($cart->product_id);
+        if ($product) {
+            $stockDisponible = $product->stock;
+            $stockSuficiente = $product->stock >= $cart->quantity;
+        } else {
+            $stockSuficiente = false;
+            $stockDisponible = 0;
+        }
+    }
+
+    $cart->stock_disponible = $stockDisponible;
+    $cart->stock_suficiente = $stockSuficiente;
 
     return response()->json(["cart" => CartEcommerceResource::make($cart)]);
 }
