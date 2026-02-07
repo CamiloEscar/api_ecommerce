@@ -178,12 +178,12 @@ class ProductController extends Controller
         // ✅ Actualizar portada en Cloudinary
         if ($request->hasFile("portada")) {
             // Eliminar imagen anterior
-            if ($product->imagen) {
-                $publicId = $this->imageService->getPublicIdFromUrl($product->imagen);
-                if ($publicId) {
-                    $this->imageService->delete($publicId);
-                }
-            }
+            // if ($product->imagen) {
+            //     $publicId = $this->imageService->getPublicIdFromUrl($product->imagen);
+            //     if ($publicId) {
+            //         $this->imageService->delete($publicId);
+            //     }
+            // }
 
             $cloudinaryUrl = $this->imageService->upload($request->file("portada"), 'products');
             $request->request->add(["imagen" => $cloudinaryUrl]);
