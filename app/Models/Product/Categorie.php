@@ -35,6 +35,7 @@ class Categorie extends Model
         $this->attributes["updated_at"] = Carbon::now();
     }
 
+    // Relaciones PADRE (belongsTo - una categoría pertenece a...)
     public function categorie_second()
     {
         return $this->belongsTo(Categorie::class, "categorie_second_id");
@@ -44,13 +45,17 @@ class Categorie extends Model
         return $this->belongsTo(Categorie::class, "categorie_third_id");
     }
 
+    // Relaciones HIJOS (hasMany - una categoría tiene muchas...)
+    // Las categorías de nivel 2 que pertenecen a esta categoría de nivel 1
     public function categorie_seconds()
     {
         return $this->hasMany(Categorie::class, "categorie_second_id");
     }
+    // CORRECCIÓN: Las categorías de nivel 3 que pertenecen a esta categoría de nivel 2
     public function categorie_thirds()
     {
-        return $this->hasMany(Categorie::class, "categorie_third_id");
+        return $this->hasMany(Categorie::class, "categorie_second_id")
+                    ->whereNotNull("categorie_third_id");
     }
     public function product_categorie_firsts()
     {
@@ -76,5 +81,3 @@ class Categorie extends Model
     //     return $value ? asset('storage/categories/' . $value) : null;
     // }
 }
-
-//Este código define un modelo de categoría de producto en Laravel que gestiona las relaciones jerárquicas entre categorías, establece fechas personalizadas con la zona horaria de Buenos Aires y utiliza eliminación suave.
