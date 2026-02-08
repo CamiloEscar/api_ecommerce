@@ -127,7 +127,7 @@ class HomeController extends Controller
             ->where("categorie_second_id", NULL)
             ->where("categorie_third_id", NULL)
             ->inRandomOrder()
-            ->limit(5)
+            ->limit(6)
             ->get();
 
 
