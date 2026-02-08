@@ -441,7 +441,9 @@ class HomeController extends Controller
             "categories" => $categories->map(function ($categorie) {
                 return [
                     "id" => $categorie->id,
+                    "name" => $categorie->name,
                     "imagen" => ImageHelper::getImageUrl($categorie->imagen),
+                    "products_count" => $categorie->product_categorie_firsts_count,
                 ];
             }),
             "brands" => $brands->map(function ($brand) {
