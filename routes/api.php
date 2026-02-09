@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\Product\CategorieController;
 use App\Http\Controllers\Admin\Product\AttributeProductController;
 use App\Http\Controllers\Admin\Product\BrandController;
+use App\Http\Controllers\Admin\Product\ProductSalesHistoryController;
 use App\Http\Controllers\Admin\Product\ProductSpecificationsController;
 use App\Http\Controllers\Admin\Product\ProductStockMovementController;
 use App\Http\Controllers\Admin\Product\ProductVariationsAnidadoController;
@@ -110,6 +111,10 @@ Route::group([
     Route::post('/', [ProductStockMovementController::class, 'store']);
     Route::get('/{id}', [ProductStockMovementController::class, 'show']);
     Route::delete('/{id}', [ProductStockMovementController::class, 'destroy']);
+    Route::group(['prefix' => 'products'], function () {
+    Route::get('/{id}/sales-history', [ProductSalesHistoryController::class, 'getSalesHistory']);
+    Route::get('/{id}/sales-summary', [ProductSalesHistoryController::class, 'getSalesSummary']);
+});
 });
 
     Route::group([
