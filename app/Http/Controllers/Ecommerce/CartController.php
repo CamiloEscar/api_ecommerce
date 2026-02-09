@@ -342,6 +342,18 @@ class CartController extends Controller
     ]);
 }
 
+public function list_cupones()
+{
+    $cupones = Cupone::where("state", 1)
+        ->select("id", "code", "type_discount", "discount", "type_cupone")
+        ->get();
+
+    return response()->json([
+        "cupones" => $cupones
+    ]);
+}
+
+
 public function apply_costo(Request $request)
 {
     $costo = Costo::where("code", $request->code_costo)->where("state", 1)->first();

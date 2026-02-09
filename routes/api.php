@@ -145,6 +145,7 @@ Route::group([
     Route::get("home",  [HomeController::class, "home"]);
     Route::get("menus",  [HomeController::class, "menus"]);
     Route::get("producto/{slug}",  [HomeController::class, "show_product"]);
+    Route::get("cupones", [CartController::class, "list_cupones"]);
 
     //middleware que va a obligar a que se use el carrito de compra si estas autentificado
     Route::group([
