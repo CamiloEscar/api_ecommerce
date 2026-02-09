@@ -111,10 +111,20 @@ Route::group([
     Route::post('/', [ProductStockMovementController::class, 'store']);
     Route::get('/{id}', [ProductStockMovementController::class, 'show']);
     Route::delete('/{id}', [ProductStockMovementController::class, 'destroy']);
-    Route::group(['prefix' => 'products'], function () {
-    Route::get('/{id}/sales-history', [ProductSalesHistoryController::class, 'getSalesHistory']);
-    Route::get('/{id}/sales-summary', [ProductSalesHistoryController::class, 'getSalesSummary']);
-});
+
+    // RUTAS DE STOCK MOVEMENTS
+    Route::prefix('product-stock-movements')->group(function () {
+        Route::get('/summary/product', [ProductStockMovementController::class, 'summary']);
+        Route::get('/', [ProductStockMovementController::class, 'index']);
+        Route::post('/', [ProductStockMovementController::class, 'store']);
+        Route::get('/{id}', [ProductStockMovementController::class, 'show']);
+        Route::delete('/{id}', [ProductStockMovementController::class, 'destroy']);
+    });
+
+    // RUTAS DE HISTORIAL DE VENTAS (NUEVAS - FUERA DEL GRUPO DE STOCK)
+    Route::get('products/{id}/sales-history', [ProductSalesHistoryController::class, 'getSalesHistory']);
+    Route::get('products/{id}/sales-summary', [ProductSalesHistoryController::class, 'getSalesSummary']);
+
 });
 
     Route::group([
