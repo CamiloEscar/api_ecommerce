@@ -112,11 +112,11 @@ Route::group([
     Route::get('/{id}', [ProductStockMovementController::class, 'show']);
     Route::delete('/{id}', [ProductStockMovementController::class, 'destroy']);
 
+
+    });
     // RUTAS DE HISTORIAL DE VENTAS (NUEVAS - FUERA DEL GRUPO DE STOCK)
     Route::get('products/{id}/sales-history', [ProductSalesHistoryController::class, 'getSalesHistory']);
     Route::get('products/{id}/sales-summary', [ProductSalesHistoryController::class, 'getSalesSummary']);
-
-});
 
     Route::group([
 
