@@ -40,6 +40,7 @@ class ProductSalesHistoryController extends Controller
                 'subtotal' => $detail->subtotal,
                 'discount' => $detail->discount,
                 'discount_amount' => ($detail->subtotal * $detail->discount) / 100,
+                "shipping_status" => $sale->shipping_status,
                 'total' => $detail->total,
                 'currency' => $detail->currency,
                 'method_payment' => $sale->method_payment,
