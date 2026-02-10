@@ -57,4 +57,8 @@ class SaleDetail extends Model
     {
         return $this->hasOne(Review::class, "sale_detail_id");
     }
+    public function sale()
+    {
+        return $this->belongsTo(Sale::class, 'sale_id');
+    }
 }
