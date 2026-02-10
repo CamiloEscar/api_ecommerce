@@ -27,6 +27,7 @@ class Sale extends Model
         "n_transaccion",
         "preference_id",
         "shipping_cost_id",
+        'shipping_status',
         //
         "created_at",
         "updated_at",
