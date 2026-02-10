@@ -366,16 +366,4 @@ if ($exists) {
             new SaleMail(auth("api")->user(), $sale_new)
         );
     }
-    public function updateShippingStatus(Request $request, $sale_id)
-    {
-        $sale = Sale::findOrFail($sale_id);
-
-        $sale->shipping_status = $request->shipping_status;
-        $sale->save();
-
-        return response()->json([
-            'message' => 200,
-            'message_text' => 'Estado de envío actualizado'
-        ]);
-    }
 }

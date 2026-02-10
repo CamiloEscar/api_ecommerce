@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\Product;
 
 use App\Http\Controllers\Controller;
+use App\Models\Sale\Sale;
 use App\Models\Sale\SaleDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -123,4 +124,18 @@ class ProductSalesHistoryController extends Controller
             'sales_by_month' => $salesByMonth,
         ], 200);
     }
+    public function updateShippingStatus(Request $request, $id)
+{
+    $sale = Sale::findOrFail($id);
+
+    $sale->shipping_status = $request->shipping_status;
+    $sale->save();
+
+    return response()->json([
+        'message' => 200,
+        'message_text' => 'Estado actualizado correctamente',
+        'sale' => $sale
+    ]);
+}
+
 }

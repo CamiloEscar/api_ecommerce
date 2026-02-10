@@ -79,9 +79,7 @@ Route::group([
 // RUTAS DE HISTORIAL DE VENTAS (NUEVAS - FUERA DEL GRUPO DE STOCK)
     Route::get('products/{id}/sales-history', [ProductSalesHistoryController::class, 'getSalesHistory']);
     Route::get('products/{id}/sales-summary', [ProductSalesHistoryController::class, 'getSalesSummary']);
-    Route::post(
-    'admin/sales/{sale_id}/shipping-status',
-    [SaleController::class, 'updateShippingStatus']
+    Route::post('admin/sales/{sale_id}/shipping-status',[ProductSalesHistoryController::class, 'updateShippingStatus']
 );
     Route::get("products/config", [ProductController::class, "config"]);
     Route::post("products/imagens", [ProductController::class, "imagens"]);
