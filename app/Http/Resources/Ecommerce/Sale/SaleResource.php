@@ -30,6 +30,7 @@ class SaleResource extends JsonResource
             "method_payment" => $this->resource->method_payment,
             "currency_total" => $this->resource->currency_total,
             "currency_payment" => $this->resource->currency_payment,
+            "shipping_status" => $this->resource->shipping_status,
             "discount" => $this->resource->discount,
             "subtotal" => $this->resource->subtotal,
             "total" => $this->resource->total,
