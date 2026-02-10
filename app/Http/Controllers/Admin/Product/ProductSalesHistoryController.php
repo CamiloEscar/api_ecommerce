@@ -17,7 +17,7 @@ class ProductSalesHistoryController extends Controller
         $perPage = $request->get('per_page', 25);
 
         // Obtener detalles de venta que incluyen este producto
-        $salesDetails = SaleDetail::with(['sale.user', 'sale.saleAddress', 'product'])
+        $salesDetails = SaleDetail::with(['sale.user', 'sale.sale_addres', 'product'])
             ->where('product_id', $productId)
             ->whereHas('sale') // Solo ventas que existen
             ->orderBy('created_at', 'desc')
@@ -26,6 +26,10 @@ class ProductSalesHistoryController extends Controller
         // Formatear los datos
         $salesHistory = $salesDetails->map(function($detail) {
             $sale = $detail->sale;
+
+            if (!$sale) {
+            return null;
+            }
 
             return [
                 'id' => $sale->id,
@@ -43,14 +47,14 @@ class ProductSalesHistoryController extends Controller
                     'full_name' => $sale->user->name . ' ' . ($sale->user->surname ?? ''),
                     'avatar' => $sale->user->avatar,
                 ] : null,
-                'sale_address' => $sale->saleAddress ? [
-                    'name' => $sale->saleAddress->name,
-                    'surname' => $sale->saleAddress->surname,
-                    'email' => $sale->saleAddress->email,
-                    'phone' => $sale->saleAddress->phone,
-                    'address' => $sale->saleAddress->address,
-                    'city' => $sale->saleAddress->city,
-                    'country_region' => $sale->saleAddress->country_region,
+                'sale_address' => $sale->sale_addres ? [
+                    'name' => $sale->sale_addres->name,
+                    'surname' => $sale->sale_addres->surname,
+                    'email' => $sale->sale_addres->email,
+                    'phone' => $sale->sale_addres->phone,
+                    'address' => $sale->sale_addres->address,
+                    'city' => $sale->sale_addres->city,
+                    'country_region' => $sale->sale_addres->country_region,
                 ] : null,
             ];
         });
