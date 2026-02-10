@@ -76,7 +76,9 @@ Route::group([
     Route::resource("sliders", SliderController::class);
     Route::post("sliders/{id}", [SliderController::class, "update"]);
 
-
+// RUTAS DE HISTORIAL DE VENTAS (NUEVAS - FUERA DEL GRUPO DE STOCK)
+    Route::get('products/{id}/sales-history', [ProductSalesHistoryController::class, 'getSalesHistory']);
+    Route::get('products/{id}/sales-summary', [ProductSalesHistoryController::class, 'getSalesSummary']);
     Route::get("products/config", [ProductController::class, "config"]);
     Route::post("products/imagens", [ProductController::class, "imagens"]);
     Route::delete("products/imagens/{id}", [ProductController::class, "delete_imagens"]);
@@ -114,9 +116,6 @@ Route::group([
 
 
     });
-    // RUTAS DE HISTORIAL DE VENTAS (NUEVAS - FUERA DEL GRUPO DE STOCK)
-    Route::get('products/{id}/sales-history', [ProductSalesHistoryController::class, 'getSalesHistory']);
-    Route::get('products/{id}/sales-summary', [ProductSalesHistoryController::class, 'getSalesSummary']);
 
     Route::group([
 
