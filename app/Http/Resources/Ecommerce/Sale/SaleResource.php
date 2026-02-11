@@ -34,6 +34,7 @@ class SaleResource extends JsonResource
             "discount" => $this->resource->discount,
             "subtotal" => $this->resource->subtotal,
             "total" => $this->resource->total,
+            "shipping_cost_id" => $this->resource->shipping_cost_id ?? 0,
             "price_dolar" => $this->resource->price_dolar,
             "description" => $this->resource->description,
             "n_transaccion" => $this->resource->n_transaccion,
