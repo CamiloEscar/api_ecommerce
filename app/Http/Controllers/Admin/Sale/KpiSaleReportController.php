@@ -59,9 +59,9 @@ class KpiSaleReportController extends Controller
         //         DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as total_sales"))
         //         ->groupBy("country_region")
         //         ->orderBy("total_sales", "desc");
-            $query->select("sale_addres.province as province",
+            $query->select("sale_addres.city as city",
                     DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as total_sales"))
-                    ->groupBy("province")
+                    ->groupBy("city")
                     ->orderBy("total_sales", "desc");
         $query= $query->take(6)->get();
 
