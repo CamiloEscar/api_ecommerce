@@ -28,7 +28,6 @@ class Sale extends Model
         "preference_id",
         "shipping_cost_id",
         'shipping_status',
-        "shipping_cost",
         //
         "created_at",
         "updated_at",
