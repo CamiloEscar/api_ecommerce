@@ -55,14 +55,21 @@ class KpiSaleReportController extends Controller
             $query->whereMonth("sales.created_at", $month);
         }
 
-        $query->select("sale_addres.country_region as country_region",
-                DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as total_sales"))
-                ->groupBy("country_region")
-                ->orderBy("total_sales", "desc");
+        // $query->select("sale_addres.country_region as country_region",
+        //         DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as total_sales"))
+        //         ->groupBy("country_region")
+        //         ->orderBy("total_sales", "desc");
+            $query->select("sale_addres.province as province",
+                    DB::raw("ROUND(SUM(IF(sales.currency_payment = 'USD',sales.total * $dolar, sales.total)),2) as total_sales"))
+                    ->groupBy("province")
+                    ->orderBy("total_sales", "desc");
         $query= $query->take(6)->get();
 
 
         return response()->json([
+            // "sales_for_country" => $query,
+            // "porcentageV" => round($porcentageV,2),
+            // "sales_for_year" => round($sales_for_year, 2)
             "sales_for_country" => $query,
             "porcentageV" => round($porcentageV,2),
             "sales_for_year" => round($sales_for_year, 2)
