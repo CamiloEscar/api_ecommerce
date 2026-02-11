@@ -138,6 +138,17 @@ if ($exists) {
         return;
     }
 
+    $carts = Cart::where("user_id", $userId)->get();
+    $subtotal = 0;
+
+    foreach ($carts as $cart) {
+        $subtotal += $cart->total;
+    }
+
+    // 🆕 Calcular el costo de envío (total - subtotal)
+    $transactionAmount = $paymentInfo['transaction_amount'];
+    $shippingCost = $transactionAmount - $subtotal;
+
     // Crear la venta
     $sale = Sale::create([
         "user_id" => $userId,
@@ -150,6 +161,7 @@ if ($exists) {
         "discount" => 0,
         "price_dolar" => 0,
         "description" => $saleTemp->description ?? "Compra con Mercado Pago",
+        "shipping_cost" => $shippingCost
     ]);
 
     Log::info("Sale creada", ['sale_id' => $sale->id]);
